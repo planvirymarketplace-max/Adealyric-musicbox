@@ -1,6 +1,6 @@
 "use client";
 
-import { PageShell, PageIntro } from "./SiteChrome";
+import { PageIntro } from "./SiteChrome";
 
 const philly1 = "/philly-1.jpg";
 const philly2 = "/philly-2.jpg";
@@ -8,7 +8,7 @@ const philly3 = "/philly-3.jpg";
 
 export function BioPage() {
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="The Artist" title="Adea Lyric," italic="in her own key." />
       <section className="px-6 pb-24 md:px-12">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
@@ -46,13 +46,13 @@ export function BioPage() {
           </div>
         ))}
       </section>
-    </PageShell>
+    </>
   );
 }
 
 export function AccountPage() {
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="Fan Portal" title="Sign in." />
       <section className="px-6 pb-32 md:px-12">
         <div className="mx-auto max-w-md">
@@ -73,6 +73,6 @@ export function AccountPage() {
           </form>
         </div>
       </section>
-    </PageShell>
+    </>
   );
 }

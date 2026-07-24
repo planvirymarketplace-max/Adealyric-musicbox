@@ -5,6 +5,7 @@ import { useAppStore } from "@/lib/store";
 import { RELEASES, PRODUCTS } from "@/lib/catalog";
 
 const fkboiAsset = "/fkboi.jpg";
+const heroBg = "/hero-muted.png";
 const cantnobodyAsset = "/cantnobody.webp";
 const philly1 = "/philly-1.jpg";
 const philly2 = "/philly-2.jpg";
@@ -62,8 +63,8 @@ function Hero() {
     <section id="top" className="relative min-h-[100svh] w-full overflow-hidden grain">
       <div className="absolute inset-0">
         <img
-          src={fkboiAsset}
-          alt="Adea Lyric — F**K BOI cover"
+          src={heroBg}
+          alt="Adea Lyric — Hero"
           className="absolute inset-0 h-full w-full object-cover opacity-40 saturate-0"
           style={{ transform: `translateY(${t * 0.3}px) scale(${1 + t * 0.0004})` }}
         />

@@ -29,7 +29,7 @@ export function ShopPage() {
   }, []);
 
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="The Shop" title="Objects," italic="in editions." sub="Every item is numbered, limited, and pulled straight from the studio. Ships worldwide." />
       <section className="sticky top-[73px] z-20 border-y border-border bg-ink/80 px-6 backdrop-blur-md md:px-12">
         <div className="mx-auto flex max-w-[1600px] flex-col justify-between gap-4 py-4 md:flex-row md:items-center">
@@ -81,7 +81,7 @@ export function ShopPage() {
         </div>
         {items.length === 0 && <div className="py-24 text-center text-ash">No items in this category.</div>}
       </section>
-    </PageShell>
+    </>
   );
 }
 

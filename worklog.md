@@ -34,3 +34,24 @@ Stage Summary:
 - All images serving correctly, custom dark theme with Fraunces/Inter Tight typography
 - Browser verified: renders fully with all sections, interactions working
 - Lint clean, no 404 errors on static assets
+
+---
+Task ID: 3
+Agent: Main
+Task: Fix hero image + remove double footer across all sub-pages
+
+Work Log:
+- Found `/hero-muted.png` (1376x768 PNG) already in public folder from user upload
+- Updated Hero component in Landing.tsx to use `/hero-muted.png` instead of `/fkboi.jpg`
+- Replaced `<PageShell>` with `<>` in BioAccount.tsx (BioPage + AccountPage)
+- Replaced `<PageShell>` with `<>` in Shop.tsx (ShopPage only; ProductDetailPage keeps PageShell as it renders outside global wrapper)
+- Replaced `<PageShell>` with `<>` in Booking.tsx (BookingPage)
+- Kept PageShell import in Shop.tsx for ProductDetailPage which renders outside global wrapper
+- Ran ESLint: 0 errors
+- Browser verified: hero loads from /hero-muted.png, all sub-pages (Bio, Shop, Booking) show exactly 1 header + 1 footer
+
+Stage Summary:
+- Hero image now uses user's provided muted monochrome background
+- Double footer eliminated across all navigation tabs
+- All 8 main pages render with single global header/footer from page.tsx
+- Detail pages (ReleaseDetail, ProductDetail) retain their own PageShell as intended

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PageShell, PageIntro } from "./SiteChrome";
+import { PageIntro } from "./SiteChrome";
 
 const INQUIRY_TYPES = [
   { id: "promoter", label: "Promoter / Festival / Hall", desc: "Headline concerts, festival lineups, multi-bill showcases with full 5-piece live band." },
@@ -41,7 +41,7 @@ export function BookingPage() {
   };
 
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="Direct Line for Talent Buyers" title="Book Adea," italic="live." sub="Promoters, music halls, bars, restaurants, festivals, and private affairs. Choose your format and request available dates." />
       <section className="border-t border-border px-6 py-20 md:px-12 md:py-28">
         <div className="mx-auto max-w-[1600px]">
@@ -200,6 +200,6 @@ export function BookingPage() {
           ))}
         </div>
       </section>
-    </PageShell>
+    </>
   );
 }
