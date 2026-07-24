@@ -168,23 +168,21 @@ function BioSection() {
   const { setActiveTab } = useAppStore();
   return (
     <section id="bio" ref={ref} className="relative bg-white px-6 py-32 md:px-12 md:py-48">
-      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
-        {/* Left — Headline */}
-        <div className="md:col-span-4">
-          <div className="sticky top-32">
-            <div className="text-eyebrow text-ink/40">01 — Bio</div>
-            <h2
-              className={`mt-6 text-display text-[clamp(5rem,13vw,16rem)] leading-[0.85] text-ink transition-all duration-1000 ${
-                shown ? "opacity-100" : "opacity-0 translate-y-8"
-              }`}
-            >
-              heart and
-              <span className="italic text-ink/40">soul.</span>
-            </h2>
-          </div>
+      <div className="mx-auto max-w-[1600px]">
+        {/* Headline — stacked above */}
+        <div className={`transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          <div className="text-eyebrow text-ink/40">01 — Bio</div>
+          <h2
+            className={`mt-6 text-display text-[clamp(5rem,13vw,16rem)] leading-[0.85] text-ink transition-all duration-1000 ${
+              shown ? "opacity-100" : "opacity-0 translate-y-8"
+            }`}
+          >
+            heart and
+            <span className="italic text-ink/40">soul.</span>
+          </h2>
         </div>
-        {/* Right — Bento Grid */}
-        <div className={`md:col-span-7 md:col-start-6 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        {/* Bento Grid — below headline */}
+        <div className={`mt-16 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="bento-float grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
             {/* Row 1 — Large card (2col 2row) + 1 small */}
             <BentoCard index={0} colSpan={2} rowSpan={2} />
