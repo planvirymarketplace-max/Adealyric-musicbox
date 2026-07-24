@@ -6,6 +6,7 @@ import { useAppStore } from "@/lib/store";
 import { RELEASES, TOUR, type ReleaseType } from "@/lib/catalog";
 
 const TYPES: ("All" | ReleaseType)[] = ["All", "Album", "EP", "Single", "Mixtape"];
+const DISCO_HERO = "/discography-hero.jpg";
 
 function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -15,89 +16,9 @@ function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-export function MusicPage() {
-  const all = RELEASES.flatMap((r) => r.tracks.map((t) => ({ ...t, release: r })));
-  const [current, setCurrent] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const { setActiveTab, setDetailSlug } = useAppStore();
-  const t = all[current];
-
-  return (
-    <>
-      <PageIntro eyebrow="Music" title="Continuous," italic="uninterrupted." sub="The full catalog, in a single player." />
-      <section className="px-6 pb-24 md:px-12">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <div className="sticky top-32">
-              <div className="relative aspect-square overflow-hidden border border-border">
-                <img src={t.release.cover} alt={t.release.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
-                <button onClick={() => setPlaying((v) => !v)} className="absolute inset-0 grid place-items-center cursor-pointer">
-                  <span className="grid h-24 w-24 place-items-center border border-bone/60 bg-ink/40 text-bone backdrop-blur-sm transition-all hover:scale-110 hover:bg-bone hover:text-ink">
-                    {playing ? (
-                      <svg viewBox="0 0 24 24" className="h-8 w-8" fill="currentColor" aria-hidden>
-                        <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" className="h-8 w-8" fill="currentColor" aria-hidden>
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    )}
-                  </span>
-                </button>
-              </div>
-              <div className="mt-6 text-eyebrow text-ash">{t.release.type} · {t.release.year}</div>
-              <h2 className="mt-2 text-display text-4xl text-bone md:text-5xl">{t.title}</h2>
-              <button
-                onClick={() => { setActiveTab("discography"); setDetailSlug(t.release.slug, "release"); }}
-                className="mt-2 inline-block text-bone/70 hover:text-bone cursor-pointer"
-              >
-                from <span className="italic">{t.release.title}</span>
-              </button>
-              <div className="mt-8 flex items-center gap-4 text-eyebrow text-ash">
-                <span>0:00</span>
-                <div className="relative h-px flex-1 bg-border">
-                  <div className={`absolute inset-y-0 left-0 bg-bone transition-all duration-1000 ${playing ? "w-1/3" : "w-0"}`} />
-                </div>
-                <span>{t.length}</span>
-              </div>
-              <div className="mt-6 flex gap-2">
-                <button onClick={() => setCurrent((c) => Math.max(0, c - 1))} className="grid h-12 w-12 place-items-center border border-border text-bone hover:border-bone cursor-pointer">‹</button>
-                <button onClick={() => setPlaying((v) => !v)} className="grid h-12 w-12 place-items-center border border-bone bg-bone text-ink cursor-pointer">{playing ? "❚❚" : "▶"}</button>
-                <button onClick={() => setCurrent((c) => Math.min(all.length - 1, c + 1))} className="grid h-12 w-12 place-items-center border border-border text-bone hover:border-bone cursor-pointer">›</button>
-              </div>
-            </div>
-          </div>
-          <div className="md:col-span-7">
-            <div className="text-eyebrow mb-4 text-ash">Queue · {all.length} tracks</div>
-            <ul>
-              {all.map((tr, i) => {
-                const active = i === current;
-                return (
-                  <li key={`${tr.release.slug}-${tr.n}`}>
-                    <button
-                      onClick={() => { setCurrent(i); setPlaying(true); }}
-                      className={`group flex w-full items-center justify-between gap-6 border-t border-border py-4 text-left last:border-b transition-colors ${active ? "text-bone" : "text-bone/60 hover:text-bone"} cursor-pointer`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <span className="text-eyebrow w-6 text-ash">{active && playing ? "♪" : String(i + 1).padStart(2, "0")}</span>
-                        <div>
-                          <div className="text-display text-xl md:text-2xl">{tr.title}</div>
-                          <div className="text-eyebrow mt-1 text-ash">{tr.release.title}</div>
-                        </div>
-                      </div>
-                      <span className="text-eyebrow text-ash">{tr.length}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
-      </section>
-    </>
-  );
-}
+/* =====================================================================
+   COMBINED DISCOGRAPHY PAGE  (Discography releases + Music player)
+   ===================================================================== */
 
 export function DiscographyPage() {
   const [filter, setFilter] = useState<"All" | ReleaseType>("All");
@@ -119,15 +40,36 @@ export function DiscographyPage() {
 
   const active = filtered.find((r) => r.slug === hover) ?? filtered[0];
 
+  /* ---- music player state ---- */
+  const allTracks = useMemo(() => RELEASES.flatMap((r) => r.tracks.map((t) => ({ ...t, release: r }))), []);
+  const [current, setCurrent] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const track = allTracks[current];
+
   return (
     <>
-      <PageIntro eyebrow="Volume — Discography" title="The Ledger," italic="year by year." sub="Every release, in the order the world got to hear it." />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-30">
-        {filtered.map((r) => (
-          <img key={r.slug} src={r.bgImage} alt="" className={`absolute inset-0 h-full w-full object-cover grayscale transition-opacity duration-700 ${active?.slug === r.slug ? "opacity-100" : "opacity-0"}`} />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-ink via-ink/80 to-ink" />
-      </div>
+      {/* ===== SECTION 1 — Hero with background image ===== */}
+      <section className="relative flex min-h-[60svh] items-end overflow-hidden md:min-h-[70svh]">
+        <img
+          src={DISCO_HERO}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-40 grayscale"
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/30" />
+        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-16 pt-40 md:px-12 md:pb-24 md:pt-56">
+          <div className="text-eyebrow text-ash">Volume — Discography</div>
+          <h1 className="mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] leading-none text-bone">
+            The Ledger,
+            <span className="block italic text-ash">year by year.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-bone/70">
+            Every release, in the order the world got to hear it.
+          </p>
+        </div>
+      </section>
+
+      {/* ===== SECTION 1b — Filters + Release List ===== */}
       <section className="relative z-10 border-y border-border bg-ink/70 px-6 backdrop-blur-md md:px-12">
         <div className="mx-auto flex max-w-[1600px] flex-col justify-between gap-6 py-6 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-2">
@@ -145,6 +87,7 @@ export function DiscographyPage() {
           </div>
         </div>
       </section>
+
       {view === "path" ? (
         <section className="relative z-10 px-6 py-20 md:px-12 md:py-32">
           <div className="mx-auto max-w-[1600px]">
@@ -202,9 +145,95 @@ export function DiscographyPage() {
           </div>
         </section>
       )}
+
+      {/* ===== SECTION 2 — Music Player ===== */}
+      <section className="border-t border-border px-6 py-20 md:px-12 md:py-32">
+        <div className="mx-auto max-w-[1600px]">
+          <div className="text-eyebrow mb-4 text-ash">02 — Player</div>
+          <h2 className="text-display text-4xl text-bone md:text-6xl">
+            Continuous, <span className="italic text-ash">uninterrupted.</span>
+          </h2>
+          <p className="mt-4 max-w-lg text-base text-bone/60">The full catalog, in a single player. Every track from every release.</p>
+        </div>
+      </section>
+
+      <section className="px-6 pb-32 md:px-12">
+        <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <div className="sticky top-32">
+              <div className="relative aspect-square overflow-hidden border border-border">
+                <img src={track.release.cover} alt={track.release.title} className="h-full w-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
+                <button onClick={() => setPlaying((v) => !v)} className="absolute inset-0 grid place-items-center cursor-pointer">
+                  <span className="grid h-24 w-24 place-items-center border border-bone/60 bg-ink/40 text-bone backdrop-blur-sm transition-all hover:scale-110 hover:bg-bone hover:text-ink">
+                    {playing ? (
+                      <svg viewBox="0 0 24 24" className="h-8 w-8" fill="currentColor" aria-hidden>
+                        <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-8 w-8" fill="currentColor" aria-hidden>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </span>
+                </button>
+              </div>
+              <div className="mt-6 text-eyebrow text-ash">{track.release.type} · {track.release.year}</div>
+              <h3 className="mt-2 text-display text-4xl text-bone md:text-5xl">{track.title}</h3>
+              <button
+                onClick={() => { setDetailSlug(track.release.slug, "release"); }}
+                className="mt-2 inline-block text-bone/70 hover:text-bone cursor-pointer"
+              >
+                from <span className="italic">{track.release.title}</span>
+              </button>
+              <div className="mt-8 flex items-center gap-4 text-eyebrow text-ash">
+                <span>0:00</span>
+                <div className="relative h-px flex-1 bg-border">
+                  <div className={`absolute inset-y-0 left-0 bg-bone transition-all duration-1000 ${playing ? "w-1/3" : "w-0"}`} />
+                </div>
+                <span>{track.length}</span>
+              </div>
+              <div className="mt-6 flex gap-2">
+                <button onClick={() => setCurrent((c) => Math.max(0, c - 1))} className="grid h-12 w-12 place-items-center border border-border text-bone hover:border-bone cursor-pointer">‹</button>
+                <button onClick={() => setPlaying((v) => !v)} className="grid h-12 w-12 place-items-center border border-bone bg-bone text-ink cursor-pointer">{playing ? "❚❚" : "▶"}</button>
+                <button onClick={() => setCurrent((c) => Math.min(allTracks.length - 1, c + 1))} className="grid h-12 w-12 place-items-center border border-border text-bone hover:border-bone cursor-pointer">›</button>
+              </div>
+            </div>
+          </div>
+          <div className="md:col-span-7">
+            <div className="text-eyebrow mb-4 text-ash">Queue · {allTracks.length} tracks</div>
+            <ul>
+              {allTracks.map((tr, i) => {
+                const isActive = i === current;
+                return (
+                  <li key={`${tr.release.slug}-${tr.n}`}>
+                    <button
+                      onClick={() => { setCurrent(i); setPlaying(true); }}
+                      className={`group flex w-full items-center justify-between gap-6 border-t border-border py-4 text-left last:border-b transition-colors ${isActive ? "text-bone" : "text-bone/60 hover:text-bone"} cursor-pointer`}
+                    >
+                      <div className="flex items-center gap-6">
+                        <span className="text-eyebrow w-6 text-ash">{isActive && playing ? "♪" : String(i + 1).padStart(2, "0")}</span>
+                        <div>
+                          <div className="text-display text-xl md:text-2xl">{tr.title}</div>
+                          <div className="text-eyebrow mt-1 text-ash">{tr.release.title}</div>
+                        </div>
+                      </div>
+                      <span className="text-eyebrow text-ash">{tr.length}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
+
+/* =====================================================================
+   RELEASE DETAIL PAGE  (keeps its own PageShell)
+   ===================================================================== */
 
 export function ReleaseDetailPage() {
   const { detailSlug, setDetailSlug } = useAppStore();
@@ -294,6 +323,10 @@ export function ReleaseDetailPage() {
     </PageShell>
   );
 }
+
+/* =====================================================================
+   TOUR PAGE
+   ===================================================================== */
 
 export function TourPage() {
   return (

@@ -133,6 +133,18 @@
   }
 }
 
+@utility footer-marquee-track {
+  animation: footer-marquee 30s linear infinite;
+}
+@keyframes footer-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-25%);
+  }
+}
+
 @keyframes shard-fall {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);

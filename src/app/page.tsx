@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAppStore, type TabId } from "@/lib/store";
 import { EntryGate } from "@/components/adea/EntryGate";
 import { Landing } from "@/components/adea/Landing";
-import { MusicPage, DiscographyPage, ReleaseDetailPage, TourPage } from "@/components/adea/MusicDiscography";
+import { DiscographyPage, ReleaseDetailPage, TourPage } from "@/components/adea/MusicDiscography";
 import { ShopPage, ProductDetailPage } from "@/components/adea/Shop";
 import { BookingPage } from "@/components/adea/Booking";
 import { BioPage, AccountPage } from "@/components/adea/BioAccount";
@@ -14,8 +14,6 @@ function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
     case "home":
       return <Landing />;
-    case "music":
-      return <MusicPage />;
     case "discography":
       return <DiscographyPage />;
     case "shop":

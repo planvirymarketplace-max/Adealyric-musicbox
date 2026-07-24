@@ -96,7 +96,7 @@ function Hero() {
             style={{ animationDelay: "0.7s" }}
           >
             <button
-              onClick={() => setActiveTab("music")}
+              onClick={() => setActiveTab("discography")}
               className="group inline-flex items-center gap-4 border border-bone px-8 py-4 text-eyebrow text-bone transition-all hover:bg-bone hover:text-ink cursor-pointer"
             >
               <PlayIcon />

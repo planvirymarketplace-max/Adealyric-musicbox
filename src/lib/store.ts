@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type TabId = "home" | "music" | "discography" | "shop" | "tour" | "booking" | "bio" | "account";
+export type TabId = "home" | "discography" | "shop" | "tour" | "booking" | "bio" | "account";
 
 export interface AppState {
   activeTab: TabId;
