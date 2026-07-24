@@ -1,8 +1,9 @@
 "use client";
 
-import { Routes, Route, Link, useNavigate, useLocation } from '@/lib/react-router-stub';
+import { Link, useLocation, useNavigate } from '@/lib/react-router-stub';
 import { Music, Calendar, Image as ImageIcon, Video, User, Home, LogOut, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useAppStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase-stub';
 import { toast } from '@/components/dashboard/ui/Toast';
 import PortalHomePage from '@/components/portal/pages/PortalHomePage';
@@ -16,11 +17,38 @@ import PortalDashboardPage from '@/components/portal/pages/PortalDashboardPage';
 import PortalMusicPage from '@/components/portal/pages/PortalMusicPage';
 import PortalReleaseDetailPage from '@/components/portal/pages/PortalReleaseDetailPage';
 
+function PortalRouteContent({ route }: { route: string }) {
+  switch (route) {
+    case '/portal':
+    case '/':
+      return <PortalHomePage />;
+    case '/portal/music':
+      return <PortalMusicPage />;
+    case '/portal/events':
+      return <PortalEventsPage />;
+    case '/portal/gallery':
+      return <PortalGalleryPage />;
+    case '/portal/videos':
+      return <PortalVideosPage />;
+    case '/portal/login':
+      return <PortalLoginPage />;
+    case '/portal/signup':
+      return <PortalSignupPage />;
+    case '/portal/dashboard':
+      return <PortalDashboardPage />;
+    default:
+      if (route.startsWith('/portal/music/')) return <PortalReleaseDetailPage />;
+      if (route.startsWith('/portal/events/')) return <PortalEventDetailPage />;
+      return <PortalHomePage />;
+  }
+}
+
 export default function PortalApp() {
   const [user, setUser] = useState<unknown>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { portalRoute } = useAppStore();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -78,7 +106,7 @@ export default function PortalApp() {
                 <Link to="/portal/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors">
                   <User size={16} /> Dashboard
                 </Link>
-                <button onClick={signOut} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors">
+                <button onClick={signOut} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
                   <LogOut size={16} /> Sign Out
                 </button>
               </>
@@ -91,7 +119,7 @@ export default function PortalApp() {
           </div>
 
           {/* Mobile toggle */}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-white/60">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-white/60 cursor-pointer">
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
@@ -107,7 +135,7 @@ export default function PortalApp() {
             {user ? (
               <>
                 <Link to="/portal/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5"><User size={16} /> Dashboard</Link>
-                <button onClick={() => { signOut(); setMobileOpen(false); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5"><LogOut size={16} /> Sign Out</button>
+                <button onClick={() => { signOut(); setMobileOpen(false); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 cursor-pointer"><LogOut size={16} /> Sign Out</button>
               </>
             ) : (
               <div className="flex gap-2 pt-2">
@@ -121,18 +149,7 @@ export default function PortalApp() {
 
       {/* Content */}
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<PortalHomePage />} />
-          <Route path="/music" element={<PortalMusicPage />} />
-          <Route path="/music/:id" element={<PortalReleaseDetailPage />} />
-          <Route path="/events" element={<PortalEventsPage />} />
-          <Route path="/events/:id" element={<PortalEventDetailPage />} />
-          <Route path="/gallery" element={<PortalGalleryPage />} />
-          <Route path="/videos" element={<PortalVideosPage />} />
-          <Route path="/login" element={<PortalLoginPage />} />
-          <Route path="/signup" element={<PortalSignupPage />} />
-          <Route path="/dashboard" element={<PortalDashboardPage />} />
-        </Routes>
+        <PortalRouteContent route={portalRoute} />
       </main>
 
       {/* Footer */}

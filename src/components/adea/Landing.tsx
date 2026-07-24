@@ -174,7 +174,7 @@ function BioSection() {
           <div className="sticky top-32">
             <div className="text-eyebrow text-ink/40">01 — Bio</div>
             <h2
-              className={`mt-6 text-display text-[clamp(4rem,10vw,12rem)] leading-[0.9] text-ink transition-all duration-1000 ${
+              className={`mt-6 text-display text-[clamp(5rem,13vw,16rem)] leading-[0.85] text-ink transition-all duration-1000 ${
                 shown ? "opacity-100" : "opacity-0 translate-y-8"
               }`}
             >
