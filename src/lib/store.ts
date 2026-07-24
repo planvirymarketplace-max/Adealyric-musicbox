@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export type TabId = "home" | "discography" | "shop" | "tour" | "booking" | "bio" | "account";
+export type TabId = "home" | "discography" | "shop" | "tour" | "booking" | "bio" | "account" | "off" | "login" | "admin" | "portal";
+
+export interface AdminRoute {
+  path: string;
+  label: string;
+}
 
 export interface AppState {
   activeTab: TabId;
@@ -8,10 +13,19 @@ export interface AppState {
   cartCount: number;
   detailSlug: string | null;
   detailType: "release" | "product" | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  authUser: string | null;
+  adminRoute: string;
+  portalRoute: string;
   setActiveTab: (tab: TabId) => void;
   setEntered: (v: boolean) => void;
   setDetailSlug: (slug: string | null, type: "release" | "product" | null) => void;
   addToCart: () => void;
+  login: (username: string, password: string) => boolean;
+  logout: () => void;
+  setAdminRoute: (route: string) => void;
+  setPortalRoute: (route: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -20,8 +34,23 @@ export const useAppStore = create<AppState>((set) => ({
   cartCount: 0,
   detailSlug: null,
   detailType: null,
+  isAuthenticated: false,
+  isAdmin: false,
+  authUser: null,
+  adminRoute: "/",
+  portalRoute: "/portal",
   setActiveTab: (tab) => set({ activeTab: tab, detailSlug: null, detailType: null }),
   setEntered: (v) => set({ entered: v }),
   setDetailSlug: (slug, type) => set({ detailSlug: slug, detailType: type }),
   addToCart: () => set((s) => ({ cartCount: s.cartCount + 1 })),
+  login: (username, password) => {
+    if (username === "admin" && password === "adminphilly") {
+      set({ isAuthenticated: true, isAdmin: true, authUser: "admin" });
+      return true;
+    }
+    return false;
+  },
+  logout: () => set({ isAuthenticated: false, isAdmin: false, authUser: null, activeTab: "login" }),
+  setAdminRoute: (route) => set({ adminRoute: route }),
+  setPortalRoute: (route) => set({ portalRoute: route }),
 }));

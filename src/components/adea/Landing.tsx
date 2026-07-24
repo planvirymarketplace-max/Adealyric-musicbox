@@ -167,20 +167,20 @@ function BioSection() {
   const { ref, shown } = useReveal<HTMLDivElement>();
   const { setActiveTab } = useAppStore();
   return (
-    <section id="bio" ref={ref} className="relative bg-ink px-6 py-32 md:px-12 md:py-48">
+    <section id="bio" ref={ref} className="relative bg-white px-6 py-32 md:px-12 md:py-48">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
         {/* Left — Headline */}
         <div className="md:col-span-4">
           <div className="sticky top-32">
-            <div className="text-eyebrow text-ash">01 — Bio</div>
+            <div className="text-eyebrow text-ink/40">01 — Bio</div>
             <h2
-              className={`mt-6 text-display text-[clamp(3rem,7vw,7rem)] text-bone transition-all duration-1000 ${
+              className={`mt-6 text-display text-[clamp(4rem,10vw,12rem)] leading-[0.9] text-ink transition-all duration-1000 ${
                 shown ? "opacity-100" : "opacity-0 translate-y-8"
               }`}
             >
               Not chasing
               <br />
-              <span className="italic text-ash">a sound.</span>
+              <span className="italic text-ink/40">a sound.</span>
             </h2>
           </div>
         </div>
@@ -201,8 +201,8 @@ function BioSection() {
             <BentoCard index={7} colSpan={1} rowSpan={1} />
           </div>
           <div className="mt-10">
-            <button onClick={() => setActiveTab("bio")} className="inline-flex items-center gap-4 text-eyebrow text-bone cursor-pointer">
-              <span className="block h-px w-16 bg-bone" />
+            <button onClick={() => setActiveTab("bio")} className="inline-flex items-center gap-4 text-eyebrow text-ink cursor-pointer">
+              <span className="block h-px w-16 bg-ink" />
               Read the full story
             </button>
           </div>

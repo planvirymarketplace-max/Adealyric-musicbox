@@ -1,0 +1,2002 @@
+     1→===FILE:/tmp/dashboard-repo/src/pages/crm/ContactsPage.tsx===
+     2→import { useEffect, useState, useCallback } from 'react';
+     3→import { Link } from 'react-router-dom';
+     4→import { Plus, Users, LayoutGrid, List, Search, Upload } from 'lucide-react';
+     5→import { Button } from '@/components/ui/Button';
+     6→import { Card } from '@/components/ui/Card';
+     7→import { Badge, StatusBadge } from '@/components/ui/Badge';
+     8→import { LoadingState, EmptyState } from '@/components/ui/States';
+     9→import { PageHeader } from '@/components/layout/PageHeader';
+    10→import { Modal } from '@/components/ui/Modal';
+    11→import { Field, Input, Select, Textarea } from '@/components/ui/Form';
+    12→import { toast } from '@/components/ui/Toast';
+    13→import { supabase } from '@/lib/supabase';
+    14→import { formatCents, formatDate } from '@/lib/format';
+    15→import type { CrmContact } from '@/types/database';
+    16→
+    17→const CONTACT_TYPES = [
+    18→  { value: 'venue', label: 'Venue' },
+    19→  { value: 'bar_club', label: 'Bar/Club' },
+    20→  { value: 'promoter', label: 'Promoter' },
+    21→  { value: 'stylist', label: 'Stylist' },
+    22→  { value: 'photographer', label: 'Photographer' },
+    23→  { value: 'publicist', label: 'Publicist' },
+    24→  { value: 'agent', label: 'Agent' },
+    25→  { value: 'vendor', label: 'Vendor' },
+    26→  { value: 'press', label: 'Press' },
+    27→  { value: 'team', label: 'Team' },
+    28→  { value: 'other', label: 'Other' },
+    29→];
+    30→
+    31→const STAGES = ['new', 'contacted', 'qualified', 'negotiating', 'active', 'inactive', 'lost'];
+    32→
+    33→const typeColors: Record<string, 'gray' | 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'teal' | 'pink'> = {
+    34→  venue: 'blue',
+    35→  bar_club: 'purple',
+    36→  promoter: 'pink',
+    37→  stylist: 'teal',
+    38→  photographer: 'amber',
+    39→  publicist: 'green',
+    40→  agent: 'red',
+    41→  vendor: 'gray',
+    42→  press: 'blue',
+    43→  team: 'teal',
+    44→  other: 'gray',
+    45→};
+    46→
+    47→export default function ContactsPage() {
+    48→  const [contacts, setContacts] = useState<CrmContact[]>([]);
+    49→  const [loading, setLoading] = useState(true);
+    50→  const [view, setView] = useState<'list' | 'board'>('list');
+    51→  const [search, setSearch] = useState('');
+    52→  const [typeFilter, setTypeFilter] = useState('all');
+    53→  const [createOpen, setCreateOpen] = useState(false);
+    54→
+    55→  const fetchContacts = useCallback(async () => {
+    56→    setLoading(true);
+    57→    const { data } = await supabase.from('crm_contacts').select('*').order('created_at', { ascending: false });
+    58→    setContacts(data ?? []);
+    59→    setLoading(false);
+    60→  }, []);
+    61→
+    62→  useEffect(() => { fetchContacts(); }, [fetchContacts]);
+    63→
+    64→  const filtered = contacts.filter((c) => {
+    65→    if (typeFilter !== 'all' && c.contact_type !== typeFilter) return false;
+    66→    if (search) {
+    67→      const q = search.toLowerCase();
+    68→      return c.name.toLowerCase().includes(q) || (c.company?.toLowerCase().includes(q) ?? false) || (c.email?.toLowerCase().includes(q) ?? false);
+    69→    }
+    70→    return true;
+    71→  });
+    72→
+    73→  return (
+    74→    <div>
+    75→      <PageHeader
+    76→        title="CRM Contacts"
+    77→        description="Manage your team — venues, promoters, stylists, photographers, and more"
+    78→        actions={
+    79→          <>
+    80→            <Link to="/crm/import"><Button variant="secondary"><Upload size={16} /> Import CSV</Button></Link>
+    81→            <Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Contact</Button>
+    82→          </>
+    83→        }
+    84→      />
+    85→
+    86→      {/* Toolbar */}
+    87→      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+    88→        <div className="relative flex-1 max-w-sm">
+    89→          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+    90→          <Input placeholder="Search contacts…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+    91→        </div>
+    92→        <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="max-w-[180px]">
+    93→          <option value="all">All Types</option>
+    94→          {CONTACT_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+    95→        </Select>
+    96→        <div className="flex gap-1 ml-auto">
+    97→          <Button variant={view === 'list' ? 'primary' : 'secondary'} size="sm" onClick={() => setView('list')}><List size={16} /></Button>
+    98→          <Button variant={view === 'board' ? 'primary' : 'secondary'} size="sm" onClick={() => setView('board')}><LayoutGrid size={16} /></Button>
+    99→        </div>
+   100→      </div>
+   101→
+   102→      {loading ? (
+   103→        <LoadingState />
+   104→      ) : filtered.length === 0 ? (
+   105→        <Card className="p-6">
+   106→          <EmptyState
+   107→            icon={<Users size={48} />}
+   108→            title="No contacts yet"
+   109→            description="Add contacts manually or import a CSV to populate your CRM"
+   110→            action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Contact</Button>}
+   111→          />
+   112→        </Card>
+   113→      ) : view === 'list' ? (
+   114→        <Card className="p-0 overflow-hidden">
+   115→          <table className="w-full">
+   116→            <thead className="bg-neutral-50 border-b border-neutral-200">
+   117→              <tr>
+   118→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Name</th>
+   119→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Type</th>
+   120→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Company</th>
+   121→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Location</th>
+   122→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Stage</th>
+   123→                <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Value</th>
+   124→              </tr>
+   125→            </thead>
+   126→            <tbody className="divide-y divide-neutral-100">
+   127→              {filtered.map((c) => (
+   128→                <tr key={c.id} className="hover:bg-neutral-50 transition-colors">
+   129→                  <td className="px-4 py-3">
+   130→                    <Link to={`/crm/contacts/${c.id}`} className="block">
+   131→                      <p className="text-sm font-medium text-neutral-900">{c.name}</p>
+   132→                      <p className="text-xs text-neutral-400">{c.email}</p>
+   133→                    </Link>
+   134→                  </td>
+   135→                  <td className="px-4 py-3"><Badge color={typeColors[c.contact_type]}>{CONTACT_TYPES.find((t) => t.value === c.contact_type)?.label ?? c.contact_type}</Badge></td>
+   136→                  <td className="px-4 py-3 text-sm text-neutral-600">{c.company ?? '—'}</td>
+   137→                  <td className="px-4 py-3 text-sm text-neutral-600">{c.city ? `${c.city}${c.state ? `, ${c.state}` : ''}` : '—'}</td>
+   138→                  <td className="px-4 py-3"><StatusBadge status={c.stage} /></td>
+   139→                  <td className="px-4 py-3 text-sm text-neutral-600 text-right">{c.value_estimate_cents ? formatCents(c.value_estimate_cents) : '—'}</td>
+   140→                </tr>
+   141→              ))}
+   142→            </tbody>
+   143→          </table>
+   144→        </Card>
+   145→      ) : (
+   146→        <div className="flex gap-3 overflow-x-auto pb-4">
+   147→          {STAGES.map((stage) => {
+   148→            const stageContacts = filtered.filter((c) => c.stage === stage);
+   149→            return (
+   150→              <div key={stage} className="flex-shrink-0 w-64">
+   151→                <Card className="p-0">
+   152→                  <div className="px-4 py-3 border-b border-neutral-100">
+   153→                    <div className="flex items-center justify-between">
+   154→                      <h3 className="text-sm font-semibold text-neutral-700 capitalize">{stage}</h3>
+   155→                      <span className="text-xs text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">{stageContacts.length}</span>
+   156→                    </div>
+   157→                  </div>
+   158→                  <div className="p-2 space-y-2 min-h-[100px]">
+   159→                    {stageContacts.map((c) => (
+   160→                      <Link key={c.id} to={`/crm/contacts/${c.id}`} className="block bg-white rounded-lg border border-neutral-200 p-3 hover:shadow-sm transition-shadow">
+   161→                        <p className="text-sm font-medium text-neutral-900">{c.name}</p>
+   162→                        <p className="text-xs text-neutral-500">{c.company ?? c.email ?? '—'}</p>
+   163→                        <div className="flex items-center justify-between mt-2">
+   164→                          <Badge color={typeColors[c.contact_type]}>{CONTACT_TYPES.find((t) => t.value === c.contact_type)?.label ?? c.contact_type}</Badge>
+   165→                          {c.value_estimate_cents ? <span className="text-xs text-neutral-600">{formatCents(c.value_estimate_cents)}</span> : null}
+   166→                        </div>
+   167→                      </Link>
+   168→                    ))}
+   169→                    {stageContacts.length === 0 && <p className="text-xs text-neutral-300 text-center py-4">No contacts</p>}
+   170→                  </div>
+   171→                </Card>
+   172→              </div>
+   173→            );
+   174→          })}
+   175→        </div>
+   176→      )}
+   177→
+   178→      <CreateContactModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetchContacts} />
+   179→    </div>
+   180→  );
+   181→}
+   182→
+   183→function CreateContactModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+   184→  const [form, setForm] = useState({
+   185→    name: '', contact_type: 'venue', company: '', email: '', phone: '', city: '', state: '',
+   186→    stage: 'new', role_title: '', notes: '', source: 'manual',
+   187→  });
+   188→  const [saving, setSaving] = useState(false);
+   189→
+   190→  const save = async () => {
+   191→    if (!form.name) { toast('error', 'Name is required'); return; }
+   192→    setSaving(true);
+   193→    const { error } = await supabase.from('crm_contacts').insert({
+   194→      ...form,
+   195→      tags: [],
+   196→    });
+   197→    setSaving(false);
+   198→    if (error) { toast('error', 'Failed to create contact'); return; }
+   199→    toast('success', 'Contact created');
+   200→    setForm({ name: '', contact_type: 'venue', company: '', email: '', phone: '', city: '', state: '', stage: 'new', role_title: '', notes: '', source: 'manual' });
+   201→    onClose();
+   202→    onCreated();
+   203→  };
+   204→
+   205→  return (
+   206→    <Modal
+   207→      open={open}
+   208→      onClose={onClose}
+   209→      title="New Contact"
+   210→      size="lg"
+   211→      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button></>}
+   212→    >
+   213→      <div className="space-y-4">
+   214→        <div className="grid grid-cols-2 gap-4">
+   215→          <Field label="Name" required><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
+   216→          <Field label="Contact Type"><Select value={form.contact_type} onChange={(e) => setForm({ ...form, contact_type: e.target.value })}>{CONTACT_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</Select></Field>
+   217→        </div>
+   218→        <div className="grid grid-cols-2 gap-4">
+   219→          <Field label="Company"><Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} /></Field>
+   220→          <Field label="Role/Title"><Input value={form.role_title} onChange={(e) => setForm({ ...form, role_title: e.target.value })} /></Field>
+   221→        </div>
+   222→        <div className="grid grid-cols-2 gap-4">
+   223→          <Field label="Email"><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></Field>
+   224→          <Field label="Phone"><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></Field>
+   225→        </div>
+   226→        <div className="grid grid-cols-3 gap-4">
+   227→          <Field label="City"><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></Field>
+   228→          <Field label="State"><Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} /></Field>
+   229→          <Field label="Stage"><Select value={form.stage} onChange={(e) => setForm({ ...form, stage: e.target.value })}>{STAGES.map((s) => <option key={s} value={s}>{s}</option>)}</Select></Field>
+   230→        </div>
+   231→        <Field label="Notes"><Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field>
+   232→      </div>
+   233→    </Modal>
+   234→  );
+   235→}
+   236→
+   237→===FILE:/tmp/dashboard-repo/src/pages/crm/ContactDetailPage.tsx===
+   238→import { useEffect, useState, useCallback } from 'react';
+   239→import { useParams, Link, useNavigate } from 'react-router-dom';
+   240→import { ArrowLeft, Plus, Phone, Mail, MapPin, Building2, Trash2, Check, Clock } from 'lucide-react';
+   241→import { Button } from '@/components/ui/Button';
+   242→import { Card } from '@/components/ui/Card';
+   243→import { Badge, StatusBadge } from '@/components/ui/Badge';
+   244→import { LoadingState, ErrorState, EmptyState } from '@/components/ui/States';
+   245→import { Field, Input, Select, Textarea } from '@/components/ui/Form';
+   246→import { Modal } from '@/components/ui/Modal';
+   247→import { toast } from '@/components/ui/Toast';
+   248→import { supabase } from '@/lib/supabase';
+   249→import { formatCents, formatDate, formatDateTime, timeAgo, centsToInput, inputToCents } from '@/lib/format';
+   250→import type { CrmContact, CrmActivity } from '@/types/database';
+   251→
+   252→const ACTIVITY_TYPES = [
+   253→  { value: 'call', label: 'Call' },
+   254→  { value: 'email', label: 'Email' },
+   255→  { value: 'meeting', label: 'Meeting' },
+   256→  { value: 'note', label: 'Note' },
+   257→  { value: 'task', label: 'Task' },
+   258→];
+   259→
+   260→const activityIcons: Record<string, React.ReactNode> = {
+   261→  call: <Phone size={14} />,
+   262→  email: <Mail size={14} />,
+   263→  meeting: <Building2 size={14} />,
+   264→  note: <Clock size={14} />,
+   265→  task: <Check size={14} />,
+   266→};
+   267→
+   268→export default function ContactDetailPage() {
+   269→  const { id } = useParams();
+   270→  const navigate = useNavigate();
+   271→  const [contact, setContact] = useState<CrmContact | null>(null);
+   272→  const [activities, setActivities] = useState<CrmActivity[]>([]);
+   273→  const [loading, setLoading] = useState(true);
+   274→  const [error, setError] = useState('');
+   275→  const [editMode, setEditMode] = useState(false);
+   276→  const [activityModalOpen, setActivityModalOpen] = useState(false);
+   277→
+   278→  const fetchData = useCallback(async () => {
+   279→    if (!id) return;
+   280→    setLoading(true);
+   281→    const [contactRes, activitiesRes] = await Promise.all([
+   282→      supabase.from('crm_contacts').select('*').eq('id', id).maybeSingle(),
+   283→      supabase.from('crm_activities').select('*').eq('crm_contact_id', id).order('created_at', { ascending: false }),
+   284→    ]);
+   285→    if (contactRes.error) setError(contactRes.error.message);
+   286→    setContact(contactRes.data as CrmContact | null);
+   287→    setActivities(activitiesRes.data ?? []);
+   288→    setLoading(false);
+   289→  }, [id]);
+   290→
+   291→  useEffect(() => { fetchData(); }, [fetchData]);
+   292→
+   293→  const updateContact = async (updates: Partial<CrmContact>) => {
+   294→    if (!contact) return;
+   295→    const { error } = await supabase.from('crm_contacts').update(updates).eq('id', contact.id);
+   296→    if (error) { toast('error', 'Failed to update'); return; }
+   297→    setContact({ ...contact, ...updates });
+   298→    toast('success', 'Contact updated');
+   299→  };
+   300→
+   301→  const deleteContact = async () => {
+   302→    if (!contact) return;
+   303→    if (!confirm('Delete this contact? This cannot be undone.')) return;
+   304→    const { error } = await supabase.from('crm_contacts').delete().eq('id', contact.id);
+   305→    if (error) { toast('error', 'Failed to delete'); return; }
+   306→    toast('success', 'Contact deleted');
+   307→    navigate('/crm/contacts');
+   308→  };
+   309→
+   310→  const toggleActivityComplete = async (activity: CrmActivity) => {
+   311→    const completed = !activity.completed_at;
+   312→    const { error } = await supabase.from('crm_activities').update({
+   313→      completed_at: completed ? new Date().toISOString() : null,
+   314→    }).eq('id', activity.id);
+   315→    if (error) { toast('error', 'Failed to update'); return; }
+   316→    setActivities((prev) => prev.map((a) => a.id === activity.id ? { ...a, completed_at: completed ? new Date().toISOString() : null } : a));
+   317→  };
+   318→
+   319→  if (loading) return <LoadingState />;
+   320→  if (error) return <ErrorState message={error} />;
+   321→  if (!contact) return <ErrorState message="Contact not found" />;
+   322→
+   323→  return (
+   324→    <div>
+   325→      <Link to="/crm/contacts" className="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 mb-4">
+   326→        <ArrowLeft size={16} /> Back to Contacts
+   327→      </Link>
+   328→
+   329→      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+   330→        <div className="flex items-start gap-4">
+   331→          <div className="w-12 h-12 rounded-full bg-neutral-200 flex items-center justify-center text-lg font-semibold text-neutral-600">
+   332→            {contact.name.charAt(0).toUpperCase()}
+   333→          </div>
+   334→          <div>
+   335→            <h1 className="text-2xl font-semibold text-neutral-900">{contact.name}</h1>
+   336→            <div className="flex items-center gap-2 mt-1">
+   337→              <Badge color="blue">{contact.contact_type.replace(/_/g, ' ')}</Badge>
+   338→              <StatusBadge status={contact.stage} />
+   339→            </div>
+   340→          </div>
+   341→        </div>
+   342→        <div className="flex items-center gap-2">
+   343→          <Button variant="secondary" onClick={() => setEditMode(!editMode)}>{editMode ? 'Done' : 'Edit'}</Button>
+   344→          <Button variant="danger" onClick={deleteContact}><Trash2 size={16} /></Button>
+   345→        </div>
+   346→      </div>
+   347→
+   348→      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+   349→        {/* Left: Contact info */}
+   350→        <div className="lg:col-span-1 space-y-4">
+   351→          <Card className="p-5">
+   352→            <h3 className="font-semibold text-neutral-900 mb-3">Contact Info</h3>
+   353→            {editMode ? (
+   354→              <EditContactForm contact={contact} onSave={(u) => { updateContact(u); setEditMode(false); }} />
+   355→            ) : (
+   356→              <div className="space-y-3 text-sm">
+   357→                {contact.company && <InfoRow icon={<Building2 size={16} />} label="Company" value={contact.company} />}
+   358→                {contact.role_title && <InfoRow label="Role" value={contact.role_title} />}
+   359→                {contact.email && <InfoRow icon={<Mail size={16} />} label="Email" value={contact.email} />}
+   360→                {contact.phone && <InfoRow icon={<Phone size={16} />} label="Phone" value={contact.phone} />}
+   361→                {(contact.city || contact.state) && <InfoRow icon={<MapPin size={16} />} label="Location" value={`${contact.city ?? ''}${contact.city && contact.state ? ', ' : ''}${contact.state ?? ''}`} />}
+   362→                {contact.value_estimate_cents ? <InfoRow label="Est. Value" value={formatCents(contact.value_estimate_cents)} /> : null}
+   363→                {contact.rate_notes && <InfoRow label="Rate Notes" value={contact.rate_notes} />}
+   364→                <InfoRow label="Source" value={contact.source ?? '—'} />
+   365→                <InfoRow label="Owner" value={contact.owner ?? '—'} />
+   366→                <InfoRow label="Created" value={formatDate(contact.created_at)} />
+   367→              </div>
+   368→            )}
+   369→          </Card>
+   370→
+   371→          {contact.notes && !editMode && (
+   372→            <Card className="p-5">
+   373→              <h3 className="font-semibold text-neutral-900 mb-2">Notes</h3>
+   374→              <p className="text-sm text-neutral-600 whitespace-pre-wrap">{contact.notes}</p>
+   375→            </Card>
+   376→          )}
+   377→        </div>
+   378→
+   379→        {/* Right: Activity timeline */}
+   380→        <div className="lg:col-span-2">
+   381→          <Card className="p-5">
+   382→            <div className="flex items-center justify-between mb-4">
+   383→              <h3 className="font-semibold text-neutral-900">Activity Timeline</h3>
+   384→              <Button variant="primary" size="sm" onClick={() => setActivityModalOpen(true)}><Plus size={14} /> Add Activity</Button>
+   385→            </div>
+   386→            {activities.length === 0 ? (
+   387→              <EmptyState icon={<Clock size={48} />} title="No activities yet" description="Log calls, emails, meetings, and notes to track your relationship" />
+   388→            ) : (
+   389→              <div className="space-y-3">
+   390→                {activities.map((a) => (
+   391→                  <div key={a.id} className="flex gap-3 p-3 rounded-lg hover:bg-neutral-50 transition-colors">
+   392→                    <button
+   393→                      onClick={() => toggleActivityComplete(a)}
+   394→                      className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+   395→                        a.completed_at ? 'bg-green-500 border-green-500' : 'border-neutral-300 hover:border-neutral-400'
+   396→                      }`}
+   397→                    >
+   398→                      {a.completed_at && <Check size={12} className="text-white" />}
+   399→                    </button>
+   400→                    <div className="flex-1">
+   401→                      <div className="flex items-center gap-2 mb-1">
+   402→                        <span className="text-neutral-400">{activityIcons[a.type]}</span>
+   403→                        <span className="text-xs font-semibold text-neutral-500 uppercase">{a.type}</span>
+   404→                        {a.due_date && !a.completed_at && <Badge color="amber">Due {formatDate(a.due_date)}</Badge>}
+   405→                      </div>
+   406→                      <p className={`text-sm text-neutral-700 ${a.completed_at ? 'line-through text-neutral-400' : ''}`}>{a.content}</p>
+   407→                      <p className="text-xs text-neutral-400 mt-1">{timeAgo(a.created_at)}{a.created_by ? ` · ${a.created_by}` : ''}</p>
+   408→                    </div>
+   409→                  </div>
+   410→                ))}
+   411→              </div>
+   412→            )}
+   413→          </Card>
+   414→        </div>
+   415→      </div>
+   416→
+   417→      <ActivityModal open={activityModalOpen} onClose={() => setActivityModalOpen(false)} contactId={contact.id} onCreated={fetchData} />
+   418→    </div>
+   419→  );
+   420→}
+   421→
+   422→function InfoRow({ icon, label, value }: { icon?: React.ReactNode; label: string; value: string }) {
+   423→  return (
+   424→    <div className="flex items-start gap-2">
+   425→      {icon && <span className="text-neutral-400 mt-0.5">{icon}</span>}
+   426→      <div>
+   427→        <p className="text-xs text-neutral-400">{label}</p>
+   428→        <p className="text-sm text-neutral-700">{value}</p>
+   429→      </div>
+   430→    </div>
+   431→  );
+   432→}
+   433→
+   434→function EditContactForm({ contact, onSave }: { contact: CrmContact; onSave: (u: Partial<CrmContact>) => void }) {
+   435→  const [form, setForm] = useState({
+   436→    name: contact.name,
+   437→    company: contact.company ?? '',
+   438→    email: contact.email ?? '',
+   439→    phone: contact.phone ?? '',
+   440→    city: contact.city ?? '',
+   441→    state: contact.state ?? '',
+   442→    stage: contact.stage,
+   443→    role_title: contact.role_title ?? '',
+   444→    rate_notes: contact.rate_notes ?? '',
+   445→    value_estimate: centsToInput(contact.value_estimate_cents),
+   446→    notes: contact.notes ?? '',
+   447→  });
+   448→
+   449→  return (
+   450→    <div className="space-y-3">
+   451→      <Field label="Name"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
+   452→      <Field label="Company"><Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} /></Field>
+   453→      <Field label="Email"><Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></Field>
+   454→      <Field label="Phone"><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></Field>
+   455→      <div className="grid grid-cols-2 gap-3">
+   456→        <Field label="City"><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></Field>
+   457→        <Field label="State"><Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} /></Field>
+   458→      </div>
+   459→      <Field label="Stage"><Select value={form.stage} onChange={(e) => setForm({ ...form, stage: e.target.value })}><option value="new">New</option><option value="contacted">Contacted</option><option value="qualified">Qualified</option><option value="negotiating">Negotiating</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="lost">Lost</option></Select></Field>
+   460→      <Field label="Role/Title"><Input value={form.role_title} onChange={(e) => setForm({ ...form, role_title: e.target.value })} /></Field>
+   461→      <Field label="Est. Value (USD)"><Input type="number" step="0.01" value={form.value_estimate} onChange={(e) => setForm({ ...form, value_estimate: e.target.value })} /></Field>
+   462→      <Field label="Rate Notes"><Input value={form.rate_notes} onChange={(e) => setForm({ ...form, rate_notes: e.target.value })} /></Field>
+   463→      <Field label="Notes"><Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field>
+   464→      <Button variant="primary" onClick={() => onSave({
+   465→        name: form.name,
+   466→        company: form.company || null,
+   467→        email: form.email || null,
+   468→        phone: form.phone || null,
+   469→        city: form.city || null,
+   470→        state: form.state || null,
+   471→        stage: form.stage,
+   472→        role_title: form.role_title || null,
+   473→        rate_notes: form.rate_notes || null,
+   474→        value_estimate_cents: form.value_estimate ? inputToCents(form.value_estimate) : null,
+   475→        notes: form.notes || null,
+   476→      })}>Save Changes</Button>
+   477→    </div>
+   478→  );
+   479→}
+   480→
+   481→function ActivityModal({ open, onClose, contactId, onCreated }: { open: boolean; onClose: () => void; contactId: string; onCreated: () => void }) {
+   482→  const [form, setForm] = useState({ type: 'note', content: '', due_date: '' });
+   483→  const [saving, setSaving] = useState(false);
+   484→
+   485→  const save = async () => {
+   486→    if (!form.content) { toast('error', 'Content is required'); return; }
+   487→    setSaving(true);
+   488→    const { error } = await supabase.from('crm_activities').insert({
+   489→      crm_contact_id: contactId,
+   490→      type: form.type,
+   491→      content: form.content,
+   492→      due_date: form.due_date || null,
+   493→    });
+   494→    setSaving(false);
+   495→    if (error) { toast('error', 'Failed to add activity'); return; }
+   496→    toast('success', 'Activity added');
+   497→    setForm({ type: 'note', content: '', due_date: '' });
+   498→    onClose();
+   499→    onCreated();
+   500→  };
+   501→
+   502→  return (
+   503→    <Modal
+   504→      open={open}
+   505→      onClose={onClose}
+   506→      title="Add Activity"
+   507→      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Add'}</Button></>}
+   508→    >
+   509→      <div className="space-y-4">
+   510→        <Field label="Type"><Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>{ACTIVITY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</Select></Field>
+   511→        <Field label="Content" required><Textarea rows={3} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} placeholder="What happened?" /></Field>
+   512→        <Field label="Due Date (for tasks)"><Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} /></Field>
+   513→      </div>
+   514→    </Modal>
+   515→  );
+   516→}
+   517→
+   518→===FILE:/tmp/dashboard-repo/src/pages/crm/CsvImportPage.tsx===
+   519→import { useState, useCallback, useRef } from 'react';
+   520→import { Upload, FileText, CheckCircle2, AlertCircle, Download, ArrowRight } from 'lucide-react';
+   521→import { Button } from '@/components/ui/Button';
+   522→import { Card } from '@/components/ui/Card';
+   523→import { Badge } from '@/components/ui/Badge';
+   524→import { Select } from '@/components/ui/Form';
+   525→import { PageHeader } from '@/components/layout/PageHeader';
+   526→import { toast } from '@/components/ui/Toast';
+   527→import { supabase } from '@/lib/supabase';
+   528→import type { CrmContact } from '@/types/database';
+   529→
+   530→// CSV parser — handles quoted fields, commas inside quotes, newlines inside quotes
+   531→function parseCSV(text: string): string[][] {
+   532→  const rows: string[][] = [];
+   533→  let row: string[] = [];
+   534→  let field = '';
+   535→  let inQuotes = false;
+   536→  let i = 0;
+   537→
+   538→  while (i < text.length) {
+   539→    const char = text[i];
+   540→    if (inQuotes) {
+   541→      if (char === '"') {
+   542→        if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+   543→        inQuotes = false; i++; continue;
+   544→      }
+   545→      field += char; i++; continue;
+   546→    }
+   547→    if (char === '"') { inQuotes = true; i++; continue; }
+   548→    if (char === ',') { row.push(field); field = ''; i++; continue; }
+   549→    if (char === '\r') { i++; continue; }
+   550→    if (char === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+   551→    field += char; i++;
+   552→  }
+   553→  if (field || row.length > 0) { row.push(field); rows.push(row); }
+   554→  return rows.filter((r) => r.some((c) => c.trim() !== ''));
+   555→}
+   556→
+   557→const FIELD_OPTIONS = [
+   558→  { value: '', label: '— Skip —' },
+   559→  { value: 'name', label: 'Name' },
+   560→  { value: 'contact_type', label: 'Contact Type' },
+   561→  { value: 'company', label: 'Company' },
+   562→  { value: 'email', label: 'Email' },
+   563→  { value: 'phone', label: 'Phone' },
+   564→  { value: 'city', label: 'City' },
+   565→  { value: 'state', label: 'State' },
+   566→  { value: 'country', label: 'Country' },
+   567→  { value: 'stage', label: 'Stage' },
+   568→  { value: 'role_title', label: 'Role/Title' },
+   569→  { value: 'rate_notes', label: 'Rate Notes' },
+   570→  { value: 'value_estimate_cents', label: 'Est. Value (cents)' },
+   571→  { value: 'owner', label: 'Owner' },
+   572→  { value: 'notes', label: 'Notes' },
+   573→  { value: 'source', label: 'Source' },
+   574→];
+   575→
+   576→const CONTACT_TYPES = ['venue', 'bar_club', 'promoter', 'stylist', 'photographer', 'publicist', 'agent', 'vendor', 'press', 'team', 'other'];
+   577→
+   578→function guessColumn(header: string): string {
+   579→  const h = header.toLowerCase().trim();
+   580→  if (h.match(/^(name|full name|contact name|first name)/)) return 'name';
+   581→  if (h.match(/^(type|contact.?type|category)/)) return 'contact_type';
+   582→  if (h.match(/^(company|organization|org|venue|club)/)) return 'company';
+   583→  if (h.match(/^(email|e-mail|mail)/)) return 'email';
+   584→  if (h.match(/^(phone|tel|telephone|mobile|cell)/)) return 'phone';
+   585→  if (h.match(/^(city)/)) return 'city';
+   586→  if (h.match(/^(state|region|province)/)) return 'state';
+   587→  if (h.match(/^(country)/)) return 'country';
+   588→  if (h.match(/^(stage|status)/)) return 'stage';
+   589→  if (h.match(/^(role|title|position|job)/)) return 'role_title';
+   590→  if (h.match(/^(rate|fee|pay)/)) return 'rate_notes';
+   591→  if (h.match(/^(value|estimat|worth|deal)/)) return 'value_estimate_cents';
+   592→  if (h.match(/^(owner|assigned|rep)/)) return 'owner';
+   593→  if (h.match(/^(notes|comment|description)/)) return 'notes';
+   594→  if (h.match(/^(source|origin|referral)/)) return 'source';
+   595→  return '';
+   596→}
+   597→
+   598→type ParsedRow = { data: Record<string, string>; valid: boolean; errors: string[] };
+   599→
+   600→export default function CsvImportPage() {
+   601→  const [step, setStep] = useState<'upload' | 'map' | 'preview' | 'done'>('upload');
+   602→  const [fileName, setFileName] = useState('');
+   603→  const [headers, setHeaders] = useState<string[]>([]);
+   604→  const [rows, setRows] = useState<string[][]>([]);
+   605→  const [mapping, setMapping] = useState<Record<number, string>>({});
+   606→  const [defaultType, setDefaultType] = useState('venue');
+   607→  const [importing, setImporting] = useState(false);
+   608→  const [importResults, setImportResults] = useState({ success: 0, failed: 0 });
+   609→  const fileInputRef = useRef<HTMLInputElement>(null);
+   610→
+   611→  const handleFile = useCallback((file: File) => {
+   612→    const reader = new FileReader();
+   613→    reader.onload = (e) => {
+   614→      const text = e.target?.result as string;
+   615→      const parsed = parseCSV(text);
+   616→      if (parsed.length < 2) { toast('error', 'CSV needs at least a header row and one data row'); return; }
+   617→      const hdrs = parsed[0];
+   618→      setHeaders(hdrs);
+   619→      setRows(parsed.slice(1));
+   620→      setFileName(file.name);
+   621→      // Auto-guess mapping
+   622→      const guess: Record<number, string> = {};
+   623→      hdrs.forEach((h, i) => { guess[i] = guessColumn(h); });
+   624→      setMapping(guess);
+   625→      setStep('map');
+   626→    };
+   627→    reader.readAsText(file);
+   628→  }, []);
+   629→
+   630→  const mappedRows = (): ParsedRow[] => {
+   631→    return rows.map((row) => {
+   632→      const data: Record<string, string> = {};
+   633→      for (let i = 0; i < headers.length; i++) {
+   634→        const field = mapping[i];
+   635→        if (field) data[field] = (row[i] ?? '').trim();
+   636→      }
+   637→      const errors: string[] = [];
+   638→      if (!data.name) errors.push('Missing name');
+   639→      if (data.value_estimate_cents && isNaN(parseInt(data.value_estimate_cents))) errors.push('Invalid value');
+   640→      return { data, valid: errors.length === 0, errors };
+   641→    });
+   642→  };
+   643→
+   644→  const doImport = async () => {
+   645→    const parsed = mappedRows();
+   646→    setImporting(true);
+   647→    let success = 0, failed = 0;
+   648→
+   649→    // Batch insert in chunks of 50
+   650→    const contacts = parsed.map((r) => {
+   651→      const contact: Record<string, unknown> = {
+   652→        name: r.data.name,
+   653→        tags: [],
+   654→      };
+   655→      if (r.data.company) contact.company = r.data.company;
+   656→      if (r.data.email) contact.email = r.data.email;
+   657→      if (r.data.phone) contact.phone = r.data.phone;
+   658→      if (r.data.city) contact.city = r.data.city;
+   659→      if (r.data.state) contact.state = r.data.state;
+   660→      if (r.data.country) contact.country = r.data.country;
+   661→      if (r.data.role_title) contact.role_title = r.data.role_title;
+   662→      if (r.data.rate_notes) contact.rate_notes = r.data.rate_notes;
+   663→      if (r.data.owner) contact.owner = r.data.owner;
+   664→      if (r.data.notes) contact.notes = r.data.notes;
+   665→      if (r.data.source) contact.source = r.data.source;
+   666→      if (r.data.value_estimate_cents) contact.value_estimate_cents = parseInt(r.data.value_estimate_cents);
+   667→      // Contact type: use mapped value or default
+   668→      const ct = r.data.contact_type?.toLowerCase().trim() ?? '';
+   669→      contact.contact_type = CONTACT_TYPES.includes(ct) ? ct : defaultType;
+   670→      // Stage: validate or default
+   671→      const validStages = ['new', 'contacted', 'qualified', 'negotiating', 'active', 'inactive', 'lost'];
+   672→      const st = r.data.stage?.toLowerCase().trim() ?? '';
+   673→      contact.stage = validStages.includes(st) ? st : 'new';
+   674→      return contact;
+   675→    });
+   676→
+   677→    for (let i = 0; i < contacts.length; i += 50) {
+   678→      const batch = contacts.slice(i, i + 50);
+   679→      const { error } = await supabase.from('crm_contacts').insert(batch);
+   680→      if (error) { failed += batch.length; }
+   681→      else { success += batch.length; }
+   682→    }
+   683→
+   684→    setImporting(false);
+   685→    setImportResults({ success, failed });
+   686→    setStep('done');
+   687→    if (failed === 0) toast('success', `Imported ${success} contacts`);
+   688→    else toast('info', `Imported ${success}, ${failed} failed`);
+   689→  };
+   690→
+   691→  const downloadTemplate = () => {
+   692→    const csv = 'name,contact_type,company,email,phone,city,state,stage,role_title,notes\nJohn Smith,venue,The Warehouse,john@warehouse.com,555-0100,New York,NY,new,Booking Manager,Great venue for weekend shows\nJane Doe,promoter,Promo Co,jane@promo.com,555-0200,Los Angeles,CA,contacted,Promoter,Handles west coast dates';
+   693→    const blob = new Blob([csv], { type: 'text/csv' });
+   694→    const url = URL.createObjectURL(blob);
+   695→    const a = document.createElement('a');
+   696→    a.href = url; a.download = 'crm_contacts_template.csv'; a.click();
+   697→    URL.revokeObjectURL(url);
+   698→  };
+   699→
+   700→  const reset = () => {
+   701→    setStep('upload'); setHeaders([]); setRows([]); setMapping({}); setFileName(''); setImportResults({ success: 0, failed: 0 });
+   702→  };
+   703→
+   704→  return (
+   705→    <div>
+   706→      <PageHeader title="CSV Import" description="Bulk import contacts — venues, promoters, stylists, photographers, and your whole team" />
+   707→
+   708→      {/* Step indicator */}
+   709→      <div className="flex items-center gap-2 mb-6 text-sm">
+   710→        {(['upload', 'map', 'preview', 'done'] as const).map((s, i) => (
+   711→          <div key={s} className="flex items-center gap-2">
+   712→            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
+   713→              step === s ? 'bg-neutral-900 text-white' : ['upload','map','preview','done'].indexOf(step) > i ? 'bg-green-500 text-white' : 'bg-neutral-200 text-neutral-400'
+   714→            }`}>{i + 1}</div>
+   715→            <span className={`capitalize ${step === s ? 'text-neutral-900 font-medium' : 'text-neutral-400'}`}>{s}</span>
+   716→            {i < 3 && <ArrowRight size={14} className="text-neutral-300" />}
+   717→          </div>
+   718→        ))}
+   719→      </div>
+   720→
+   721→      {step === 'upload' && (
+   722→        <Card className="p-8">
+   723→          <div
+   724→            onDragOver={(e) => e.preventDefault()}
+   725→            onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
+   726→            className="border-2 border-dashed border-neutral-200 rounded-xl p-12 text-center hover:border-neutral-300 transition-colors cursor-pointer"
+   727→            onClick={() => fileInputRef.current?.click()}
+   728→          >
+   729→            <Upload size={40} className="text-neutral-300 mx-auto mb-4" />
+   730→            <p className="text-sm font-medium text-neutral-700">Drop your CSV file here, or click to browse</p>
+   731→            <p className="text-xs text-neutral-400 mt-1">Supports headers in the first row</p>
+   732→            <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+   733→          </div>
+   734→          <div className="flex items-center justify-between mt-6">
+   735→            <p className="text-sm text-neutral-500">Need a template?</p>
+   736→            <Button variant="secondary" onClick={downloadTemplate}><Download size={16} /> Download Template</Button>
+   737→          </div>
+   738→        </Card>
+   739→      )}
+   740→
+   741→      {step === 'map' && (
+   742→        <Card className="p-6">
+   743→          <div className="flex items-center gap-2 mb-4">
+   744→            <FileText size={20} className="text-neutral-400" />
+   745→            <span className="text-sm font-medium text-neutral-700">{fileName}</span>
+   746→            <Badge color="gray">{rows.length} rows</Badge>
+   747→          </div>
+   748→
+   749→          <div className="mb-4">
+   750→            <label className="block text-sm font-medium text-neutral-700 mb-1.5">Default Contact Type</label>
+   751→            <Select value={defaultType} onChange={(e) => setDefaultType(e.target.value)} className="max-w-xs">
+   752→              {CONTACT_TYPES.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
+   753→            </Select>
+   754→            <p className="text-xs text-neutral-400 mt-1">Used when a row doesn't specify a valid type</p>
+   755→          </div>
+   756→
+   757→          <h3 className="text-sm font-semibold text-neutral-700 mb-3">Map Columns</h3>
+   758→          <div className="space-y-2">
+   759→            {headers.map((h, i) => (
+   760→              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-neutral-50">
+   761→                <div className="flex-1">
+   762→                  <p className="text-sm font-medium text-neutral-700">{h}</p>
+   763→                  <p className="text-xs text-neutral-400">Sample: {rows[0]?.[i] ?? '—'}</p>
+   764→                </div>
+   765→                <ArrowRight size={16} className="text-neutral-300" />
+   766→                <Select value={mapping[i] ?? ''} onChange={(e) => setMapping({ ...mapping, [i]: e.target.value })} className="max-w-[200px]">
+   767→                  {FIELD_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+   768→                </Select>
+   769→              </div>
+   770→            ))}
+   771→          </div>
+   772→
+   773→          <div className="flex justify-end gap-2 mt-6">
+   774→            <Button onClick={reset}>Cancel</Button>
+   775→            <Button variant="primary" onClick={() => setStep('preview')}>Preview Import</Button>
+   776→          </div>
+   777→        </Card>
+   778→      )}
+   779→
+   780→      {step === 'preview' && (
+   781→        <Card className="p-0 overflow-hidden">
+   782→          <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
+   783→            <div>
+   784→              <h3 className="font-semibold text-neutral-900">Preview</h3>
+   785→              <p className="text-sm text-neutral-500">{mappedRows().filter((r) => r.valid).length} valid · {mappedRows().filter((r) => !r.valid).length} invalid</p>
+   786→            </div>
+   787→            <div className="flex gap-2">
+   788→              <Button onClick={() => setStep('map')}>Back</Button>
+   789→              <Button variant="primary" onClick={doImport} disabled={importing}>{importing ? 'Importing…' : `Import ${mappedRows().filter((r) => r.valid).length} Contacts`}</Button>
+   790→            </div>
+   791→          </div>
+   792→          <div className="overflow-x-auto">
+   793→            <table className="w-full text-sm">
+   794→              <thead className="bg-neutral-50 border-b border-neutral-200">
+   795→                <tr>
+   796→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">#</th>
+   797→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">Name</th>
+   798→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">Type</th>
+   799→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">Company</th>
+   800→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">Email</th>
+   801→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">City</th>
+   802→                  <th className="px-4 py-2 text-left text-xs font-semibold text-neutral-500">Status</th>
+   803→                </tr>
+   804→              </thead>
+   805→              <tbody className="divide-y divide-neutral-100">
+   806→                {mappedRows().slice(0, 100).map((r, i) => (
+   807→                  <tr key={i} className={r.valid ? '' : 'bg-red-50'}>
+   808→                    <td className="px-4 py-2 text-neutral-400">{i + 1}</td>
+   809→                    <td className="px-4 py-2 text-neutral-900">{r.data.name || '—'}</td>
+   810→                    <td className="px-4 py-2 text-neutral-600">{r.data.contact_type || defaultType}</td>
+   811→                    <td className="px-4 py-2 text-neutral-600">{r.data.company || '—'}</td>
+   812→                    <td className="px-4 py-2 text-neutral-600">{r.data.email || '—'}</td>
+   813→                    <td className="px-4 py-2 text-neutral-600">{r.data.city || '—'}</td>
+   814→                    <td className="px-4 py-2">
+   815→                      {r.valid ? <CheckCircle2 size={16} className="text-green-500" /> : <AlertCircle size={16} className="text-red-500" />}
+   816→                    </td>
+   817→                  </tr>
+   818→                ))}
+   819→              </tbody>
+   820→            </table>
+   821→            {mappedRows().length > 100 && <p className="text-xs text-neutral-400 text-center py-3">Showing first 100 of {mappedRows().length} rows</p>}
+   822→          </div>
+   823→        </Card>
+   824→      )}
+   825→
+   826→      {step === 'done' && (
+   827→        <Card className="p-8 text-center">
+   828→          <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
+   829→          <h3 className="text-lg font-semibold text-neutral-900">Import Complete</h3>
+   830→          <p className="text-sm text-neutral-500 mt-1">
+   831→            {importResults.success} contacts imported successfully{importResults.failed > 0 ? `, ${importResults.failed} failed` : ''}
+   832→          </p>
+   833→          <div className="flex justify-center gap-2 mt-6">
+   834→            <Button onClick={reset}>Import Another File</Button>
+   835→            <Button variant="primary" onClick={() => window.location.href = '/crm/contacts'}>View Contacts</Button>
+   836→          </div>
+   837→        </Card>
+   838→      )}
+   839→    </div>
+   840→  );
+   841→}
+   842→
+   843→===FILE:/tmp/dashboard-repo/src/pages/comms/CampaignsPage.tsx===
+   844→import { useEffect, useState, useCallback } from 'react';
+   845→import { Mail, Plus, Send } from 'lucide-react';
+   846→import { Button } from '@/components/ui/Button';
+   847→import { Card } from '@/components/ui/Card';
+   848→import { StatusBadge } from '@/components/ui/Badge';
+   849→import { LoadingState, EmptyState } from '@/components/ui/States';
+   850→import { PageHeader } from '@/components/layout/PageHeader';
+   851→import { Modal } from '@/components/ui/Modal';
+   852→import { Field, Input, Textarea } from '@/components/ui/Form';
+   853→import { toast } from '@/components/ui/Toast';
+   854→import { supabase } from '@/lib/supabase';
+   855→import { formatDate } from '@/lib/format';
+   856→import type { EmailCampaign } from '@/types/database';
+   857→
+   858→export default function CampaignsPage() {
+   859→  const [campaigns, setCampaigns] = useState<EmailCampaign[]>([]);
+   860→  const [loading, setLoading] = useState(true);
+   861→  const [createOpen, setCreateOpen] = useState(false);
+   862→
+   863→  const fetch = useCallback(async () => {
+   864→    setLoading(true);
+   865→    const { data } = await supabase.from('email_campaigns').select('*').order('created_at', { ascending: false });
+   866→    setCampaigns(data ?? []);
+   867→    setLoading(false);
+   868→  }, []);
+   869→
+   870→  useEffect(() => { fetch(); }, [fetch]);
+   871→
+   872→  return (
+   873→    <div>
+   874→      <PageHeader title="Email Campaigns" description="Manage your fan communications" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Campaign</Button>} />
+   875→      {loading ? <LoadingState /> : campaigns.length === 0 ? (
+   876→        <Card className="p-6"><EmptyState icon={<Mail size={48} />} title="No campaigns yet" description="Create your first email campaign to reach your fans" /></Card>
+   877→      ) : (
+   878→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+   879→          {campaigns.map((c) => (
+   880→            <Card key={c.id} className="p-5">
+   881→              <div className="flex items-start justify-between mb-2">
+   882→                <Send size={20} className="text-neutral-400" />
+   883→                <StatusBadge status={c.status} />
+   884→              </div>
+   885→              <p className="text-sm font-semibold text-neutral-900">{c.subject}</p>
+   886→              <p className="text-xs text-neutral-500 mt-1">{formatDate(c.scheduled_for ?? c.created_at)}</p>
+   887→              {c.sent_at && <p className="text-xs text-green-600 mt-1">Sent · {c.recipient_count ?? 0} recipients · {c.open_count ?? 0} opens</p>}
+   888→            </Card>
+   889→          ))}
+   890→        </div>
+   891→      )}
+   892→      <CreateCampaignModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetch} />
+   893→    </div>
+   894→  );
+   895→}
+   896→
+   897→function CreateCampaignModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+   898→  const [form, setForm] = useState({ subject: '', body: '', status: 'draft' });
+   899→  const [saving, setSaving] = useState(false);
+   900→
+   901→  const save = async () => {
+   902→    if (!form.subject) { toast('error', 'Subject is required'); return; }
+   903→    setSaving(true);
+   904→    const { error } = await supabase.from('email_campaigns').insert(form);
+   905→    setSaving(false);
+   906→    if (error) { toast('error', 'Failed to create campaign'); return; }
+   907→    toast('success', 'Campaign created');
+   908→    setForm({ subject: '', body: '', status: 'draft' });
+   909→    onClose(); onCreated();
+   910→  };
+   911→
+   912→  return (
+   913→    <Modal open={open} onClose={onClose} title="New Campaign" size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button></>}>
+   914→      <div className="space-y-4">
+   915→        <Field label="Subject" required><Input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></Field>
+   916→        <Field label="Body"><Textarea rows={6} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} /></Field>
+   917→      </div>
+   918→    </Modal>
+   919→  );
+   920→}
+   921→
+   922→===FILE:/tmp/dashboard-repo/src/pages/SettingsPage.tsx===
+   923→import { useState } from 'react';
+   924→import { Settings, User, Music, Bell, Shield } from 'lucide-react';
+   925→import { Button } from '@/components/ui/Button';
+   926→import { Card } from '@/components/ui/Card';
+   927→import { Field, Input, Textarea, Select } from '@/components/ui/Form';
+   928→import { PageHeader } from '@/components/layout/PageHeader';
+   929→import { toast } from '@/components/ui/Toast';
+   930→import { supabase } from '@/lib/supabase';
+   931→
+   932→const TABS = [
+   933→  { key: 'profile', label: 'Profile', icon: <User size={16} /> },
+   934→  { key: 'artist', label: 'Artist Profile', icon: <Music size={16} /> },
+   935→  { key: 'notifications', label: 'Notifications', icon: <Bell size={16} /> },
+   936→  { key: 'security', label: 'Security', icon: <Shield size={16} /> },
+   937→];
+   938→
+   939→export default function SettingsPage() {
+   940→  const [activeTab, setActiveTab] = useState('profile');
+   941→  const [profile, setProfile] = useState({ name: 'Admin', email: 'admin@example.com' });
+   942→  const [artistForm, setArtistForm] = useState({ name: 'My Artist', bio: '', slug: 'my-artist' });
+   943→  const [notifSettings, setNotifSettings] = useState({ newInquiries: true, bookingReminders: true, paymentAlerts: true, weeklyDigest: false });
+   944→  const [saving, setSaving] = useState(false);
+   945→
+   946→  const saveProfile = async () => {
+   947→    setSaving(true);
+   948→    setTimeout(() => { setSaving(false); toast('success', 'Profile saved'); }, 500);
+   949→  };
+   950→
+   951→  const saveArtist = async () => {
+   952→    setSaving(true);
+   953→    const { data: existing } = await supabase.from('artists').select('id').eq('slug', 'my-artist').maybeSingle();
+   954→    if (existing) {
+   955→      await supabase.from('artists').update({ name: artistForm.name, bio: artistForm.bio }).eq('id', existing.id);
+   956→    } else {
+   957→      await supabase.from('artists').insert({ name: artistForm.name, slug: artistForm.slug, bio: artistForm.bio });
+   958→    }
+   959→    setSaving(false);
+   960→    toast('success', 'Artist profile saved');
+   961→  };
+   962→
+   963→  return (
+   964→    <div>
+   965→      <PageHeader title="Settings" description="Manage your portal configuration" />
+   966→
+   967→      <div className="flex flex-col sm:flex-row gap-6">
+   968→        <div className="sm:w-48 flex-shrink-0">
+   969→          <div className="space-y-1">
+   970→            {TABS.map((tab) => (
+   971→              <button
+   972→                key={tab.key}
+   973→                onClick={() => setActiveTab(tab.key)}
+   974→                className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+   975→                  activeTab === tab.key ? 'bg-neutral-900 text-white' : 'text-neutral-600 hover:bg-neutral-100'
+   976→                }`}
+   977→              >
+   978→                {tab.icon}{tab.label}
+   979→              </button>
+   980→            ))}
+   981→          </div>
+   982→        </div>
+   983→
+   984→        <div className="flex-1">
+   985→          {activeTab === 'profile' && (
+   986→            <Card className="p-6">
+   987→              <h3 className="font-semibold text-neutral-900 mb-4">Profile Settings</h3>
+   988→              <div className="space-y-4 max-w-md">
+   989→                <Field label="Name"><Input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} /></Field>
+   990→                <Field label="Email"><Input type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} /></Field>
+   991→                <Button variant="primary" onClick={saveProfile} disabled={saving}>{saving ? 'Saving…' : 'Save Changes'}</Button>
+   992→              </div>
+   993→            </Card>
+   994→          )}
+   995→
+   996→          {activeTab === 'artist' && (
+   997→            <Card className="p-6">
+   998→              <h3 className="font-semibold text-neutral-900 mb-4">Artist Profile</h3>
+   999→              <div className="space-y-4 max-w-md">
+  1000→                <Field label="Artist Name"><Input value={artistForm.name} onChange={(e) => setArtistForm({ ...artistForm, name: e.target.value })} /></Field>
+  1001→                <Field label="Slug"><Input value={artistForm.slug} onChange={(e) => setArtistForm({ ...artistForm, slug: e.target.value })} /></Field>
+  1002→                <Field label="Bio"><Textarea rows={4} value={artistForm.bio} onChange={(e) => setArtistForm({ ...artistForm, bio: e.target.value })} /></Field>
+  1003→                <Button variant="primary" onClick={saveArtist} disabled={saving}>{saving ? 'Saving…' : 'Save Artist'}</Button>
+  1004→              </div>
+  1005→            </Card>
+  1006→          )}
+  1007→
+  1008→          {activeTab === 'notifications' && (
+  1009→            <Card className="p-6">
+  1010→              <h3 className="font-semibold text-neutral-900 mb-4">Notification Preferences</h3>
+  1011→              <div className="space-y-3 max-w-md">
+  1012→                {(Object.keys(notifSettings) as (keyof typeof notifSettings)[]).map((key) => (
+  1013→                  <label key={key} className="flex items-center justify-between p-3 rounded-lg bg-neutral-50">
+  1014→                    <span className="text-sm text-neutral-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+  1015→                    <input
+  1016→                      type="checkbox"
+  1017→                      checked={notifSettings[key]}
+  1018→                      onChange={(e) => setNotifSettings({ ...notifSettings, [key]: e.target.checked })}
+  1019→                      className="w-5 h-5 rounded"
+  1020→                    />
+  1021→                  </label>
+  1022→                ))}
+  1023→                <Button variant="primary" onClick={() => toast('success', 'Preferences saved')}>Save Preferences</Button>
+  1024→              </div>
+  1025→            </Card>
+  1026→          )}
+  1027→
+  1028→          {activeTab === 'security' && (
+  1029→            <Card className="p-6">
+  1030→              <h3 className="font-semibold text-neutral-900 mb-4">Security</h3>
+  1031→              <div className="space-y-4 max-w-md">
+  1032→                <Field label="Current Password"><Input type="password" placeholder="••••••••" /></Field>
+  1033→                <Field label="New Password"><Input type="password" placeholder="••••••••" /></Field>
+  1034→                <Field label="Confirm Password"><Input type="password" placeholder="••••••••" /></Field>
+  1035→                <Button variant="primary" onClick={() => toast('success', 'Password updated')}>Update Password</Button>
+  1036→              </div>
+  1037→            </Card>
+  1038→          )}
+  1039→        </div>
+  1040→      </div>
+  1041→    </div>
+  1042→  );
+  1043→}
+  1044→
+  1045→===FILE:/tmp/dashboard-repo/src/pages/IntegrationsPage.tsx===
+  1046→import { useEffect, useState, useCallback } from 'react';
+  1047→import { Plug, Plus, RefreshCw, Check, X, AlertCircle } from 'lucide-react';
+  1048→import { Button } from '@/components/ui/Button';
+  1049→import { Card } from '@/components/ui/Card';
+  1050→import { StatusBadge } from '@/components/ui/Badge';
+  1051→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1052→import { PageHeader } from '@/components/layout/PageHeader';
+  1053→import { Modal } from '@/components/ui/Modal';
+  1054→import { Field, Select } from '@/components/ui/Form';
+  1055→import { toast } from '@/components/ui/Toast';
+  1056→import { supabase } from '@/lib/supabase';
+  1057→import { formatDateTime } from '@/lib/format';
+  1058→import type { PlatformConnection, PlatformProvider, Artist } from '@/types/database';
+  1059→
+  1060→const statusIcons: Record<string, React.ReactNode> = {
+  1061→  connected: <Check size={14} className="text-green-500" />,
+  1062→  disconnected: <X size={14} className="text-neutral-400" />,
+  1063→  error: <AlertCircle size={14} className="text-red-500" />,
+  1064→  pending: <AlertCircle size={14} className="text-amber-500" />,
+  1065→};
+  1066→
+  1067→export default function IntegrationsPage() {
+  1068→  const [connections, setConnections] = useState<PlatformConnection[]>([]);
+  1069→  const [providers, setProviders] = useState<PlatformProvider[]>([]);
+  1070→  const [artists, setArtists] = useState<Artist[]>([]);
+  1071→  const [loading, setLoading] = useState(true);
+  1072→  const [connectOpen, setConnectOpen] = useState(false);
+  1073→
+  1074→  const fetch = useCallback(async () => {
+  1075→    setLoading(true);
+  1076→    const [c, p, a] = await Promise.all([
+  1077→      supabase.from('platform_connections').select('*').order('created_at', { ascending: false }),
+  1078→      supabase.from('platform_providers').select('*').order('display_name'),
+  1079→      supabase.from('artists').select('*'),
+  1080→    ]);
+  1081→    setConnections(c.data ?? []);
+  1082→    setProviders(p.data ?? []);
+  1083→    setArtists(a.data ?? []);
+  1084→    setLoading(false);
+  1085→  }, []);
+  1086→
+  1087→  useEffect(() => { fetch(); }, [fetch]);
+  1088→
+  1089→  const connectedKeys = new Set(connections.map((c) => c.provider));
+  1090→  const availableProviders = providers.filter((p) => !connectedKeys.has(p.key));
+  1091→
+  1092→  return (
+  1093→    <div>
+  1094→      <PageHeader title="Integrations" description="Connect music platforms and distribution services" actions={availableProviders.length > 0 ? <Button variant="primary" onClick={() => setConnectOpen(true)}><Plus size={16} /> Add Connection</Button> : undefined} />
+  1095→      {loading ? <LoadingState /> : connections.length === 0 ? (
+  1096→        <Card className="p-6"><EmptyState icon={<Plug size={48} />} title="No connections yet" description="Connect your music platforms to sync data" action={availableProviders.length > 0 ? <Button variant="primary" onClick={() => setConnectOpen(true)}><Plus size={16} /> Add Connection</Button> : undefined} /></Card>
+  1097→      ) : (
+  1098→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  1099→          {connections.map((c) => {
+  1100→            const provider = providers.find((p) => p.key === c.provider);
+  1101→            return (
+  1102→              <Card key={c.id} className="p-5">
+  1103→                <div className="flex items-start justify-between mb-3">
+  1104→                  <div>
+  1105→                    <p className="text-sm font-semibold text-neutral-900">{provider?.display_name ?? c.provider}</p>
+  1106→                    <p className="text-xs text-neutral-500 capitalize">{c.auth_type} auth</p>
+  1107→                  </div>
+  1108→                  {statusIcons[c.status]}
+  1109→                </div>
+  1110→                <div className="flex items-center justify-between">
+  1111→                  <StatusBadge status={c.status} />
+  1112→                  {c.last_synced_at && <span className="text-xs text-neutral-400">Synced {formatDateTime(c.last_synced_at)}</span>}
+  1113→                </div>
+  1114→                {c.last_error && <p className="text-xs text-red-500 mt-2">{c.last_error}</p>}
+  1115→                <div className="flex gap-2 mt-3">
+  1116→                  <Button size="sm" variant="secondary" onClick={async () => {
+  1117→                    const { error } = await supabase.from('platform_connections').update({ last_synced_at: new Date().toISOString(), last_error: null }).eq('id', c.id);
+  1118→                    if (error) toast('error', 'Sync failed'); else { toast('success', 'Synced'); fetch(); }
+  1119→                  }}><RefreshCw size={14} /> Sync</Button>
+  1120→                  <Button size="sm" variant="ghost" onClick={async () => {
+  1121→                    const { error } = await supabase.from('platform_connections').update({ status: c.status === 'connected' ? 'disconnected' : 'connected' }).eq('id', c.id);
+  1122→                    if (error) toast('error', 'Failed'); else { toast('success', 'Updated'); fetch(); }
+  1123→                  }}>{c.status === 'connected' ? 'Disconnect' : 'Connect'}</Button>
+  1124→                </div>
+  1125→              </Card>
+  1126→            );
+  1127→          })}
+  1128→        </div>
+  1129→      )}
+  1130→      <ConnectModal open={connectOpen} onClose={() => setConnectOpen(false)} onCreated={fetch} providers={availableProviders} artists={artists} />
+  1131→    </div>
+  1132→  );
+  1133→}
+  1134→
+  1135→function ConnectModal({ open, onClose, onCreated, providers, artists }: { open: boolean; onClose: () => void; onCreated: () => void; providers: PlatformProvider[]; artists: Artist[] }) {
+  1136→  const [form, setForm] = useState({ provider: '', artist_id: '' });
+  1137→  const [saving, setSaving] = useState(false);
+  1138→
+  1139→  const save = async () => {
+  1140→    if (!form.provider || !form.artist_id) { toast('error', 'Select a platform and artist'); return; }
+  1141→    const provider = providers.find((p) => p.key === form.provider);
+  1142→    setSaving(true);
+  1143→    const { error } = await supabase.from('platform_connections').insert({
+  1144→      provider: form.provider,
+  1145→      artist_id: form.artist_id,
+  1146→      auth_type: provider?.auth_type ?? 'manual',
+  1147→      status: 'pending',
+  1148→    });
+  1149→    setSaving(false);
+  1150→    if (error) { toast('error', 'Failed to add connection'); return; }
+  1151→    toast('success', 'Connection added');
+  1152→    setForm({ provider: '', artist_id: '' });
+  1153→    onClose(); onCreated();
+  1154→  };
+  1155→
+  1156→  return (
+  1157→    <Modal open={open} onClose={onClose} title="Add Connection" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Connect'}</Button></>}>
+  1158→      <div className="space-y-4">
+  1159→        <Field label="Platform" required><Select value={form.provider} onChange={(e) => setForm({ ...form, provider: e.target.value })}><option value="">—</option>{providers.map((p) => <option key={p.key} value={p.key}>{p.display_name}</option>)}</Select></Field>
+  1160→        <Field label="Artist" required><Select value={form.artist_id} onChange={(e) => setForm({ ...form, artist_id: e.target.value })}><option value="">—</option>{artists.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select></Field>
+  1161→      </div>
+  1162→    </Modal>
+  1163→  );
+  1164→}
+  1165→
+  1166→===FILE:/tmp/dashboard-repo/src/pages/AutomationPage.tsx===
+  1167→import { useEffect, useState, useCallback } from 'react';
+  1168→import { Bot, Plus, Key, Activity, Check, X, AlertCircle } from 'lucide-react';
+  1169→import { Button } from '@/components/ui/Button';
+  1170→import { Card } from '@/components/ui/Card';
+  1171→import { StatusBadge } from '@/components/ui/Badge';
+  1172→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1173→import { PageHeader } from '@/components/layout/PageHeader';
+  1174→import { Modal } from '@/components/ui/Modal';
+  1175→import { Field, Input } from '@/components/ui/Form';
+  1176→import { toast } from '@/components/ui/Toast';
+  1177→import { supabase } from '@/lib/supabase';
+  1178→import { formatDateTime, timeAgo } from '@/lib/format';
+  1179→import type { McpToken, McpActionLog } from '@/types/database';
+  1180→
+  1181→const statusIcons: Record<string, React.ReactNode> = {
+  1182→  success: <Check size={14} className="text-green-500" />,
+  1183→  error: <X size={14} className="text-red-500" />,
+  1184→  pending_confirmation: <AlertCircle size={14} className="text-amber-500" />,
+  1185→  confirmed: <Check size={14} className="text-green-500" />,
+  1186→  rejected: <X size={14} className="text-red-500" />,
+  1187→};
+  1188→
+  1189→export default function AutomationPage() {
+  1190→  const [tokens, setTokens] = useState<McpToken[]>([]);
+  1191→  const [logs, setLogs] = useState<McpActionLog[]>([]);
+  1192→  const [loading, setLoading] = useState(true);
+  1193→  const [createOpen, setCreateOpen] = useState(false);
+  1194→  const [activeTab, setActiveTab] = useState('tokens');
+  1195→
+  1196→  const fetch = useCallback(async () => {
+  1197→    setLoading(true);
+  1198→    const [t, l] = await Promise.all([
+  1199→      supabase.from('mcp_tokens').select('*').order('created_at', { ascending: false }),
+  1200→      supabase.from('mcp_action_log').select('*').order('created_at', { ascending: false }).limit(50),
+  1201→    ]);
+  1202→    setTokens(t.data ?? []);
+  1203→    setLogs(l.data ?? []);
+  1204→    setLoading(false);
+  1205→  }, []);
+  1206→
+  1207→  useEffect(() => { fetch(); }, [fetch]);
+  1208→
+  1209→  return (
+  1210→    <div>
+  1211→      <PageHeader title="Automation (MCP)" description="Manage MCP tokens and review the action log" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Token</Button>} />
+  1212→
+  1213→      <div className="flex gap-1 mb-4 border-b border-neutral-200">
+  1214→        <button onClick={() => setActiveTab('tokens')} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'tokens' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-500'}`}>Tokens</button>
+  1215→        <button onClick={() => setActiveTab('logs')} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'logs' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-500'}`}>Action Log</button>
+  1216→      </div>
+  1217→
+  1218→      {loading ? <LoadingState /> : activeTab === 'tokens' ? (
+  1219→        tokens.length === 0 ? (
+  1220→          <Card className="p-6"><EmptyState icon={<Key size={48} />} title="No tokens yet" description="Create an MCP token to enable automated actions" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Token</Button>} /></Card>
+  1221→        ) : (
+  1222→          <div className="space-y-3">
+  1223→            {tokens.map((t) => (
+  1224→              <Card key={t.id} className="p-5">
+  1225→                <div className="flex items-start justify-between">
+  1226→                  <div className="flex items-start gap-3">
+  1227→                    <Bot size={20} className="text-neutral-400 mt-0.5" />
+  1228→                    <div>
+  1229→                      <p className="text-sm font-semibold text-neutral-900">{t.label}</p>
+  1230→                      <p className="text-xs text-neutral-500 mt-0.5">Scopes: {t.scopes.length > 0 ? t.scopes.join(', ') : 'all'}</p>
+  1231→                      {t.require_confirmation_over_cents && <p className="text-xs text-amber-600 mt-0.5">Confirmation required over ${(t.require_confirmation_over_cents / 100).toFixed(2)}</p>}
+  1232→                      <p className="text-xs text-neutral-400 mt-0.5">Created {formatDateTime(t.created_at)}{t.last_used_at ? ` · Last used ${timeAgo(t.last_used_at)}` : ''}</p>
+  1233→                    </div>
+  1234→                  </div>
+  1235→                  <div className="flex items-center gap-2">
+  1236→                    <StatusBadge status={t.active ? 'connected' : 'disconnected'} />
+  1237→                    <Button size="sm" variant="ghost" onClick={async () => { await supabase.from('mcp_tokens').update({ active: !t.active }).eq('id', t.id); fetch(); }}>{t.active ? 'Deactivate' : 'Activate'}</Button>
+  1238→                  </div>
+  1239→                </div>
+  1240→              </Card>
+  1241→            ))}
+  1242→          </div>
+  1243→        )
+  1244→      ) : (
+  1245→        logs.length === 0 ? (
+  1246→          <Card className="p-6"><EmptyState icon={<Activity size={48} />} title="No actions logged" description="MCP tool calls will appear here" /></Card>
+  1247→        ) : (
+  1248→          <Card className="p-0 overflow-hidden">
+  1249→            <table className="w-full">
+  1250→              <thead className="bg-neutral-50 border-b border-neutral-200">
+  1251→                <tr>
+  1252→                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Tool</th>
+  1253→                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Status</th>
+  1254→                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Summary</th>
+  1255→                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">When</th>
+  1256→                </tr>
+  1257→              </thead>
+  1258→              <tbody className="divide-y divide-neutral-100">
+  1259→                {logs.map((l) => (
+  1260→                  <tr key={l.id} className="hover:bg-neutral-50">
+  1261→                    <td className="px-4 py-3 text-sm font-mono text-neutral-700">{l.tool_name}</td>
+  1262→                    <td className="px-4 py-3">{statusIcons[l.result_status]} <span className="text-xs text-neutral-500 ml-1">{l.result_status.replace(/_/g, ' ')}</span></td>
+  1263→                    <td className="px-4 py-3 text-sm text-neutral-600">{l.result_summary ?? '—'}</td>
+  1264→                    <td className="px-4 py-3 text-sm text-neutral-500">{timeAgo(l.created_at)}</td>
+  1265→                  </tr>
+  1266→                ))}
+  1267→              </tbody>
+  1268→            </table>
+  1269→          </Card>
+  1270→        )
+  1271→      )}
+  1272→
+  1273→      <CreateTokenModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetch} />
+  1274→    </div>
+  1275→  );
+  1276→}
+  1277→
+  1278→function CreateTokenModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+  1279→  const [form, setForm] = useState({ label: '', scopes: '', require_confirmation_over: '' });
+  1280→  const [saving, setSaving] = useState(false);
+  1281→
+  1282→  const save = async () => {
+  1283→    if (!form.label) { toast('error', 'Label is required'); return; }
+  1284→    setSaving(true);
+  1285→    const { error } = await supabase.from('mcp_tokens').insert({
+  1286→      label: form.label,
+  1287→      token_hash: crypto.randomUUID(),
+  1288→      scopes: form.scopes ? form.scopes.split(',').map((s) => s.trim()) : [],
+  1289→      require_confirmation_over_cents: form.require_confirmation_over ? Math.round(parseFloat(form.require_confirmation_over) * 100) : null,
+  1290→    });
+  1291→    setSaving(false);
+  1292→    if (error) { toast('error', 'Failed to create token'); return; }
+  1293→    toast('success', 'Token created');
+  1294→    setForm({ label: '', scopes: '', require_confirmation_over: '' });
+  1295→    onClose(); onCreated();
+  1296→  };
+  1297→
+  1298→  return (
+  1299→    <Modal open={open} onClose={onClose} title="New MCP Token" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button></>}>
+  1300→      <div className="space-y-4">
+  1301→        <Field label="Label" required><Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Production API Token" /></Field>
+  1302→        <Field label="Scopes" hint="Comma-separated list of allowed scopes"><Input value={form.scopes} onChange={(e) => setForm({ ...form, scopes: e.target.value })} placeholder="bookings:create,crm:read" /></Field>
+  1303→        <Field label="Require Confirmation Over ($)" hint="Leave empty for no threshold"><Input type="number" step="0.01" value={form.require_confirmation_over} onChange={(e) => setForm({ ...form, require_confirmation_over: e.target.value })} placeholder="500.00" /></Field>
+  1304→      </div>
+  1305→    </Modal>
+  1306→  );
+  1307→}
+  1308→
+  1309→===FILE:/tmp/dashboard-repo/src/pages/ExportsPage.tsx===
+  1310→import { useState } from 'react';
+  1311→import { Download, FileText, Database } from 'lucide-react';
+  1312→import { Button } from '@/components/ui/Button';
+  1313→import { Card } from '@/components/ui/Card';
+  1314→import { PageHeader } from '@/components/layout/PageHeader';
+  1315→import { toast } from '@/components/ui/Toast';
+  1316→import { supabase } from '@/lib/supabase';
+  1317→
+  1318→const EXPORTS = [
+  1319→  { table: 'bookings', label: 'Bookings', desc: 'All booking records with status, fees, and dates' },
+  1320→  { table: 'booking_inquiries', label: 'Inquiries', desc: 'All booking inquiries from forms and DMs' },
+  1321→  { table: 'crm_contacts', label: 'CRM Contacts', desc: 'All contacts — venues, promoters, stylists, etc.' },
+  1322→  { table: 'releases', label: 'Releases', desc: 'Catalog of releases' },
+  1323→  { table: 'orders', label: 'Orders', desc: 'Commerce orders' },
+  1324→  { table: 'fans', label: 'Fans', desc: 'Fan email list with subscription status' },
+  1325→  { table: 'platform_connections', label: 'Platform Connections', desc: 'Connected music platforms' },
+  1326→  { table: 'mcp_action_log', label: 'MCP Action Log', desc: 'Automation action history' },
+  1327→];
+  1328→
+  1329→export default function ExportsPage() {
+  1330→  const [exporting, setExporting] = useState<string | null>(null);
+  1331→
+  1332→  const doExport = async (table: string, label: string) => {
+  1333→    setExporting(table);
+  1334→    const { data, error } = await supabase.from(table).select('*');
+  1335→    setExporting(null);
+  1336→    if (error) { toast('error', `Failed to export ${label}`); return; }
+  1337→    if (!data || data.length === 0) { toast('info', `No data in ${label}`); return; }
+  1338→
+  1339→    const headers = Object.keys(data[0]);
+  1340→    const csv = [
+  1341→      headers.join(','),
+  1342→      ...data.map((row) => headers.map((h) => {
+  1343→        const val = (row as Record<string, unknown>)[h];
+  1344→        const str = val === null || val === undefined ? '' : typeof val === 'object' ? JSON.stringify(val) : String(val);
+  1345→        return `"${str.replace(/"/g, '""')}"`;
+  1346→      }).join(',')),
+  1347→    ].join('\n');
+  1348→
+  1349→    const blob = new Blob([csv], { type: 'text/csv' });
+  1350→    const url = URL.createObjectURL(blob);
+  1351→    const a = document.createElement('a');
+  1352→    a.href = url; a.download = `${table}_export.csv`; a.click();
+  1353→    URL.revokeObjectURL(url);
+  1354→    toast('success', `Exported ${data.length} rows from ${label}`);
+  1355→  };
+  1356→
+  1357→  return (
+  1358→    <div>
+  1359→      <PageHeader title="Exports" description="Download your data as CSV files" />
+  1360→      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  1361→        {EXPORTS.map((e) => (
+  1362→          <Card key={e.table} className="p-5">
+  1363→            <div className="flex items-start gap-3 mb-3">
+  1364→              <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0">
+  1365→                <FileText size={20} className="text-neutral-400" />
+  1366→              </div>
+  1367→              <div>
+  1368→                <p className="text-sm font-semibold text-neutral-900">{e.label}</p>
+  1369→                <p className="text-xs text-neutral-500 mt-0.5">{e.desc}</p>
+  1370→              </div>
+  1371→            </div>
+  1372→            <Button variant="secondary" size="sm" className="w-full" onClick={() => doExport(e.table, e.label)} disabled={exporting === e.table}>
+  1373→              <Download size={14} /> {exporting === e.table ? 'Exporting…' : 'Export CSV'}
+  1374→            </Button>
+  1375→          </Card>
+  1376→        ))}
+  1377→      </div>
+  1378→      <Card className="p-5 mt-4">
+  1379→        <div className="flex items-center gap-2 text-neutral-400 mb-1"><Database size={16} /><span className="text-xs font-semibold uppercase">Info</span></div>
+  1380→        <p className="text-sm text-neutral-600">Exports download all rows from each table as a CSV file. Data includes all columns currently in the database.</p>
+  1381→      </Card>
+  1382→    </div>
+  1383→  );
+  1384→}
+  1385→
+  1386→===FILE:/tmp/dashboard-repo/src/pages/cms/GalleriesPage.tsx===
+  1387→import { useEffect, useState, useCallback } from 'react';
+  1388→import { Image as ImageIcon, Plus, Trash2, Edit, Eye, EyeOff } from 'lucide-react';
+  1389→import { Button } from '@/components/ui/Button';
+  1390→import { Card } from '@/components/ui/Card';
+  1391→import { Badge } from '@/components/ui/Badge';
+  1392→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1393→import { PageHeader } from '@/components/layout/PageHeader';
+  1394→import { Modal } from '@/components/ui/Modal';
+  1395→import { Field, Input, Textarea } from '@/components/ui/Form';
+  1396→import { toast } from '@/components/ui/Toast';
+  1397→import { supabase } from '@/lib/supabase';
+  1398→import type { CmsGallery, CmsImage } from '@/types/database';
+  1399→
+  1400→export default function GalleriesPage() {
+  1401→  const [galleries, setGalleries] = useState<CmsGallery[]>([]);
+  1402→  const [loading, setLoading] = useState(true);
+  1403→  const [createOpen, setCreateOpen] = useState(false);
+  1404→  const [editing, setEditing] = useState<CmsGallery | null>(null);
+  1405→  const [imagesModal, setImagesModal] = useState<CmsGallery | null>(null);
+  1406→
+  1407→  const fetch = useCallback(async () => {
+  1408→    setLoading(true);
+  1409→    const { data } = await supabase.from('cms_galleries').select('*').eq('kind', 'image').order('sort_order', { ascending: true });
+  1410→    setGalleries(data ?? []);
+  1411→    setLoading(false);
+  1412→  }, []);
+  1413→
+  1414→  useEffect(() => { fetch(); }, [fetch]);
+  1415→
+  1416→  const togglePublish = async (g: CmsGallery) => {
+  1417→    await supabase.from('cms_galleries').update({ published: !g.published }).eq('id', g.id);
+  1418→    fetch();
+  1419→    toast('success', g.published ? 'Unpublished' : 'Published');
+  1420→  };
+  1421→
+  1422→  const del = async (g: CmsGallery) => {
+  1423→    if (!confirm(`Delete gallery "${g.title}" and all its images?`)) return;
+  1424→    await supabase.from('cms_galleries').delete().eq('id', g.id);
+  1425→    fetch();
+  1426→    toast('success', 'Gallery deleted');
+  1427→  };
+  1428→
+  1429→  return (
+  1430→    <div>
+  1431→      <PageHeader title="Image Galleries" description="Publish photo galleries to your user portal" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Gallery</Button>} />
+  1432→      {loading ? <LoadingState /> : galleries.length === 0 ? (
+  1433→        <Card className="p-6"><EmptyState icon={<ImageIcon size={48} />} title="No galleries yet" description="Create a gallery and add images to showcase on your portal" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Gallery</Button>} /></Card>
+  1434→      ) : (
+  1435→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  1436→          {galleries.map((g) => (
+  1437→            <Card key={g.id} className="p-5">
+  1438→              <div className="flex items-start justify-between mb-3">
+  1439→                <div>
+  1440→                  <p className="text-sm font-semibold text-neutral-900">{g.title}</p>
+  1441→                  <p className="text-xs text-neutral-500 mt-0.5">{g.slug}</p>
+  1442→                </div>
+  1443→                {g.published ? <Badge color="green">Published</Badge> : <Badge color="gray">Draft</Badge>}
+  1444→              </div>
+  1445→              {g.cover_image_url && <img src={g.cover_image_url} alt={g.title} className="w-full h-32 object-cover rounded-lg mb-3" />}
+  1446→              {g.description && <p className="text-xs text-neutral-500 mb-3 line-clamp-2">{g.description}</p>}
+  1447→              <div className="flex gap-2">
+  1448→                <Button size="sm" variant="secondary" onClick={() => setImagesModal(g)}><ImageIcon size={14} /> Images</Button>
+  1449→                <Button size="sm" variant="ghost" onClick={() => setEditing(g)}><Edit size={14} /></Button>
+  1450→                <Button size="sm" variant="ghost" onClick={() => togglePublish(g)}>{g.published ? <EyeOff size={14} /> : <Eye size={14} />}</Button>
+  1451→                <Button size="sm" variant="ghost" onClick={() => del(g)}><Trash2 size={14} className="text-red-500" /></Button>
+  1452→              </div>
+  1453→            </Card>
+  1454→          ))}
+  1455→        </div>
+  1456→      )}
+  1457→      <GalleryModal open={createOpen || editing !== null} gallery={editing} onClose={() => { setCreateOpen(false); setEditing(null); }} onSaved={fetch} />
+  1458→      {imagesModal && <ImagesModal gallery={imagesModal} onClose={() => setImagesModal(null)} />}
+  1459→    </div>
+  1460→  );
+  1461→}
+  1462→
+  1463→function GalleryModal({ open, gallery, onClose, onSaved }: { open: boolean; gallery: CmsGallery | null; onClose: () => void; onSaved: () => void }) {
+  1464→  const [form, setForm] = useState({ title: '', slug: '', description: '', cover_image_url: '', published: false });
+  1465→  const [saving, setSaving] = useState(false);
+  1466→
+  1467→  useEffect(() => {
+  1468→    if (gallery) setForm({ title: gallery.title, slug: gallery.slug, description: gallery.description ?? '', cover_image_url: gallery.cover_image_url ?? '', published: gallery.published });
+  1469→    else setForm({ title: '', slug: '', description: '', cover_image_url: '', published: false });
+  1470→  }, [gallery, open]);
+  1471→
+  1472→  const save = async () => {
+  1473→    if (!form.title || !form.slug) { toast('error', 'Title and slug are required'); return; }
+  1474→    setSaving(true);
+  1475→    if (gallery) {
+  1476→      await supabase.from('cms_galleries').update(form).eq('id', gallery.id);
+  1477→    } else {
+  1478→      await supabase.from('cms_galleries').insert({ ...form, kind: 'image' });
+  1479→    }
+  1480→    setSaving(false);
+  1481→    toast('success', 'Gallery saved');
+  1482→    onClose(); onSaved();
+  1483→  };
+  1484→
+  1485→  return (
+  1486→    <Modal open={open} onClose={onClose} title={gallery ? 'Edit Gallery' : 'New Gallery'} footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button></>}>
+  1487→      <div className="space-y-4">
+  1488→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+  1489→        <Field label="Slug" required><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="summer-tour-photos" /></Field>
+  1490→        <Field label="Description"><Textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
+  1491→        <Field label="Cover Image URL"><Input value={form.cover_image_url} onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })} placeholder="https://images.pexels.com/..." /></Field>
+  1492→        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Publish to user portal</label>
+  1493→      </div>
+  1494→    </Modal>
+  1495→  );
+  1496→}
+  1497→
+  1498→function ImagesModal({ gallery, onClose }: { gallery: CmsGallery; onClose: () => void }) {
+  1499→  const [images, setImages] = useState<CmsImage[]>([]);
+  1500→  const [loading, setLoading] = useState(true);
+  1501→  const [newUrl, setNewUrl] = useState('');
+  1502→  const [newTitle, setNewTitle] = useState('');
+  1503→  const [newCaption, setNewCaption] = useState('');
+  1504→
+  1505→  const fetchImages = useCallback(async () => {
+  1506→    setLoading(true);
+  1507→    const { data } = await supabase.from('cms_images').select('*').eq('gallery_id', gallery.id).order('sort_order', { ascending: true });
+  1508→    setImages(data ?? []);
+  1509→    setLoading(false);
+  1510→  }, [gallery.id]);
+  1511→
+  1512→  useEffect(() => { fetchImages(); }, [fetchImages]);
+  1513→
+  1514→  const addImage = async () => {
+  1515→    if (!newUrl) { toast('error', 'Image URL is required'); return; }
+  1516→    await supabase.from('cms_images').insert({ gallery_id: gallery.id, image_url: newUrl, title: newTitle || null, caption: newCaption || null, sort_order: images.length });
+  1517→    setNewUrl(''); setNewTitle(''); setNewCaption('');
+  1518→    fetchImages();
+  1519→    toast('success', 'Image added');
+  1520→  };
+  1521→
+  1522→  const delImage = async (id: string) => {
+  1523→    await supabase.from('cms_images').delete().eq('id', id);
+  1524→    fetchImages();
+  1525→  };
+  1526→
+  1527→  return (
+  1528→    <Modal open={true} onClose={onClose} title={`Images — ${gallery.title}`} size="xl">
+  1529→      {loading ? <LoadingState /> : (
+  1530→        <>
+  1531→          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+  1532→            {images.map((img) => (
+  1533→              <div key={img.id} className="group relative rounded-lg overflow-hidden border border-neutral-200">
+  1534→                <img src={img.image_url} alt={img.title ?? ''} className="w-full h-32 object-cover" />
+  1535→                {img.title && <p className="text-xs text-neutral-600 p-2 truncate">{img.title}</p>}
+  1536→                <button onClick={() => delImage(img.id)} className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={12} /></button>
+  1537→              </div>
+  1538→            ))}
+  1539→            {images.length === 0 && <p className="col-span-full text-sm text-neutral-400 text-center py-8">No images yet</p>}
+  1540→          </div>
+  1541→          <div className="border-t border-neutral-200 pt-4 space-y-3">
+  1542→            <h4 className="text-sm font-semibold text-neutral-700">Add Image</h4>
+  1543→            <Field label="Image URL" required><Input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="https://images.pexels.com/..." /></Field>
+  1544→            <div className="grid grid-cols-2 gap-3">
+  1545→              <Field label="Title"><Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} /></Field>
+  1546→              <Field label="Caption"><Input value={newCaption} onChange={(e) => setNewCaption(e.target.value)} /></Field>
+  1547→            </div>
+  1548→            <Button variant="primary" onClick={addImage}><Plus size={14} /> Add Image</Button>
+  1549→          </div>
+  1550→        </>
+  1551→      )}
+  1552→    </Modal>
+  1553→  );
+  1554→}
+  1555→
+  1556→===FILE:/tmp/dashboard-repo/src/pages/cms/VideosPage.tsx===
+  1557→import { useEffect, useState, useCallback } from 'react';
+  1558→import { Video as VideoIcon, Plus, Trash2, Edit, Eye, EyeOff } from 'lucide-react';
+  1559→import { Button } from '@/components/ui/Button';
+  1560→import { Card } from '@/components/ui/Card';
+  1561→import { Badge } from '@/components/ui/Badge';
+  1562→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1563→import { PageHeader } from '@/components/layout/PageHeader';
+  1564→import { Modal } from '@/components/ui/Modal';
+  1565→import { Field, Input, Textarea } from '@/components/ui/Form';
+  1566→import { toast } from '@/components/ui/Toast';
+  1567→import { supabase } from '@/lib/supabase';
+  1568→import type { CmsGallery, CmsVideo } from '@/types/database';
+  1569→
+  1570→export default function VideosPage() {
+  1571→  const [galleries, setGalleries] = useState<CmsGallery[]>([]);
+  1572→  const [loading, setLoading] = useState(true);
+  1573→  const [createOpen, setCreateOpen] = useState(false);
+  1574→  const [editing, setEditing] = useState<CmsGallery | null>(null);
+  1575→  const [videosModal, setVideosModal] = useState<CmsGallery | null>(null);
+  1576→
+  1577→  const fetch = useCallback(async () => {
+  1578→    setLoading(true);
+  1579→    const { data } = await supabase.from('cms_galleries').select('*').eq('kind', 'video').order('sort_order', { ascending: true });
+  1580→    setGalleries(data ?? []);
+  1581→    setLoading(false);
+  1582→  }, []);
+  1583→
+  1584→  useEffect(() => { fetch(); }, [fetch]);
+  1585→
+  1586→  const togglePublish = async (g: CmsGallery) => {
+  1587→    await supabase.from('cms_galleries').update({ published: !g.published }).eq('id', g.id);
+  1588→    fetch();
+  1589→    toast('success', g.published ? 'Unpublished' : 'Published');
+  1590→  };
+  1591→
+  1592→  const del = async (g: CmsGallery) => {
+  1593→    if (!confirm(`Delete gallery "${g.title}" and all its videos?`)) return;
+  1594→    await supabase.from('cms_galleries').delete().eq('id', g.id);
+  1595→    fetch();
+  1596→    toast('success', 'Gallery deleted');
+  1597→  };
+  1598→
+  1599→  return (
+  1600→    <div>
+  1601→      <PageHeader title="Video Galleries" description="Publish video galleries to your user portal" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Gallery</Button>} />
+  1602→      {loading ? <LoadingState /> : galleries.length === 0 ? (
+  1603→        <Card className="p-6"><EmptyState icon={<VideoIcon size={48} />} title="No video galleries yet" description="Create a gallery and add videos to showcase on your portal" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Gallery</Button>} /></Card>
+  1604→      ) : (
+  1605→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  1606→          {galleries.map((g) => (
+  1607→            <Card key={g.id} className="p-5">
+  1608→              <div className="flex items-start justify-between mb-3">
+  1609→                <div>
+  1610→                  <p className="text-sm font-semibold text-neutral-900">{g.title}</p>
+  1611→                  <p className="text-xs text-neutral-500 mt-0.5">{g.slug}</p>
+  1612→                </div>
+  1613→                {g.published ? <Badge color="green">Published</Badge> : <Badge color="gray">Draft</Badge>}
+  1614→              </div>
+  1615→              {g.cover_image_url && <img src={g.cover_image_url} alt={g.title} className="w-full h-32 object-cover rounded-lg mb-3" />}
+  1616→              {g.description && <p className="text-xs text-neutral-500 mb-3 line-clamp-2">{g.description}</p>}
+  1617→              <div className="flex gap-2">
+  1618→                <Button size="sm" variant="secondary" onClick={() => setVideosModal(g)}><VideoIcon size={14} /> Videos</Button>
+  1619→                <Button size="sm" variant="ghost" onClick={() => setEditing(g)}><Edit size={14} /></Button>
+  1620→                <Button size="sm" variant="ghost" onClick={() => togglePublish(g)}>{g.published ? <EyeOff size={14} /> : <Eye size={14} />}</Button>
+  1621→                <Button size="sm" variant="ghost" onClick={() => del(g)}><Trash2 size={14} className="text-red-500" /></Button>
+  1622→              </div>
+  1623→            </Card>
+  1624→          ))}
+  1625→        </div>
+  1626→      )}
+  1627→      <GalleryModal open={createOpen || editing !== null} gallery={editing} onClose={() => { setCreateOpen(false); setEditing(null); }} onSaved={fetch} />
+  1628→      {videosModal && <VideosModal gallery={videosModal} onClose={() => setVideosModal(null)} />}
+  1629→    </div>
+  1630→  );
+  1631→}
+  1632→
+  1633→function GalleryModal({ open, gallery, onClose, onSaved }: { open: boolean; gallery: CmsGallery | null; onClose: () => void; onSaved: () => void }) {
+  1634→  const [form, setForm] = useState({ title: '', slug: '', description: '', cover_image_url: '', published: false });
+  1635→  const [saving, setSaving] = useState(false);
+  1636→
+  1637→  useEffect(() => {
+  1638→    if (gallery) setForm({ title: gallery.title, slug: gallery.slug, description: gallery.description ?? '', cover_image_url: gallery.cover_image_url ?? '', published: gallery.published });
+  1639→    else setForm({ title: '', slug: '', description: '', cover_image_url: '', published: false });
+  1640→  }, [gallery, open]);
+  1641→
+  1642→  const save = async () => {
+  1643→    if (!form.title || !form.slug) { toast('error', 'Title and slug are required'); return; }
+  1644→    setSaving(true);
+  1645→    if (gallery) await supabase.from('cms_galleries').update(form).eq('id', gallery.id);
+  1646→    else await supabase.from('cms_galleries').insert({ ...form, kind: 'video' });
+  1647→    setSaving(false);
+  1648→    toast('success', 'Gallery saved');
+  1649→    onClose(); onSaved();
+  1650→  };
+  1651→
+  1652→  return (
+  1653→    <Modal open={open} onClose={onClose} title={gallery ? 'Edit Gallery' : 'New Video Gallery'} footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button></>}>
+  1654→      <div className="space-y-4">
+  1655→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+  1656→        <Field label="Slug" required><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} /></Field>
+  1657→        <Field label="Description"><Textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
+  1658→        <Field label="Cover Image URL"><Input value={form.cover_image_url} onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })} /></Field>
+  1659→        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Publish to user portal</label>
+  1660→      </div>
+  1661→    </Modal>
+  1662→  );
+  1663→}
+  1664→
+  1665→function VideosModal({ gallery, onClose }: { gallery: CmsGallery; onClose: () => void }) {
+  1666→  const [videos, setVideos] = useState<CmsVideo[]>([]);
+  1667→  const [loading, setLoading] = useState(true);
+  1668→  const [form, setForm] = useState({ title: '', description: '', video_url: '', thumbnail_url: '' });
+  1669→
+  1670→  const fetchVideos = useCallback(async () => {
+  1671→    setLoading(true);
+  1672→    const { data } = await supabase.from('cms_videos').select('*').eq('gallery_id', gallery.id).order('sort_order', { ascending: true });
+  1673→    setVideos(data ?? []);
+  1674→    setLoading(false);
+  1675→  }, [gallery.id]);
+  1676→
+  1677→  useEffect(() => { fetchVideos(); }, [fetchVideos]);
+  1678→
+  1679→  const addVideo = async () => {
+  1680→    if (!form.title || !form.video_url) { toast('error', 'Title and video URL are required'); return; }
+  1681→    await supabase.from('cms_videos').insert({ gallery_id: gallery.id, ...form, sort_order: videos.length });
+  1682→    setForm({ title: '', description: '', video_url: '', thumbnail_url: '' });
+  1683→    fetchVideos();
+  1684→    toast('success', 'Video added');
+  1685→  };
+  1686→
+  1687→  const delVideo = async (id: string) => {
+  1688→    await supabase.from('cms_videos').delete().eq('id', id);
+  1689→    fetchVideos();
+  1690→  };
+  1691→
+  1692→  return (
+  1693→    <Modal open={true} onClose={onClose} title={`Videos — ${gallery.title}`} size="xl">
+  1694→      {loading ? <LoadingState /> : (
+  1695→        <>
+  1696→          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+  1697→            {videos.map((v) => (
+  1698→              <div key={v.id} className="group relative rounded-lg overflow-hidden border border-neutral-200">
+  1699→                {v.thumbnail_url ? <img src={v.thumbnail_url} alt={v.title} className="w-full h-32 object-cover" /> : <div className="w-full h-32 bg-neutral-100 flex items-center justify-center"><VideoIcon size={32} className="text-neutral-300" /></div>}
+  1700→                <div className="p-2">
+  1701→                  <p className="text-sm font-medium text-neutral-900">{v.title}</p>
+  1702→                  {v.description && <p className="text-xs text-neutral-500 line-clamp-1">{v.description}</p>}
+  1703→                </div>
+  1704→                <button onClick={() => delVideo(v.id)} className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={12} /></button>
+  1705→              </div>
+  1706→            ))}
+  1707→            {videos.length === 0 && <p className="col-span-full text-sm text-neutral-400 text-center py-8">No videos yet</p>}
+  1708→          </div>
+  1709→          <div className="border-t border-neutral-200 pt-4 space-y-3">
+  1710→            <h4 className="text-sm font-semibold text-neutral-700">Add Video</h4>
+  1711→            <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+  1712→            <Field label="Video URL" required><Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://youtube.com/..." /></Field>
+  1713→            <div className="grid grid-cols-2 gap-3">
+  1714→              <Field label="Thumbnail URL"><Input value={form.thumbnail_url} onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })} /></Field>
+  1715→              <Field label="Description"><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
+  1716→            </div>
+  1717→            <Button variant="primary" onClick={addVideo}><Plus size={14} /> Add Video</Button>
+  1718→          </div>
+  1719→        </>
+  1720→      )}
+  1721→    </Modal>
+  1722→  );
+  1723→}
+  1724→
+  1725→===FILE:/tmp/dashboard-repo/src/pages/cms/BannersPage.tsx===
+  1726→import { useEffect, useState, useCallback } from 'react';
+  1727→import { LayoutTemplate, Plus, Trash2, Edit, Eye, EyeOff, ExternalLink } from 'lucide-react';
+  1728→import { Button } from '@/components/ui/Button';
+  1729→import { Card } from '@/components/ui/Card';
+  1730→import { Badge } from '@/components/ui/Badge';
+  1731→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1732→import { PageHeader } from '@/components/layout/PageHeader';
+  1733→import { Modal } from '@/components/ui/Modal';
+  1734→import { Field, Input, Textarea, Select } from '@/components/ui/Form';
+  1735→import { toast } from '@/components/ui/Toast';
+  1736→import { supabase } from '@/lib/supabase';
+  1737→import type { CmsBanner, TicketEvent } from '@/types/database';
+  1738→
+  1739→const POSITIONS = [
+  1740→  { value: 'hero', label: 'Hero (top of page)' },
+  1741→  { value: 'promo', label: 'Promo strip' },
+  1742→  { value: 'sidebar', label: 'Sidebar' },
+  1743→  { value: 'footer', label: 'Footer' },
+  1744→];
+  1745→
+  1746→export default function BannersPage() {
+  1747→  const [banners, setBanners] = useState<CmsBanner[]>([]);
+  1748→  const [events, setEvents] = useState<TicketEvent[]>([]);
+  1749→  const [loading, setLoading] = useState(true);
+  1750→  const [createOpen, setCreateOpen] = useState(false);
+  1751→  const [editing, setEditing] = useState<CmsBanner | null>(null);
+  1752→
+  1753→  const fetch = useCallback(async () => {
+  1754→    setLoading(true);
+  1755→    const [b, e] = await Promise.all([
+  1756→      supabase.from('cms_banners').select('*').order('sort_order', { ascending: true }),
+  1757→      supabase.from('ticket_events').select('id, title'),
+  1758→    ]);
+  1759→    setBanners(b.data ?? []);
+  1760→    setEvents(e.data ?? []);
+  1761→    setLoading(false);
+  1762→  }, []);
+  1763→
+  1764→  useEffect(() => { fetch(); }, [fetch]);
+  1765→
+  1766→  const togglePublish = async (b: CmsBanner) => {
+  1767→    await supabase.from('cms_banners').update({ published: !b.published }).eq('id', b.id);
+  1768→    fetch();
+  1769→    toast('success', b.published ? 'Unpublished' : 'Published');
+  1770→  };
+  1771→
+  1772→  const del = async (b: CmsBanner) => {
+  1773→    if (!confirm(`Delete banner "${b.title}"?`)) return;
+  1774→    await supabase.from('cms_banners').delete().eq('id', b.id);
+  1775→    fetch();
+  1776→    toast('success', 'Banner deleted');
+  1777→  };
+  1778→
+  1779→  return (
+  1780→    <div>
+  1781→      <PageHeader title="Banners" description="Promotional banners shown on your user portal — promote events, sell tickets, or link to anything" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Banner</Button>} />
+  1782→      {loading ? <LoadingState /> : banners.length === 0 ? (
+  1783→        <Card className="p-6"><EmptyState icon={<LayoutTemplate size={48} />} title="No banners yet" description="Create banners to promote events and sell tickets on your portal" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Banner</Button>} /></Card>
+  1784→      ) : (
+  1785→        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  1786→          {banners.map((b) => (
+  1787→            <Card key={b.id} className="p-0 overflow-hidden">
+  1788→              {b.image_url && <img src={b.image_url} alt={b.title} className="w-full h-40 object-cover" />}
+  1789→              <div className="p-4">
+  1790→                <div className="flex items-start justify-between mb-2">
+  1791→                  <div>
+  1792→                    <p className="text-sm font-semibold text-neutral-900">{b.title}</p>
+  1793→                    {b.subtitle && <p className="text-xs text-neutral-500 mt-0.5">{b.subtitle}</p>}
+  1794→                  </div>
+  1795→                  {b.published ? <Badge color="green">Published</Badge> : <Badge color="gray">Draft</Badge>}
+  1796→                </div>
+  1797→                <div className="flex items-center gap-2 mb-3">
+  1798→                  <Badge color="blue">{POSITIONS.find((p) => p.value === b.position)?.label ?? b.position}</Badge>
+  1799→                  {b.cta_text && <span className="text-xs text-neutral-500">CTA: {b.cta_text}</span>}
+  1800→                </div>
+  1801→                <div className="flex gap-2">
+  1802→                  <Button size="sm" variant="ghost" onClick={() => setEditing(b)}><Edit size={14} /></Button>
+  1803→                  <Button size="sm" variant="ghost" onClick={() => togglePublish(b)}>{b.published ? <EyeOff size={14} /> : <Eye size={14} />}</Button>
+  1804→                  <Button size="sm" variant="ghost" onClick={() => del(b)}><Trash2 size={14} className="text-red-500" /></Button>
+  1805→                </div>
+  1806→              </div>
+  1807→            </Card>
+  1808→          ))}
+  1809→        </div>
+  1810→      )}
+  1811→      <BannerModal open={createOpen || editing !== null} banner={editing} events={events} onClose={() => { setCreateOpen(false); setEditing(null); }} onSaved={fetch} />
+  1812→    </div>
+  1813→  );
+  1814→}
+  1815→
+  1816→function BannerModal({ open, banner, events, onClose, onSaved }: { open: boolean; banner: CmsBanner | null; events: TicketEvent[]; onClose: () => void; onSaved: () => void }) {
+  1817→  const [form, setForm] = useState({ title: '', subtitle: '', image_url: '', cta_text: '', cta_link: '', linked_event_id: '', position: 'hero', published: false, sort_order: 0 });
+  1818→  const [saving, setSaving] = useState(false);
+  1819→
+  1820→  useEffect(() => {
+  1821→    if (banner) setForm({ title: banner.title, subtitle: banner.subtitle ?? '', image_url: banner.image_url, cta_text: banner.cta_text ?? '', cta_link: banner.cta_link ?? '', linked_event_id: banner.linked_event_id ?? '', position: banner.position, published: banner.published, sort_order: banner.sort_order });
+  1822→    else setForm({ title: '', subtitle: '', image_url: '', cta_text: '', cta_link: '', linked_event_id: '', position: 'hero', published: false, sort_order: 0 });
+  1823→  }, [banner, open]);
+  1824→
+  1825→  const save = async () => {
+  1826→    if (!form.title || !form.image_url) { toast('error', 'Title and image URL are required'); return; }
+  1827→    setSaving(true);
+  1828→    const payload = { ...form, linked_event_id: form.linked_event_id || null };
+  1829→    if (banner) await supabase.from('cms_banners').update(payload).eq('id', banner.id);
+  1830→    else await supabase.from('cms_banners').insert(payload);
+  1831→    setSaving(false);
+  1832→    toast('success', 'Banner saved');
+  1833→    onClose(); onSaved();
+  1834→  };
+  1835→
+  1836→  return (
+  1837→    <Modal open={open} onClose={onClose} title={banner ? 'Edit Banner' : 'New Banner'} size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button></>}>
+  1838→      <div className="space-y-4">
+  1839→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+  1840→        <Field label="Subtitle"><Input value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} /></Field>
+  1841→        <Field label="Image URL" required><Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://images.pexels.com/..." /></Field>
+  1842→        {form.image_url && <img src={form.image_url} alt="Preview" className="w-full h-32 object-cover rounded-lg" />}
+  1843→        <div className="grid grid-cols-2 gap-4">
+  1844→          <Field label="CTA Text"><Input value={form.cta_text} onChange={(e) => setForm({ ...form, cta_text: e.target.value })} placeholder="Buy Tickets" /></Field>
+  1845→          <Field label="CTA Link"><Input value={form.cta_link} onChange={(e) => setForm({ ...form, cta_link: e.target.value })} placeholder="https://..." /></Field>
+  1846→        </div>
+  1847→        <div className="grid grid-cols-2 gap-4">
+  1848→          <Field label="Position"><Select value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })}>{POSITIONS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</Select></Field>
+  1849→          <Field label="Link to Event"><Select value={form.linked_event_id} onChange={(e) => setForm({ ...form, linked_event_id: e.target.value })}><option value="">— None —</option>{events.map((ev) => <option key={ev.id} value={ev.id}>{ev.title}</option>)}</Select></Field>
+  1850→        </div>
+  1851→        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Publish to user portal</label>
+  1852→      </div>
+  1853→    </Modal>
+  1854→  );
+  1855→}
+  1856→
+  1857→===FILE:/tmp/dashboard-repo/src/pages/tickets/TicketEventsPage.tsx===
+  1858→import { useEffect, useState, useCallback } from 'react';
+  1859→import { Ticket, Plus, Trash2, Edit, Eye, EyeOff, Calendar, MapPin } from 'lucide-react';
+  1860→import { Button } from '@/components/ui/Button';
+  1861→import { Card } from '@/components/ui/Card';
+  1862→import { Badge } from '@/components/ui/Badge';
+  1863→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1864→import { PageHeader } from '@/components/layout/PageHeader';
+  1865→import { Modal } from '@/components/ui/Modal';
+  1866→import { Field, Input, Textarea, Select } from '@/components/ui/Form';
+  1867→import { toast } from '@/components/ui/Toast';
+  1868→import { supabase } from '@/lib/supabase';
+  1869→import { formatCents, formatDate, inputToCents, centsToInput } from '@/lib/format';
+  1870→import type { TicketEvent, TicketTier } from '@/types/database';
+  1871→
+  1872→export default function TicketEventsPage() {
+  1873→  const [events, setEvents] = useState<TicketEvent[]>([]);
+  1874→  const [loading, setLoading] = useState(true);
+  1875→  const [createOpen, setCreateOpen] = useState(false);
+  1876→  const [editing, setEditing] = useState<TicketEvent | null>(null);
+  1877→  const [tiersModal, setTiersModal] = useState<TicketEvent | null>(null);
+  1878→
+  1879→  const fetch = useCallback(async () => {
+  1880→    setLoading(true);
+  1881→    const { data } = await supabase.from('ticket_events').select('*').order('event_date', { ascending: false });
+  1882→    setEvents(data ?? []);
+  1883→    setLoading(false);
+  1884→  }, []);
+  1885→
+  1886→  useEffect(() => { fetch(); }, [fetch]);
+  1887→
+  1888→  const togglePublish = async (e: TicketEvent) => {
+  1889→    await supabase.from('ticket_events').update({ published: !e.published }).eq('id', e.id);
+  1890→    fetch();
+  1891→    toast('success', e.published ? 'Unpublished' : 'Published');
+  1892→  };
+  1893→
+  1894→  const del = async (e: TicketEvent) => {
+  1895→    if (!confirm(`Delete event "${e.title}" and all its tickets?`)) return;
+  1896→    await supabase.from('ticket_events').delete().eq('id', e.id);
+  1897→    fetch();
+  1898→    toast('success', 'Event deleted');
+  1899→  };
+  1900→
+  1901→  return (
+  1902→    <div>
+  1903→      <PageHeader title="Ticket Events" description="Create events, manage ticket tiers, and sell tickets" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Event</Button>} />
+  1904→      {loading ? <LoadingState /> : events.length === 0 ? (
+  1905→        <Card className="p-6"><EmptyState icon={<Ticket size={48} />} title="No ticketed events yet" description="Create an event, add ticket tiers, and publish to your portal" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Event</Button>} /></Card>
+  1906→      ) : (
+  1907→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  1908→          {events.map((e) => (
+  1909→            <Card key={e.id} className="p-0 overflow-hidden">
+  1910→              {e.cover_image_url ? <img src={e.cover_image_url} alt={e.title} className="w-full h-40 object-cover" /> : <div className="w-full h-40 bg-gradient-to-br from-neutral-700 to-neutral-900 flex items-center justify-center"><Ticket size={32} className="text-white/50" /></div>}
+  1911→              <div className="p-4">
+  1912→                <div className="flex items-start justify-between mb-2">
+  1913→                  <p className="text-sm font-semibold text-neutral-900">{e.title}</p>
+  1914→                  {e.published ? <Badge color="green">Published</Badge> : <Badge color="gray">Draft</Badge>}
+  1915→                </div>
+  1916→                <div className="space-y-1 text-xs text-neutral-500 mb-3">
+  1917→                  <p className="flex items-center gap-1"><Calendar size={12} /> {formatDate(e.event_date)}</p>
+  1918→                  <p className="flex items-center gap-1"><MapPin size={12} /> {e.venue_name}{e.city ? `, ${e.city}` : ''}</p>
+  1919→                </div>
+  1920→                <div className="flex gap-2">
+  1921→                  <Button size="sm" variant="secondary" onClick={() => setTiersModal(e)}>Tiers</Button>
+  1922→                  <Button size="sm" variant="ghost" onClick={() => setEditing(e)}><Edit size={14} /></Button>
+  1923→                  <Button size="sm" variant="ghost" onClick={() => togglePublish(e)}>{e.published ? <EyeOff size={14} /> : <Eye size={14} />}</Button>
+  1924→                  <Button size="sm" variant="ghost" onClick={() => del(e)}><Trash2 size={14} className="text-red-500" /></Button>
+  1925→                </div>
+  1926→              </div>
+  1927→            </Card>
+  1928→          ))}
+  1929→        </div>
+  1930→      )}
+  1931→      <EventModal open={createOpen || editing !== null} event={editing} onClose={() => { setCreateOpen(false); setEditing(null); }} onSaved={fetch} />
+  1932→      {tiersModal && <TiersModal event={tiersModal} onClose={() => setTiersModal(null)} />}
+  1933→    </div>
+  1934→  );
+  1935→}
+  1936→
+  1937→function EventModal({ open, event, onClose, onSaved }: { open: boolean; event: TicketEvent | null; onClose: () => void; onSaved: () => void }) {
+  1938→  const [form, setForm] = useState({ title: '', description: '', venue_name: '', address: '', city: '', state: '', country: '', event_date: '', door_time: '', show_time: '', age_restriction: '', cover_image_url: '', capacity: '', published: false });
+  1939→  const [saving, setSaving] = useState(false);
+  1940→
+  1941→  useEffect(() => {
+  1942→    if (event) setForm({
+  1943→      title: event.title, description: event.description ?? '', venue_name: event.venue_name, address: event.address ?? '',
+  1944→      city: event.city ?? '', state: event.state ?? '', country: event.country ?? '',
+  1945→      event_date: event.event_date.slice(0, 16), door_time: event.door_time ?? '', show_time: event.show_time ?? '',
+  1946→      age_restriction: event.age_restriction ?? '', cover_image_url: event.cover_image_url ?? '',
+  1947→      capacity: event.capacity?.toString() ?? '', published: event.published,
+  1948→    });
+  1949→    else setForm({ title: '', description: '', venue_name: '', address: '', city: '', state: '', country: '', event_date: '', door_time: '', show_time: '', age_restriction: '', cover_image_url: '', capacity: '', published: false });
+  1950→  }, [event, open]);
+  1951→
+  1952→  const save = async () => {
+  1953→    if (!form.title || !form.venue_name || !form.event_date) { toast('error', 'Title, venue, and date are required'); return; }
+  1954→    setSaving(true);
+  1955→    const payload = {
+  1956→      title: form.title, description: form.description || null, venue_name: form.venue_name,
+  1957→      address: form.address || null, city: form.city || null, state: form.state || null, country: form.country || null,
+  1958→      event_date: form.event_date, door_time: form.door_time || null, show_time: form.show_time || null,
+  1959→      age_restriction: form.age_restriction || null, cover_image_url: form.cover_image_url || null,
+  1960→      capacity: form.capacity ? parseInt(form.capacity) : null, published: form.published,
+  1961→    };
+  1962→    if (event) await supabase.from('ticket_events').update(payload).eq('id', event.id);
+  1963→    else await supabase.from('ticket_events').insert(payload);
+  1964→    setSaving(false);
+  1965→    toast('success', 'Event saved');
+  1966→    onClose(); onSaved();
+  1967→  };
+  1968→
+  1969→  return (
+  1970→    <Modal open={open} onClose={onClose} title={event ? 'Edit Event' : 'New Ticketed Event'} size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button></>}>
+  1971→      <div className="space-y-4">
+  1972→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+  1973→        <Field label="Description"><Textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
+  1974→        <div className="grid grid-cols-2 gap-4">
+  1975→          <Field label="Venue" required><Input value={form.venue_name} onChange={(e) => setForm({ ...form, venue_name: e.target.value })} /></Field>
+  1976→          <Field label="Capacity"><Input type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} /></Field>
+  1977→        </div>
+  1978→        <div className="grid grid-cols-2 gap-4">
+  1979→          <Field label="Event Date & Time" required><Input type="datetime-local" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} /></Field>
+  1980→          <Field label="Age Restriction"><Input value={form.age_restriction} onChange={(e) => setForm({ ...form, age_restriction: e.target.value })} placeholder="21+" /></Field>
+  1981→        </div>
+  1982→        <div className="grid grid-cols-2 gap-4">
+  1983→          <Field label="Door Time"><Input type="time" value={form.door_time} onChange={(e) => setForm({ ...form, door_time: e.target.value })} /></Field>
+  1984→          <Field label="Show Time"><Input type="time" value={form.show_time} onChange={(e) => setForm({ ...form, show_time: e.target.value })} /></Field>
+  1985→        </div>
+  1986→        <div className="grid grid-cols-3 gap-4">
+  1987→          <Field label="City"><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></Field>
+  1988→          <Field label="State"><Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} /></Field>
+  1989→          <Field label="Country"><Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} /></Field>
+  1990→        </div>
+  1991→        <Field label="Cover Image URL"><Input value={form.cover_image_url} onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })} placeholder="https://images.pexels.com/..." /></Field>
+  1992→        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Publish to user portal</label>
+  1993→      </div>
+  1994→    </Modal>
+  1995→  );
+  1996→}
+  1997→
+  1998→function TiersModal({ event, onClose }: { event: TicketEvent; onClose: () => void }) {
+  1999→  const [tiers, setTiers] = useState<TicketTier[]>([]);
+  2000→  const [loading, setLoading] = useState(true);
+
+[showing lines 1-2000 of 2249; use offset=2001 with limit to continue reading]

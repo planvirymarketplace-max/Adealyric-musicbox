@@ -1,0 +1,1658 @@
+     1→===FILE:/tmp/dashboard-repo/src/pages/catalog/ReleasesPage.tsx===
+     2→import { useEffect, useState, useCallback } from 'react';
+     3→import { Link } from 'react-router-dom';
+     4→import { Disc3, Plus, Music } from 'lucide-react';
+     5→import { Button } from '@/components/ui/Button';
+     6→import { Card } from '@/components/ui/Card';
+     7→import { Badge, StatusBadge } from '@/components/ui/Badge';
+     8→import { LoadingState, EmptyState } from '@/components/ui/States';
+     9→import { PageHeader } from '@/components/layout/PageHeader';
+    10→import { Modal } from '@/components/ui/Modal';
+    11→import { Field, Input, Select } from '@/components/ui/Form';
+    12→import { toast } from '@/components/ui/Toast';
+    13→import { supabase } from '@/lib/supabase';
+    14→import { formatDate, formatCents, centsToInput, inputToCents } from '@/lib/format';
+    15→import type { Release, Artist } from '@/types/database';
+    16→
+    17→export default function ReleasesPage() {
+    18→  const [releases, setReleases] = useState<Release[]>([]);
+    19→  const [artists, setArtists] = useState<Artist[]>([]);
+    20→  const [loading, setLoading] = useState(true);
+    21→  const [createOpen, setCreateOpen] = useState(false);
+    22→
+    23→  const fetch = useCallback(async () => {
+    24→    setLoading(true);
+    25→    const [r, a] = await Promise.all([
+    26→      supabase.from('releases').select('*').order('created_at', { ascending: false }),
+    27→      supabase.from('artists').select('*'),
+    28→    ]);
+    29→    setReleases(r.data ?? []);
+    30→    setArtists(a.data ?? []);
+    31→    setLoading(false);
+    32→  }, []);
+    33→
+    34→  useEffect(() => { fetch(); }, [fetch]);
+    35→
+    36→  return (
+    37→    <div>
+    38→      <PageHeader title="Releases" description="Manage your catalog — upload audio, set pricing, UPC/ISRC, and distribution" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Release</Button>} />
+    39→      {loading ? <LoadingState /> : releases.length === 0 ? (
+    40→        <Card className="p-6"><EmptyState icon={<Disc3 size={48} />} title="No releases yet" description="Create your first release, add tracks, upload audio, and set pricing" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Release</Button>} /></Card>
+    41→      ) : (
+    42→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    43→          {releases.map((r) => (
+    44→            <Link key={r.id} to={`/catalog/releases/${r.id}`}>
+    45→              <Card className="p-5 hover:shadow-md transition-shadow cursor-pointer h-full">
+    46→                <div className="flex items-start gap-3">
+    47→                  <div className="w-14 h-14 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0">
+    48→                    <Disc3 size={28} className="text-neutral-400" />
+    49→                  </div>
+    50→                  <div className="flex-1 min-w-0">
+    51→                    <p className="text-sm font-semibold text-neutral-900 truncate">{r.title}</p>
+    52→                    <p className="text-xs text-neutral-500 capitalize">{r.type} · {formatDate(r.release_date)}</p>
+    53→                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+    54→                      <StatusBadge status={r.status} />
+    55→                      {r.is_free && <Badge color="green">Free</Badge>}
+    56→                      {!r.is_free && r.price_cents > 0 && <Badge color="blue">{formatCents(r.price_cents)}</Badge>}
+    57→                      {r.explicit && <Badge color="red">E</Badge>}
+    58→                    </div>
+    59→                  </div>
+    60→                </div>
+    61→                <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100">
+    62→                  <span className="text-xs text-neutral-400">{r.upc ? `UPC: ${r.upc}` : 'No UPC'}</span>
+    63→                  <span className="text-xs text-neutral-400">{r.catalog_number ? `Cat: ${r.catalog_number}` : ''}</span>
+    64→                </div>
+    65→              </Card>
+    66→            </Link>
+    67→          ))}
+    68→        </div>
+    69→      )}
+    70→      <CreateReleaseModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetch} artists={artists} />
+    71→    </div>
+    72→  );
+    73→}
+    74→
+    75→function CreateReleaseModal({ open, onClose, onCreated, artists }: { open: boolean; onClose: () => void; onCreated: () => void; artists: Artist[] }) {
+    76→  const [form, setForm] = useState({
+    77→    title: '', type: 'single', artist_id: '', release_date: '', status: 'draft',
+    78→    upc: '', catalog_number: '', genre: '', price: '', is_free: false, explicit: false,
+    79→  });
+    80→  const [saving, setSaving] = useState(false);
+    81→
+    82→  const save = async () => {
+    83→    if (!form.title) { toast('error', 'Title is required'); return; }
+    84→    setSaving(true);
+    85→    const { error } = await supabase.from('releases').insert({
+    86→      title: form.title,
+    87→      type: form.type,
+    88→      artist_id: form.artist_id || null,
+    89→      release_date: form.release_date || null,
+    90→      status: form.status,
+    91→      upc: form.upc || null,
+    92→      catalog_number: form.catalog_number || null,
+    93→      genre: form.genre || null,
+    94→      price_cents: form.is_free ? 0 : inputToCents(form.price),
+    95→      is_free: form.is_free,
+    96→      explicit: form.explicit,
+    97→    });
+    98→    setSaving(false);
+    99→    if (error) { toast('error', 'Failed to create release'); return; }
+   100→    toast('success', 'Release created — add tracks and upload audio next');
+   101→    setForm({ title: '', type: 'single', artist_id: '', release_date: '', status: 'draft', upc: '', catalog_number: '', genre: '', price: '', is_free: false, explicit: false });
+   102→    onClose(); onCreated();
+   103→  };
+   104→
+   105→  return (
+   106→    <Modal open={open} onClose={onClose} title="New Release" size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create Release'}</Button></>}>
+   107→      <div className="space-y-4">
+   108→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} autoFocus /></Field>
+   109→        <div className="grid grid-cols-2 gap-4">
+   110→          <Field label="Type"><Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></Select></Field>
+   111→          <Field label="Artist"><Select value={form.artist_id} onChange={(e) => setForm({ ...form, artist_id: e.target.value })}><option value="">—</option>{artists.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select></Field>
+   112→        </div>
+   113→        <div className="grid grid-cols-2 gap-4">
+   114→          <Field label="UPC / EAN"><Input value={form.upc} onChange={(e) => setForm({ ...form, upc: e.target.value })} placeholder="0123456789012" /></Field>
+   115→          <Field label="Catalog Number"><Input value={form.catalog_number} onChange={(e) => setForm({ ...form, catalog_number: e.target.value })} placeholder="CAT-001" /></Field>
+   116→        </div>
+   117→        <div className="grid grid-cols-2 gap-4">
+   118→          <Field label="Release Date"><Input type="date" value={form.release_date} onChange={(e) => setForm({ ...form, release_date: e.target.value })} /></Field>
+   119→          <Field label="Genre"><Input value={form.genre} onChange={(e) => setForm({ ...form, genre: e.target.value })} placeholder="Electronic, Hip-Hop…" /></Field>
+   120→        </div>
+   121→        <div className="grid grid-cols-2 gap-4">
+   122→          <Field label="Status"><Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}><option value="draft">Draft</option><option value="submitted">Submitted</option><option value="live">Live</option><option value="delisted">Delisted</option></Select></Field>
+   123→          <Field label="Release Price (USD)"><Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} disabled={form.is_free} placeholder="0.00" /></Field>
+   124→        </div>
+   125→        <div className="flex gap-6">
+   126→          <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.is_free} onChange={(e) => setForm({ ...form, is_free: e.target.checked })} /> Free release</label>
+   127→          <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.explicit} onChange={(e) => setForm({ ...form, explicit: e.target.checked })} /> Explicit content</label>
+   128→        </div>
+   129→      </div>
+   130→    </Modal>
+   131→  );
+   132→}
+   133→
+   134→===FILE:/tmp/dashboard-repo/src/pages/catalog/ReleaseDetailPage.tsx===
+   135→import { useEffect, useState, useCallback, useRef } from 'react';
+   136→import { useParams, Link, useNavigate } from 'react-router-dom';
+   137→import { ArrowLeft, Plus, Upload, Trash2, Edit, Disc3, Music, Lock, Unlock, DollarSign, Play, FileAudio, Save } from 'lucide-react';
+   138→import { Button } from '@/components/ui/Button';
+   139→import { Card } from '@/components/ui/Card';
+   140→import { Badge, StatusBadge } from '@/components/ui/Badge';
+   141→import { LoadingState, ErrorState, EmptyState } from '@/components/ui/States';
+   142→import { PageHeader } from '@/components/layout/PageHeader';
+   143→import { Modal } from '@/components/ui/Modal';
+   144→import { Field, Input, Select, Textarea } from '@/components/ui/Form';
+   145→import { AudioPlayer } from '@/components/ui/AudioPlayer';
+   146→import { toast } from '@/components/ui/Toast';
+   147→import { supabase } from '@/lib/supabase';
+   148→import { formatCents, formatDate, centsToInput, inputToCents } from '@/lib/format';
+   149→import type { Release, Track, Artist } from '@/types/database';
+   150→
+   151→const STATUSES = ['draft', 'submitted', 'live', 'delisted'];
+   152→
+   153→export default function ReleaseDetailPage() {
+   154→  const { id } = useParams();
+   155→  const navigate = useNavigate();
+   156→  const [release, setRelease] = useState<Release | null>(null);
+   157→  const [tracks, setTracks] = useState<Track[]>([]);
+   158→  const [artist, setArtist] = useState<Artist | null>(null);
+   159→  const [loading, setLoading] = useState(true);
+   160→  const [error, setError] = useState('');
+   161→  const [editMode, setEditMode] = useState(false);
+   162→  const [addTrackOpen, setAddTrackOpen] = useState(false);
+   163→  const [editingTrack, setEditingTrack] = useState<Track | null>(null);
+   164→
+   165→  const fetch = useCallback(async () => {
+   166→    if (!id) return;
+   167→    setLoading(true);
+   168→    const { data: rel, error: relErr } = await supabase.from('releases').select('*').eq('id', id).maybeSingle();
+   169→    if (relErr) { setError(relErr.message); setLoading(false); return; }
+   170→    if (!rel) { setError('Release not found'); setLoading(false); return; }
+   171→    setRelease(rel as Release);
+   172→
+   173→    const [tRes, aRes] = await Promise.all([
+   174→      supabase.from('tracks').select('*').eq('release_id', id).order('position', { ascending: true }),
+   175→      rel.artist_id ? supabase.from('artists').select('*').eq('id', rel.artist_id).maybeSingle() : Promise.resolve({ data: null }),
+   176→    ]);
+   177→    setTracks(tRes.data ?? []);
+   178→    setArtist(aRes.data as Artist | null);
+   179→    setLoading(false);
+   180→  }, [id]);
+   181→
+   182→  useEffect(() => { fetch(); }, [fetch]);
+   183→
+   184→  const updateRelease = async (updates: Partial<Release>) => {
+   185→    if (!release) return;
+   186→    const { error } = await supabase.from('releases').update(updates).eq('id', release.id);
+   187→    if (error) { toast('error', 'Failed to update'); return; }
+   188→    setRelease({ ...release, ...updates });
+   189→    toast('success', 'Release updated');
+   190→  };
+   191→
+   192→  const deleteRelease = async () => {
+   193→    if (!release) return;
+   194→    if (!confirm(`Delete "${release.title}" and all its tracks? This cannot be undone.`)) return;
+   195→    const { error } = await supabase.from('releases').delete().eq('id', release.id);
+   196→    if (error) { toast('error', 'Failed to delete'); return; }
+   197→    toast('success', 'Release deleted');
+   198→    navigate('/catalog/releases');
+   199→  };
+   200→
+   201→  const deleteTrack = async (trackId: string) => {
+   202→    if (!confirm('Delete this track?')) return;
+   203→    const track = tracks.find((t) => t.id === trackId);
+   204→    if (track?.audio_storage_path) {
+   205→      await supabase.storage.from('audio').remove([track.audio_storage_path]);
+   206→    }
+   207→    await supabase.from('tracks').delete().eq('id', trackId);
+   208→    fetch();
+   209→    toast('success', 'Track deleted');
+   210→  };
+   211→
+   212→  if (loading) return <LoadingState />;
+   213→  if (error) return <ErrorState message={error} />;
+   214→  if (!release) return <ErrorState message="Release not found" />;
+   215→
+   216→  return (
+   217→    <div>
+   218→      <Link to="/catalog/releases" className="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 mb-4">
+   219→        <ArrowLeft size={16} /> Back to Releases
+   220→      </Link>
+   221→
+   222→      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+   223→        <div className="flex items-start gap-4">
+   224→          <div className="w-16 h-16 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0">
+   225→            <Disc3 size={32} className="text-neutral-400" />
+   226→          </div>
+   227→          <div>
+   228→            <h1 className="text-2xl font-semibold text-neutral-900">{release.title}</h1>
+   229→            <p className="text-sm text-neutral-500 mt-1">
+   230→              {artist?.name ?? 'Unassigned'} · {release.type} · {formatDate(release.release_date)}
+   231→            </p>
+   232→            <div className="flex items-center gap-2 mt-2">
+   233→              <StatusBadge status={release.status} />
+   234→              {release.is_free && <Badge color="green">Free</Badge>}
+   235→              {!release.is_free && release.price_cents > 0 && <Badge color="blue">{formatCents(release.price_cents)}</Badge>}
+   236→              {release.explicit && <Badge color="red">Explicit</Badge>}
+   237→            </div>
+   238→          </div>
+   239→        </div>
+   240→        <div className="flex items-center gap-2">
+   241→          <Button variant="secondary" onClick={() => setEditMode(!editMode)}>{editMode ? 'Done' : 'Edit Release'}</Button>
+   242→          <Button variant="danger" onClick={deleteRelease}><Trash2 size={16} /></Button>
+   243→        </div>
+   244→      </div>
+   245→
+   246→      {/* Release details */}
+   247→      {editMode && (
+   248→        <Card className="p-6 mb-6">
+   249→          <h3 className="font-semibold text-neutral-900 mb-4">Release Details</h3>
+   250→          <EditReleaseForm release={release} onSave={(u) => { updateRelease(u); setEditMode(false); }} />
+   251→        </Card>
+   252→      )}
+   253→
+   254→      {!editMode && (
+   255→        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+   256→          <Card className="p-4"><p className="text-xs text-neutral-400">UPC</p><p className="text-sm font-medium text-neutral-900 mt-1">{release.upc ?? '—'}</p></Card>
+   257→          <Card className="p-4"><p className="text-xs text-neutral-400">Catalog #</p><p className="text-sm font-medium text-neutral-900 mt-1">{release.catalog_number ?? '—'}</p></Card>
+   258→          <Card className="p-4"><p className="text-xs text-neutral-400">Genre</p><p className="text-sm font-medium text-neutral-900 mt-1">{release.genre ?? '—'}</p></Card>
+   259→          <Card className="p-4"><p className="text-xs text-neutral-400">Price</p><p className="text-sm font-medium text-neutral-900 mt-1">{release.is_free ? 'Free' : formatCents(release.price_cents)}</p></Card>
+   260→        </div>
+   261→      )}
+   262→
+   263→      {/* Track list */}
+   264→      <div className="flex items-center justify-between mb-3">
+   265→        <h2 className="text-lg font-semibold text-neutral-900">Tracklist ({tracks.length})</h2>
+   266→        <Button variant="primary" size="sm" onClick={() => setAddTrackOpen(true)}><Plus size={14} /> Add Track</Button>
+   267→      </div>
+   268→
+   269→      {tracks.length === 0 ? (
+   270→        <Card className="p-6">
+   271→          <EmptyState icon={<Music size={48} />} title="No tracks yet" description="Add tracks to this release, then upload audio files and set pricing" action={<Button variant="primary" onClick={() => setAddTrackOpen(true)}><Plus size={16} /> Add Track</Button>} />
+   272→        </Card>
+   273→      ) : (
+   274→        <div className="space-y-3">
+   275→          {tracks.map((track) => (
+   276→            <TrackRow
+   277→              key={track.id}
+   278→              track={track}
+   279→              artistName={artist?.name}
+   280→              onEdit={() => setEditingTrack(track)}
+   281→              onDelete={() => deleteTrack(track.id)}
+   282→              onUpdated={fetch}
+   283→            />
+   284→          ))}
+   285→        </div>
+   286→      )}
+   287→
+   288→      <AddTrackModal open={addTrackOpen} onClose={() => setAddTrackOpen(false)} onCreated={fetch} releaseId={release.id} nextPosition={tracks.length + 1} />
+   289→      {editingTrack && <EditTrackModal track={editingTrack} artistName={artist?.name} onClose={() => setEditingTrack(null)} onSaved={fetch} />}
+   290→    </div>
+   291→  );
+   292→}
+   293→
+   294→function TrackRow({ track, artistName, onEdit, onDelete, onUpdated }: { track: Track; artistName?: string; onEdit: () => void; onDelete: () => void; onUpdated: () => void }) {
+   295→  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+   296→  const fileInputRef = useRef<HTMLInputElement>(null);
+   297→  const [uploading, setUploading] = useState(false);
+   298→
+   299→  useEffect(() => {
+   300→    if (track.audio_storage_path) {
+   301→      const { data } = supabase.storage.from('audio').getPublicUrl(track.audio_storage_path);
+   302→      setAudioUrl(data.publicUrl);
+   303→    } else {
+   304→      setAudioUrl(null);
+   305→    }
+   306→  }, [track.audio_storage_path]);
+   307→
+   308→  const handleUpload = async (file: File) => {
+   309→    setUploading(true);
+   310→    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'mp3';
+   311→    const path = `releases/${track.release_id}/${track.id}.${ext}`;
+   312→
+   313→    const { error: upErr } = await supabase.storage.from('audio').upload(path, file, { upsert: true });
+   314→    if (upErr) { setUploading(false); toast('error', 'Upload failed'); return; }
+   315→
+   316→    // Get duration from the audio element
+   317→    const audio = new Audio(URL.createObjectURL(file));
+   318→    audio.onloadedmetadata = async () => {
+   319→      const duration = Math.round(audio.duration);
+   320→      const { error } = await supabase.from('tracks').update({
+   321→        audio_storage_path: path,
+   322→        duration_seconds: duration,
+   323→      }).eq('id', track.id);
+   324→      setUploading(false);
+   325→      if (error) toast('error', 'Failed to save track info');
+   326→      else { toast('success', 'Audio uploaded'); onUpdated(); }
+   327→    };
+   328→  };
+   329→
+   330→  const download = async () => {
+   331→    if (!track.audio_storage_path) return;
+   332→    const { data, error } = await supabase.storage.from('audio').createSignedUrl(track.audio_storage_path, 3600);
+   333→    if (error || !data) { toast('error', 'Download failed'); return; }
+   334→    const a = document.createElement('a');
+   335→    a.href = data.signedUrl; a.download = `${track.title}.mp3`; a.click();
+   336→  };
+   337→
+   338→  return (
+   339→    <Card className="p-4">
+   340→      <div className="flex items-start gap-3">
+   341→        <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-sm font-medium text-neutral-400 flex-shrink-0 mt-1">
+   342→          {track.position}
+   343→        </div>
+   344→        <div className="flex-1 min-w-0">
+   345→          <div className="flex items-center gap-2 mb-1">
+   346→            <p className="text-sm font-semibold text-neutral-900">{track.title}</p>
+   347→            {track.is_free && <Badge color="green">Free</Badge>}
+   348→            {!track.is_free && track.price_cents > 0 && <Badge color="blue">{formatCents(track.price_cents)}</Badge>}
+   349→            {track.is_preview_enabled && !track.is_free && <Badge color="amber">{track.preview_seconds}s preview</Badge>}
+   350→            {!track.is_preview_enabled && !track.is_free && <Badge color="gray"><Lock size={10} className="inline" /> No preview</Badge>}
+   351→            {!track.download_allowed && <Badge color="gray">No download</Badge>}
+   352→          </div>
+   353→          <p className="text-xs text-neutral-400 mb-2">
+   354→            ISRC: {track.isrc ?? '—'} · Duration: {track.duration_seconds ? `${Math.floor(track.duration_seconds / 60)}:${String(track.duration_seconds % 60).padStart(2, '0')}` : '—'}
+   355→          </p>
+   356→
+   357→          {audioUrl ? (
+   358→            <AudioPlayer
+   359→              src={audioUrl}
+   360→              title={track.title}
+   361→              artist={artistName}
+   362→              previewSeconds={track.preview_seconds}
+   363→              isFree={track.is_free}
+   364→              isPreviewEnabled={track.is_preview_enabled}
+   365→              downloadAllowed={track.download_allowed}
+   366→              onDownload={download}
+   367→              compact
+   368→            />
+   369→          ) : (
+   370→            <div className="flex items-center gap-3">
+   371→              <input ref={fileInputRef} type="file" accept="audio/wav,audio/mpeg,audio/flac,audio/mp3,audio/x-wav" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); }} />
+   372→              <Button size="sm" variant="secondary" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+   373→                {uploading ? <><FileAudio size={14} className="animate-pulse" /> Uploading…</> : <><Upload size={14} /> Upload Audio</>}
+   374→              </Button>
+   375→              <span className="text-xs text-neutral-400">WAV, MP3, or FLAC</span>
+   376→            </div>
+   377→          )}
+   378→        </div>
+   379→        <div className="flex flex-col gap-1">
+   380→          <Button size="sm" variant="ghost" onClick={onEdit}><Edit size={14} /></Button>
+   381→          <Button size="sm" variant="ghost" onClick={onDelete}><Trash2 size={14} className="text-red-500" /></Button>
+   382→        </div>
+   383→      </div>
+   384→    </Card>
+   385→  );
+   386→}
+   387→
+   388→function EditReleaseForm({ release, onSave }: { release: Release; onSave: (u: Partial<Release>) => void }) {
+   389→  const [form, setForm] = useState({
+   390→    title: release.title,
+   391→    type: release.type,
+   392→    upc: release.upc ?? '',
+   393→    catalog_number: release.catalog_number ?? '',
+   394→    genre: release.genre ?? '',
+   395→    release_date: release.release_date ?? '',
+   396→    status: release.status,
+   397→    price: centsToInput(release.price_cents),
+   398→    is_free: release.is_free,
+   399→    explicit: release.explicit,
+   400→  });
+   401→
+   402→  return (
+   403→    <div className="space-y-4">
+   404→      <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+   405→      <div className="grid grid-cols-2 gap-4">
+   406→        <Field label="Type"><Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></Select></Field>
+   407→        <Field label="Genre"><Input value={form.genre} onChange={(e) => setForm({ ...form, genre: e.target.value })} placeholder="Electronic, Hip-Hop…" /></Field>
+   408→      </div>
+   409→      <div className="grid grid-cols-2 gap-4">
+   410→        <Field label="UPC / EAN"><Input value={form.upc} onChange={(e) => setForm({ ...form, upc: e.target.value })} placeholder="0123456789012" /></Field>
+   411→        <Field label="Catalog Number"><Input value={form.catalog_number} onChange={(e) => setForm({ ...form, catalog_number: e.target.value })} placeholder="CAT-001" /></Field>
+   412→      </div>
+   413→      <div className="grid grid-cols-2 gap-4">
+   414→        <Field label="Release Date"><Input type="date" value={form.release_date ?? ''} onChange={(e) => setForm({ ...form, release_date: e.target.value })} /></Field>
+   415→        <Field label="Status"><Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>{STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</Select></Field>
+   416→      </div>
+   417→      <div className="grid grid-cols-2 gap-4">
+   418→        <Field label="Release Price (USD)" hint="Full release purchase price"><Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} disabled={form.is_free} placeholder="0.00" /></Field>
+   419→        <div className="flex flex-col justify-end gap-3">
+   420→          <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.is_free} onChange={(e) => setForm({ ...form, is_free: e.target.checked })} /> Free release (no purchase required)</label>
+   421→          <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.explicit} onChange={(e) => setForm({ ...form, explicit: e.target.checked })} /> Explicit content</label>
+   422→        </div>
+   423→      </div>
+   424→      <Button variant="primary" onClick={() => onSave({
+   425→        title: form.title, type: form.type, upc: form.upc || null, catalog_number: form.catalog_number || null,
+   426→        genre: form.genre || null, release_date: form.release_date || null, status: form.status,
+   427→        price_cents: form.is_free ? 0 : inputToCents(form.price), is_free: form.is_free, explicit: form.explicit,
+   428→      })}><Save size={16} /> Save Changes</Button>
+   429→    </div>
+   430→  );
+   431→}
+   432→
+   433→function AddTrackModal({ open, onClose, onCreated, releaseId, nextPosition }: { open: boolean; onClose: () => void; onCreated: () => void; releaseId: string; nextPosition: number }) {
+   434→  const [form, setForm] = useState({ title: '', position: String(nextPosition), isrc: '', isrc_explicit: false });
+   435→  const [saving, setSaving] = useState(false);
+   436→
+   437→  useEffect(() => { setForm({ title: '', position: String(nextPosition), isrc: '', isrc_explicit: false }); }, [nextPosition, open]);
+   438→
+   439→  const save = async () => {
+   440→    if (!form.title) { toast('error', 'Title is required'); return; }
+   441→    setSaving(true);
+   442→    const { error } = await supabase.from('tracks').insert({
+   443→      title: form.title,
+   444→      release_id: releaseId,
+   445→      position: parseInt(form.position) || nextPosition,
+   446→      isrc: form.isrc || null,
+   447→      isrc_explicit: form.isrc_explicit,
+   448→    });
+   449→    setSaving(false);
+   450→    if (error) { toast('error', 'Failed to create track'); return; }
+   451→    toast('success', 'Track added');
+   452→    onClose(); onCreated();
+   453→  };
+   454→
+   455→  return (
+   456→    <Modal open={open} onClose={onClose} title="Add Track" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Add'}</Button></>}>
+   457→      <div className="space-y-4">
+   458→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} autoFocus /></Field>
+   459→        <div className="grid grid-cols-2 gap-4">
+   460→          <Field label="Position"><Input type="number" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} /></Field>
+   461→          <Field label="ISRC"><Input value={form.isrc} onChange={(e) => setForm({ ...form, isrc: e.target.value })} placeholder="US-XXX-YY-NNNNN" /></Field>
+   462→        </div>
+   463→        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.isrc_explicit} onChange={(e) => setForm({ ...form, isrc_explicit: e.target.checked })} /> Explicit lyrics</label>
+   464→      </div>
+   465→    </Modal>
+   466→  );
+   467→}
+   468→
+   469→function EditTrackModal({ track, artistName, onClose, onSaved }: { track: Track; artistName?: string; onClose: () => void; onSaved: () => void }) {
+   470→  const [form, setForm] = useState({
+   471→    title: track.title,
+   472→    isrc: track.isrc ?? '',
+   473→    position: String(track.position),
+   474→    preview_seconds: String(track.preview_seconds),
+   475→    is_preview_enabled: track.is_preview_enabled,
+   476→    is_free: track.is_free,
+   477→    download_allowed: track.download_allowed,
+   478→    price: centsToInput(track.price_cents),
+   479→  });
+   480→  const [saving, setSaving] = useState(false);
+   481→
+   482→  const save = async () => {
+   483→    setSaving(true);
+   484→    const { error } = await supabase.from('tracks').update({
+   485→      title: form.title,
+   486→      isrc: form.isrc || null,
+   487→      position: parseInt(form.position) || track.position,
+   488→      preview_seconds: parseInt(form.preview_seconds) || 30,
+   489→      is_preview_enabled: form.is_preview_enabled,
+   490→      is_free: form.is_free,
+   491→      download_allowed: form.download_allowed,
+   492→      price_cents: form.is_free ? 0 : inputToCents(form.price),
+   493→    }).eq('id', track.id);
+   494→    setSaving(false);
+   495→    if (error) { toast('error', 'Failed to save'); return; }
+   496→    toast('success', 'Track updated');
+   497→    onClose(); onSaved();
+   498→  };
+   499→
+   500→  return (
+   501→    <Modal open={true} onClose={onClose} title="Edit Track" size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button></>}>
+   502→      <div className="space-y-4">
+   503→        <div className="grid grid-cols-2 gap-4">
+   504→          <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+   505→          <Field label="Position"><Input type="number" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} /></Field>
+   506→        </div>
+   507→        <div className="grid grid-cols-2 gap-4">
+   508→          <Field label="ISRC"><Input value={form.isrc} onChange={(e) => setForm({ ...form, isrc: e.target.value })} placeholder="US-XXX-YY-NNNNN" /></Field>
+   509→          <Field label="Preview Length (seconds)" hint="How many seconds can be played for free"><Input type="number" value={form.preview_seconds} onChange={(e) => setForm({ ...form, preview_seconds: e.target.value })} disabled={!form.is_preview_enabled || form.is_free} /></Field>
+   510→        </div>
+   511→
+   512→        <div className="border-t border-neutral-200 pt-4">
+   513→          <p className="text-sm font-semibold text-neutral-700 mb-3">Permissions & Pricing</p>
+   514→          <div className="space-y-3">
+   515→            <label className="flex items-center gap-2 text-sm text-neutral-700">
+   516→              <input type="checkbox" checked={form.is_free} onChange={(e) => setForm({ ...form, is_free: e.target.checked })} />
+   517→              Free track (anyone can stream and download the full song)
+   518→            </label>
+   519→            {!form.is_free && (
+   520→              <>
+   521→                <label className="flex items-center gap-2 text-sm text-neutral-700">
+   522→                  <input type="checkbox" checked={form.is_preview_enabled} onChange={(e) => setForm({ ...form, is_preview_enabled: e.target.checked })} />
+   523→                  Allow free preview (first {form.preview_seconds} seconds)
+   524→                </label>
+   525→                <Field label="Track Price (USD)" hint="Price to purchase the full track"><Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0.99" /></Field>
+   526→              </>
+   527→            )}
+   528→            <label className="flex items-center gap-2 text-sm text-neutral-700">
+   529→              <input type="checkbox" checked={form.download_allowed} onChange={(e) => setForm({ ...form, download_allowed: e.target.checked })} />
+   530→              Allow download (for free tracks or after purchase)
+   531→            </label>
+   532→          </div>
+   533→        </div>
+   534→
+   535→        <div className="bg-neutral-50 rounded-lg p-3">
+   536→          <p className="text-xs font-semibold text-neutral-500 uppercase mb-2">Preview</p>
+   537→          <p className="text-xs text-neutral-500">
+   538→            {form.is_free
+   539→              ? 'Full track is free — anyone can stream and download the entire song.'
+   540→              : form.is_preview_enabled
+   541→                ? `Non-buyers can play the first ${form.preview_seconds} seconds. Full track requires purchase.`
+   542→                : 'No preview available. Full track requires purchase to listen.'}
+   543→            {!form.download_allowed && ' Downloads disabled.'}
+   544→          </p>
+   545→        </div>
+   546→      </div>
+   547→    </Modal>
+   548→  );
+   549→}
+   550→
+   551→===FILE:/tmp/dashboard-repo/src/pages/catalog/TracksPage.tsx===
+   552→import { useEffect, useState, useCallback } from 'react';
+   553→import { Link } from 'react-router-dom';
+   554→import { Music, Plus, FileAudio, Lock, DollarSign, Gift } from 'lucide-react';
+   555→import { Button } from '@/components/ui/Button';
+   556→import { Card } from '@/components/ui/Card';
+   557→import { Badge, StatusBadge } from '@/components/ui/Badge';
+   558→import { LoadingState, EmptyState } from '@/components/ui/States';
+   559→import { PageHeader } from '@/components/layout/PageHeader';
+   560→import { Modal } from '@/components/ui/Modal';
+   561→import { Field, Input, Select } from '@/components/ui/Form';
+   562→import { toast } from '@/components/ui/Toast';
+   563→import { supabase } from '@/lib/supabase';
+   564→import { formatCents } from '@/lib/format';
+   565→import type { Track, Release } from '@/types/database';
+   566→
+   567→export default function TracksPage() {
+   568→  const [tracks, setTracks] = useState<Track[]>([]);
+   569→  const [releases, setReleases] = useState<Release[]>([]);
+   570→  const [loading, setLoading] = useState(true);
+   571→  const [createOpen, setCreateOpen] = useState(false);
+   572→
+   573→  const fetch = useCallback(async () => {
+   574→    setLoading(true);
+   575→    const [t, r] = await Promise.all([
+   576→      supabase.from('tracks').select('*').order('position', { ascending: true }),
+   577→      supabase.from('releases').select('id, title'),
+   578→    ]);
+   579→    setTracks(t.data ?? []);
+   580→    setReleases(r.data ?? []);
+   581→    setLoading(false);
+   582→  }, []);
+   583→
+   584→  useEffect(() => { fetch(); }, [fetch]);
+   585→
+   586→  const releaseTitle = (id: string) => releases.find((r) => r.id === id)?.title ?? '—';
+   587→  const releaseId = (id: string) => releases.find((r) => r.id === id)?.id ?? '';
+   588→
+   589→  return (
+   590→    <div>
+   591→      <PageHeader title="Tracks" description="All tracks across your catalog — click a release to manage audio and pricing" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Track</Button>} />
+   592→      {loading ? <LoadingState /> : tracks.length === 0 ? (
+   593→        <Card className="p-6"><EmptyState icon={<Music size={48} />} title="No tracks yet" description="Create a release first, then add tracks from the release detail page" /></Card>
+   594→      ) : (
+   595→        <Card className="p-0 overflow-hidden">
+   596→          <table className="w-full">
+   597→            <thead className="bg-neutral-50 border-b border-neutral-200">
+   598→              <tr>
+   599→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">#</th>
+   600→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Title</th>
+   601→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Release</th>
+   602→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Audio</th>
+   603→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Duration</th>
+   604→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">ISRC</th>
+   605→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Pricing</th>
+   606→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Status</th>
+   607→              </tr>
+   608→            </thead>
+   609→            <tbody className="divide-y divide-neutral-100">
+   610→              {tracks.map((t) => (
+   611→                <tr key={t.id} className="hover:bg-neutral-50">
+   612→                  <td className="px-4 py-3 text-sm text-neutral-400">{t.position}</td>
+   613→                  <td className="px-4 py-3 text-sm font-medium text-neutral-900">{t.title}</td>
+   614→                  <td className="px-4 py-3 text-sm text-neutral-600">
+   615→                    <Link to={`/catalog/releases/${releaseId(t.release_id)}`} className="hover:text-neutral-900 hover:underline">{releaseTitle(t.release_id)}</Link>
+   616→                  </td>
+   617→                  <td className="px-4 py-3">
+   618→                    {t.audio_storage_path ? (
+   619→                      <Badge color="green"><FileAudio size={10} className="inline mr-1" /> Uploaded</Badge>
+   620→                    ) : (
+   621→                      <Badge color="gray">No audio</Badge>
+   622→                    )}
+   623→                  </td>
+   624→                  <td className="px-4 py-3 text-sm text-neutral-600">{t.duration_seconds ? `${Math.floor(t.duration_seconds / 60)}:${String(t.duration_seconds % 60).padStart(2, '0')}` : '—'}</td>
+   625→                  <td className="px-4 py-3 text-sm text-neutral-600">{t.isrc ?? '—'}</td>
+   626→                  <td className="px-4 py-3">
+   627→                    {t.is_free ? (
+   628→                      <Badge color="green"><Gift size={10} className="inline mr-1" /> Free</Badge>
+   629→                    ) : t.price_cents > 0 ? (
+   630→                      <Badge color="blue"><DollarSign size={10} className="inline mr-1" /> {formatCents(t.price_cents)}</Badge>
+   631→                    ) : (
+   632→                      <Badge color="gray">Not priced</Badge>
+   633→                    )}
+   634→                    {!t.is_preview_enabled && !t.is_free && <Badge color="gray" ><Lock size={10} className="inline" /></Badge>}
+   635→                  </td>
+   636→                  <td className="px-4 py-3"><StatusBadge status={t.status} /></td>
+   637→                </tr>
+   638→              ))}
+   639→            </tbody>
+   640→          </table>
+   641→        </Card>
+   642→      )}
+   643→      <CreateTrackModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetch} releases={releases} />
+   644→    </div>
+   645→  );
+   646→}
+   647→
+   648→function CreateTrackModal({ open, onClose, onCreated, releases }: { open: boolean; onClose: () => void; onCreated: () => void; releases: Release[] }) {
+   649→  const [form, setForm] = useState({ title: '', release_id: '', position: '1', duration_seconds: '', isrc: '' });
+   650→  const [saving, setSaving] = useState(false);
+   651→
+   652→  const save = async () => {
+   653→    if (!form.title || !form.release_id) { toast('error', 'Title and release are required'); return; }
+   654→    setSaving(true);
+   655→    const { error } = await supabase.from('tracks').insert({
+   656→      title: form.title,
+   657→      release_id: form.release_id,
+   658→      position: parseInt(form.position) || 1,
+   659→      duration_seconds: form.duration_seconds ? parseInt(form.duration_seconds) : null,
+   660→      isrc: form.isrc || null,
+   661→    });
+   662→    setSaving(false);
+   663→    if (error) { toast('error', 'Failed to create track'); return; }
+   664→    toast('success', 'Track created — upload audio from the release page');
+   665→    setForm({ title: '', release_id: '', position: '1', duration_seconds: '', isrc: '' });
+   666→    onClose(); onCreated();
+   667→  };
+   668→
+   669→  return (
+   670→    <Modal open={open} onClose={onClose} title="New Track" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button></>}>
+   671→      <div className="space-y-4">
+   672→        <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} autoFocus /></Field>
+   673→        <Field label="Release" required><Select value={form.release_id} onChange={(e) => setForm({ ...form, release_id: e.target.value })}><option value="">—</option>{releases.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}</Select></Field>
+   674→        <div className="grid grid-cols-2 gap-4">
+   675→          <Field label="Position"><Input type="number" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} /></Field>
+   676→          <Field label="Duration (sec)"><Input type="number" value={form.duration_seconds} onChange={(e) => setForm({ ...form, duration_seconds: e.target.value })} /></Field>
+   677→        </div>
+   678→        <Field label="ISRC"><Input value={form.isrc} onChange={(e) => setForm({ ...form, isrc: e.target.value })} placeholder="US-XXX-YY-NNNNN" /></Field>
+   679→      </div>
+   680→    </Modal>
+   681→  );
+   682→}
+   683→
+   684→===FILE:/tmp/dashboard-repo/src/pages/commerce/OrdersPage.tsx===
+   685→import { useEffect, useState, useCallback } from 'react';
+   686→import { ShoppingBag } from 'lucide-react';
+   687→import { Card } from '@/components/ui/Card';
+   688→import { StatusBadge } from '@/components/ui/Badge';
+   689→import { LoadingState, EmptyState } from '@/components/ui/States';
+   690→import { PageHeader } from '@/components/layout/PageHeader';
+   691→import { supabase } from '@/lib/supabase';
+   692→import { formatCents, formatDateTime } from '@/lib/format';
+   693→import type { Order } from '@/types/database';
+   694→
+   695→export default function OrdersPage() {
+   696→  const [orders, setOrders] = useState<Order[]>([]);
+   697→  const [loading, setLoading] = useState(true);
+   698→
+   699→  const fetch = useCallback(async () => {
+   700→    setLoading(true);
+   701→    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+   702→    setOrders(data ?? []);
+   703→    setLoading(false);
+   704→  }, []);
+   705→
+   706→  useEffect(() => { fetch(); }, [fetch]);
+   707→
+   708→  return (
+   709→    <div>
+   710→      <PageHeader title="Orders" description="Commerce orders from your store" />
+   711→      {loading ? <LoadingState /> : orders.length === 0 ? (
+   712→        <Card className="p-6"><EmptyState icon={<ShoppingBag size={48} />} title="No orders yet" description="Orders will appear here when fans purchase" /></Card>
+   713→      ) : (
+   714→        <Card className="p-0 overflow-hidden">
+   715→          <table className="w-full">
+   716→            <thead className="bg-neutral-50 border-b border-neutral-200">
+   717→              <tr>
+   718→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Order ID</th>
+   719→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Amount</th>
+   720→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Status</th>
+   721→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Date</th>
+   722→                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Stripe PI</th>
+   723→              </tr>
+   724→            </thead>
+   725→            <tbody className="divide-y divide-neutral-100">
+   726→              {orders.map((o) => (
+   727→                <tr key={o.id} className="hover:bg-neutral-50">
+   728→                  <td className="px-4 py-3 text-sm font-mono text-neutral-500">{o.id.slice(0, 8)}</td>
+   729→                  <td className="px-4 py-3 text-sm font-medium text-neutral-900">{formatCents(o.amount_total_cents)}</td>
+   730→                  <td className="px-4 py-3"><StatusBadge status={o.status} /></td>
+   731→                  <td className="px-4 py-3 text-sm text-neutral-600">{formatDateTime(o.created_at)}</td>
+   732→                  <td className="px-4 py-3 text-sm font-mono text-neutral-400">{o.stripe_payment_intent_id ?? '—'}</td>
+   733→                </tr>
+   734→              ))}
+   735→            </tbody>
+   736→          </table>
+   737→        </Card>
+   738→      )}
+   739→    </div>
+   740→  );
+   741→}
+   742→
+   743→===FILE:/tmp/dashboard-repo/src/pages/bookings/BookingsPipelinePage.tsx===
+   744→import { useEffect, useState, useCallback } from 'react';
+   745→import { Link } from 'react-router-dom';
+   746→import { Plus, Calendar, GripVertical } from 'lucide-react';
+   747→import { Button } from '@/components/ui/Button';
+   748→import { Card } from '@/components/ui/Card';
+   749→import { StatusBadge } from '@/components/ui/Badge';
+   750→import { LoadingState, EmptyState } from '@/components/ui/States';
+   751→import { PageHeader } from '@/components/layout/PageHeader';
+   752→import { Modal } from '@/components/ui/Modal';
+   753→import { Field, Input, Select, Textarea } from '@/components/ui/Form';
+   754→import { toast } from '@/components/ui/Toast';
+   755→import { supabase } from '@/lib/supabase';
+   756→import { formatCents, formatDate, centsToInput, inputToCents } from '@/lib/format';
+   757→import type { Booking } from '@/types/database';
+   758→
+   759→const COLUMNS = [
+   760→  { status: 'inquiry', label: 'Inquiry', color: 'border-t-neutral-400' },
+   761→  { status: 'hold', label: 'Hold', color: 'border-t-amber-400' },
+   762→  { status: 'confirmed', label: 'Confirmed', color: 'border-t-blue-400' },
+   763→  { status: 'contract_sent', label: 'Contract Sent', color: 'border-t-blue-500' },
+   764→  { status: 'contract_signed', label: 'Contract Signed', color: 'border-t-teal-400' },
+   765→  { status: 'deposit_paid', label: 'Deposit Paid', color: 'border-t-green-400' },
+   766→  { status: 'paid_in_full', label: 'Paid In Full', color: 'border-t-green-500' },
+   767→  { status: 'completed', label: 'Completed', color: 'border-t-neutral-300' },
+   768→  { status: 'cancelled', label: 'Cancelled', color: 'border-t-red-300' },
+   769→];
+   770→
+   771→export default function BookingsPipelinePage() {
+   772→  const [bookings, setBookings] = useState<Booking[]>([]);
+   773→  const [loading, setLoading] = useState(true);
+   774→  const [createOpen, setCreateOpen] = useState(false);
+   775→  const [draggedId, setDraggedId] = useState<string | null>(null);
+   776→  const [dragOverCol, setDragOverCol] = useState<string | null>(null);
+   777→
+   778→  const fetchBookings = useCallback(async () => {
+   779→    setLoading(true);
+   780→    const { data } = await supabase.from('bookings').select('*').order('event_date', { ascending: true });
+   781→    setBookings(data ?? []);
+   782→    setLoading(false);
+   783→  }, []);
+   784→
+   785→  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+   786→
+   787→  const handleDrop = async (status: string) => {
+   788→    if (!draggedId) return;
+   789→    const booking = bookings.find((b) => b.id === draggedId);
+   790→    if (booking && booking.status === status) { setDraggedId(null); setDragOverCol(null); return; }
+   791→    setBookings((prev) => prev.map((b) => (b.id === draggedId ? { ...b, status } : b)));
+   792→    setDraggedId(null);
+   793→    setDragOverCol(null);
+   794→    const { error } = await supabase.from('bookings').update({ status }).eq('id', draggedId);
+   795→    if (error) { toast('error', 'Failed to update status'); fetchBookings(); }
+   796→    else toast('success', 'Booking status updated');
+   797→  };
+   798→
+   799→  return (
+   800→    <div>
+   801→      <PageHeader
+   802→        title="Bookings Pipeline"
+   803→        description="Drag bookings across stages to update their status"
+   804→        actions={
+   805→          <>
+   806→            <Link to="/bookings/calendar"><Button variant="secondary"><Calendar size={16} /> Calendar</Button></Link>
+   807→            <Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Booking</Button>
+   808→          </>
+   809→        }
+   810→      />
+   811→
+   812→      {loading ? (
+   813→        <LoadingState />
+   814→      ) : bookings.length === 0 ? (
+   815→        <Card className="p-6">
+   816→          <EmptyState
+   817→            icon={<Calendar size={48} />}
+   818→            title="No bookings yet"
+   819→            description="Create your first booking to start managing your pipeline"
+   820→            action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Booking</Button>}
+   821→          />
+   822→        </Card>
+   823→      ) : (
+   824→        <div className="flex gap-3 overflow-x-auto pb-4">
+   825→          {COLUMNS.map((col) => {
+   826→            const colBookings = bookings.filter((b) => b.status === col.status);
+   827→            return (
+   828→              <div
+   829→                key={col.status}
+   830→                onDragOver={(e) => { e.preventDefault(); setDragOverCol(col.status); }}
+   831→                onDragLeave={() => setDragOverCol(null)}
+   832→                onDrop={() => handleDrop(col.status)}
+   833→                className={`flex-shrink-0 w-72 ${dragOverCol === col.status ? 'ring-2 ring-neutral-300 rounded-lg' : ''}`}
+   834→              >
+   835→                <Card className={`p-0 border-t-4 ${col.color}`}>
+   836→                  <div className="px-4 py-3 border-b border-neutral-100">
+   837→                    <div className="flex items-center justify-between">
+   838→                      <h3 className="text-sm font-semibold text-neutral-700">{col.label}</h3>
+   839→                      <span className="text-xs text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">{colBookings.length}</span>
+   840→                    </div>
+   841→                  </div>
+   842→                  <div className="p-2 space-y-2 min-h-[100px]">
+   843→                    {colBookings.map((b) => (
+   844→                      <div
+   845→                        key={b.id}
+   846→                        draggable
+   847→                        onDragStart={() => setDraggedId(b.id)}
+   848→                        onDragEnd={() => { setDraggedId(null); setDragOverCol(null); }}
+   849→                        className={`bg-white rounded-lg border border-neutral-200 p-3 cursor-grab hover:shadow-sm transition-shadow ${draggedId === b.id ? 'opacity-50' : ''}`}
+   850→                      >
+   851→                        <Link to={`/bookings/${b.id}`} className="block">
+   852→                          <div className="flex items-start justify-between gap-2 mb-1">
+   853→                            <p className="text-sm font-medium text-neutral-900 line-clamp-1">{b.event_name}</p>
+   854→                            <GripVertical size={14} className="text-neutral-300 flex-shrink-0" />
+   855→                          </div>
+   856→                          <p className="text-xs text-neutral-500 mb-2">{b.venue_name}</p>
+   857→                          <div className="flex items-center justify-between">
+   858→                            <span className="text-xs text-neutral-400">{formatDate(b.event_date)}</span>
+   859→                            <span className="text-xs font-medium text-neutral-700">{formatCents(b.fee_cents)}</span>
+   860→                          </div>
+   861→                        </Link>
+   862→                      </div>
+   863→                    ))}
+   864→                    {colBookings.length === 0 && <p className="text-xs text-neutral-300 text-center py-4">Drop here</p>}
+   865→                  </div>
+   866→                </Card>
+   867→              </div>
+   868→            );
+   869→          })}
+   870→        </div>
+   871→      )}
+   872→
+   873→      <CreateBookingModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetchBookings} />
+   874→    </div>
+   875→  );
+   876→}
+   877→
+   878→function CreateBookingModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+   879→  const [form, setForm] = useState({
+   880→    event_name: '',
+   881→    venue_name: '',
+   882→    event_date: '',
+   883→    event_type: 'club',
+   884→    fee: '',
+   885→    deposit: '',
+   886→    status: 'inquiry',
+   887→  });
+   888→  const [saving, setSaving] = useState(false);
+   889→
+   890→  const save = async () => {
+   891→    if (!form.event_name || !form.venue_name || !form.event_date) {
+   892→      toast('error', 'Event name, venue, and date are required');
+   893→      return;
+   894→    }
+   895→    setSaving(true);
+   896→    const { error } = await supabase.from('bookings').insert({
+   897→      event_name: form.event_name,
+   898→      venue_name: form.venue_name,
+   899→      event_date: form.event_date,
+   900→      event_type: form.event_type,
+   901→      fee_cents: inputToCents(form.fee),
+   902→      deposit_cents: form.deposit ? inputToCents(form.deposit) : null,
+   903→      status: form.status,
+   904→    });
+   905→    setSaving(false);
+   906→    if (error) { toast('error', 'Failed to create booking'); return; }
+   907→    toast('success', 'Booking created');
+   908→    setForm({ event_name: '', venue_name: '', event_date: '', event_type: 'club', fee: '', deposit: '', status: 'inquiry' });
+   909→    onClose();
+   910→    onCreated();
+   911→  };
+   912→
+   913→  return (
+   914→    <Modal
+   915→      open={open}
+   916→      onClose={onClose}
+   917→      title="New Booking"
+   918→      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create Booking'}</Button></>}
+   919→    >
+   920→      <div className="space-y-4">
+   921→        <Field label="Event Name" required><Input value={form.event_name} onChange={(e) => setForm({ ...form, event_name: e.target.value })} placeholder="NYE Party 2026" /></Field>
+   922→        <Field label="Venue" required><Input value={form.venue_name} onChange={(e) => setForm({ ...form, venue_name: e.target.value })} placeholder="The Warehouse" /></Field>
+   923→        <div className="grid grid-cols-2 gap-4">
+   924→          <Field label="Event Date" required><Input type="date" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} /></Field>
+   925→          <Field label="Event Type"><Select value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })}><option value="club">Club</option><option value="private">Private</option><option value="festival">Festival</option><option value="corporate">Corporate</option><option value="wedding">Wedding</option><option value="other">Other</option></Select></Field>
+   926→        </div>
+   927→        <div className="grid grid-cols-2 gap-4">
+   928→          <Field label="Fee (USD)"><Input type="number" step="0.01" value={form.fee} onChange={(e) => setForm({ ...form, fee: e.target.value })} placeholder="0.00" /></Field>
+   929→          <Field label="Deposit (USD)"><Input type="number" step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} placeholder="0.00" /></Field>
+   930→        </div>
+   931→        <Field label="Initial Status"><Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>{COLUMNS.map((c) => <option key={c.status} value={c.status}>{c.label}</option>)}</Select></Field>
+   932→      </div>
+   933→    </Modal>
+   934→  );
+   935→}
+   936→
+   937→===FILE:/tmp/dashboard-repo/src/pages/bookings/BookingsCalendarPage.tsx===
+   938→import { useEffect, useState, useCallback, useMemo } from 'react';
+   939→import { Link } from 'react-router-dom';
+   940→import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+   941→import { Button } from '@/components/ui/Button';
+   942→import { Card } from '@/components/ui/Card';
+   943→import { LoadingState } from '@/components/ui/States';
+   944→import { PageHeader } from '@/components/layout/PageHeader';
+   945→import { Modal } from '@/components/ui/Modal';
+   946→import { Field, Input, Select } from '@/components/ui/Form';
+   947→import { toast } from '@/components/ui/Toast';
+   948→import { supabase } from '@/lib/supabase';
+   949→import { formatCents, centsToInput, inputToCents } from '@/lib/format';
+   950→import type { Booking } from '@/types/database';
+   951→
+   952→const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+   953→const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+   954→
+   955→const statusColors: Record<string, string> = {
+   956→  inquiry: 'bg-neutral-400',
+   957→  hold: 'bg-amber-400',
+   958→  confirmed: 'bg-blue-500',
+   959→  contract_sent: 'bg-blue-400',
+   960→  contract_signed: 'bg-teal-500',
+   961→  deposit_paid: 'bg-green-500',
+   962→  paid_in_full: 'bg-green-600',
+   963→  completed: 'bg-neutral-300',
+   964→  cancelled: 'bg-red-400',
+   965→};
+   966→
+   967→export default function BookingsCalendarPage() {
+   968→  const [bookings, setBookings] = useState<Booking[]>([]);
+   969→  const [loading, setLoading] = useState(true);
+   970→  const [currentDate, setCurrentDate] = useState(new Date());
+   971→  const [createOpen, setCreateOpen] = useState(false);
+   972→  const [createDate, setCreateDate] = useState<string>('');
+   973→
+   974→  const fetchBookings = useCallback(async () => {
+   975→    setLoading(true);
+   976→    const { data } = await supabase.from('bookings').select('*').order('event_date', { ascending: true });
+   977→    setBookings(data ?? []);
+   978→    setLoading(false);
+   979→  }, []);
+   980→
+   981→  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+   982→
+   983→  const year = currentDate.getFullYear();
+   984→  const month = currentDate.getMonth();
+   985→
+   986→  const firstDay = useMemo(() => new Date(year, month, 1), [year, month]);
+   987→  const daysInMonth = useMemo(() => new Date(year, month + 1, 0).getDate(), [year, month]);
+   988→  const startOffset = firstDay.getDay();
+   989→
+   990→  const bookingsByDate = useMemo(() => {
+   991→    const map: Record<string, Booking[]> = {};
+   992→    for (const b of bookings) {
+   993→      const key = b.event_date;
+   994→      if (!map[key]) map[key] = [];
+   995→      map[key].push(b);
+   996→    }
+   997→    return map;
+   998→  }, [bookings]);
+   999→
+  1000→  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  1001→  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  1002→  const goToday = () => setCurrentDate(new Date());
+  1003→
+  1004→  const openCreate = (dateStr: string) => { setCreateDate(dateStr); setCreateOpen(true); };
+  1005→
+  1006→  return (
+  1007→    <div>
+  1008→      <PageHeader
+  1009→        title="Bookings Calendar"
+  1010→        description="View and manage bookings on a monthly calendar"
+  1011→        actions={<Button variant="primary" onClick={() => { setCreateDate(new Date().toISOString().slice(0, 10)); setCreateOpen(true); }}><Plus size={16} /> New Booking</Button>}
+  1012→      />
+  1013→
+  1014→      <div className="flex items-center justify-between mb-4">
+  1015→        <div className="flex items-center gap-2">
+  1016→          <Button variant="ghost" onClick={prevMonth}><ChevronLeft size={18} /></Button>
+  1017→          <h2 className="text-lg font-semibold text-neutral-900 min-w-[180px] text-center">{MONTHSonth]} {year}</h2>
+  1018→          <Button variant="ghost" onClick={nextMonth}><ChevronRight size={18} /></Button>
+  1019→        </div>
+  1020→        <Button variant="secondary" onClick={goToday}>Today</Button>
+  1021→      </div>
+  1022→
+  1023→      {loading ? (
+  1024→        <LoadingState />
+  1025→      ) : (
+  1026→        <Card className="p-0 overflow-hidden">
+  1027→          {/* Weekday header */}
+  1028→          <div className="grid grid-cols-7 border-b border-neutral-200">
+  1029→            {WEEKDAYS.map((d) => (
+  1030→              <div key={d} className="px-3 py-2 text-xs font-semibold text-neutral-500 text-center">{d}</div>
+  1031→            ))}
+  1032→          </div>
+  1033→
+  1034→          {/* Calendar grid */}
+  1035→          <div className="grid grid-cols-7">
+  1036→            {Array.from({ length: startOffset }).map((_, i) => (
+  1037→              <div key={`empty-${i}`} className="min-h-[120px] border-r border-b border-neutral-100 bg-neutral-50" />
+  1038→            ))}
+  1039→            {Array.from({ length: daysInMonth }).map((_, i) => {
+  1040→              const day = i + 1;
+  1041→              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  1042→              const dayBookings = bookingsByDate[dateStr] ?? [];
+  1043→              const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+  1044→              return (
+  1045→                <div
+  1046→                  key={day}
+  1047→                  onClick={() => openCreate(dateStr)}
+  1048→                  className={`min-h-[120px] border-r border-b border-neutral-100 p-1.5 cursor-pointer hover:bg-neutral-50 transition-colors ${isToday ? 'bg-blue-50/50' : ''}`}
+  1049→                >
+  1050→                  <div className={`text-xs font-medium mb-1 ${isToday ? 'text-blue-600' : 'text-neutral-500'}`}>{day}</div>
+  1051→                  <div className="space-y-1">
+  1052→                    {dayBookings.slice(0, 3).map((b) => (
+  1053→                      <Link
+  1054→                        key={b.id}
+  1055→                        to={`/bookings/${b.id}`}
+  1056→                        onClick={(e) => e.stopPropagation()}
+  1057→                        className="block"
+  1058→                      >
+  1059→                        <div className="flex items-center gap-1.5 px-1.5 py-1 rounded text-xs hover:bg-white transition-colors">
+  1060→                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusColors[b.status] ?? 'bg-neutral-400'}`} />
+  1061→                          <span className="text-neutral-700 truncate">{b.event_name}</span>
+  1062→                        </div>
+  1063→                      </Link>
+  1064→                    ))}
+  1065→                    {dayBookings.length > 3 && <p className="text-xs text-neutral-400 px-1.5">+{dayBookings.length - 3} more</p>}
+  1066→                  </div>
+  1067→                </div>
+  1068→              );
+  1069→            })}
+  1070→          </div>
+  1071→        </Card>
+  1072→      )}
+  1073→
+  1074→      <QuickCreateModal
+  1075→        open={createOpen}
+  1076→        onClose={() => setCreateOpen(false)}
+  1077→        date={createDate}
+  1078→        onCreated={fetchBookings}
+  1079→      />
+  1080→    </div>
+  1081→  );
+  1082→}
+  1083→
+  1084→function QuickCreateModal({ open, onClose, date, onCreated }: { open: boolean; onClose: () => void; date: string; onCreated: () => void }) {
+  1085→  const [form, setForm] = useState({ event_name: '', venue_name: '', fee: '', status: 'inquiry' });
+  1086→  const [saving, setSaving] = useState(false);
+  1087→
+  1088→  useEffect(() => { setForm({ event_name: '', venue_name: '', fee: '', status: 'inquiry' }); }, [date, open]);
+  1089→
+  1090→  const save = async () => {
+  1091→    if (!form.event_name || !form.venue_name) { toast('error', 'Event name and venue are required'); return; }
+  1092→    setSaving(true);
+  1093→    const { error } = await supabase.from('bookings').insert({
+  1094→      event_name: form.event_name,
+  1095→      venue_name: form.venue_name,
+  1096→      event_date: date,
+  1097→      fee_cents: inputToCents(form.fee),
+  1098→      status: form.status,
+  1099→    });
+  1100→    setSaving(false);
+  1101→    if (error) { toast('error', 'Failed to create booking'); return; }
+  1102→    toast('success', 'Booking created');
+  1103→    onClose();
+  1104→    onCreated();
+  1105→  };
+  1106→
+  1107→  return (
+  1108→    <Modal
+  1109→      open={open}
+  1110→      onClose={onClose}
+  1111→      title={`New Booking — ${date}`}
+  1112→      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button></>}
+  1113→    >
+  1114→      <div className="space-y-4">
+  1115→        <Field label="Event Name" required><Input value={form.event_name} onChange={(e) => setForm({ ...form, event_name: e.target.value })} /></Field>
+  1116→        <Field label="Venue" required><Input value={form.venue_name} onChange={(e) => setForm({ ...form, venue_name: e.target.value })} /></Field>
+  1117→        <div className="grid grid-cols-2 gap-4">
+  1118→          <Field label="Fee (USD)"><Input type="number" step="0.01" value={form.fee} onChange={(e) => setForm({ ...form, fee: e.target.value })} placeholder="0.00" /></Field>
+  1119→          <Field label="Status"><Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}><option value="inquiry">Inquiry</option><option value="hold">Hold</option><option value="confirmed">Confirmed</option><option value="deposit_paid">Deposit Paid</option><option value="paid_in_full">Paid In Full</option></Select></Field>
+  1120→        </div>
+  1121→      </div>
+  1122→    </Modal>
+  1123→  );
+  1124→}
+  1125→
+  1126→===FILE:/tmp/dashboard-repo/src/pages/bookings/InquiriesPage.tsx===
+  1127→import { useEffect, useState, useCallback } from 'react';
+  1128→import { Inbox, Plus, Mail, Globe, User, MessageSquare } from 'lucide-react';
+  1129→import { Button } from '@/components/ui/Button';
+  1130→import { Card } from '@/components/ui/Card';
+  1131→import { StatusBadge } from '@/components/ui/Badge';
+  1132→import { LoadingState, EmptyState } from '@/components/ui/States';
+  1133→import { PageHeader } from '@/components/layout/PageHeader';
+  1134→import { Modal } from '@/components/ui/Modal';
+  1135→import { Field, Input, Select, Textarea } from '@/components/ui/Form';
+  1136→import { toast } from '@/components/ui/Toast';
+  1137→import { supabase } from '@/lib/supabase';
+  1138→import { formatDate, timeAgo } from '@/lib/format';
+  1139→import type { BookingInquiry } from '@/types/database';
+  1140→
+  1141→const sourceIcons: Record<string, React.ReactNode> = {
+  1142→  web_form: <Globe size={14} />,
+  1143→  in_app: <MessageSquare size={14} />,
+  1144→  email: <Mail size={14} />,
+  1145→  dm: <MessageSquare size={14} />,
+  1146→  manual: <User size={14} />,
+  1147→};
+  1148→
+  1149→const STATUS_TABS = [
+  1150→  { key: 'all', label: 'All' },
+  1151→  { key: 'new', label: 'New' },
+  1152→  { key: 'contacted', label: 'Contacted' },
+  1153→  { key: 'negotiating', label: 'Negotiating' },
+  1154→  { key: 'won', label: 'Won' },
+  1155→  { key: 'lost', label: 'Lost' },
+  1156→];
+  1157→
+  1158→export default function InquiriesPage() {
+  1159→  const [inquiries, setInquiries] = useState<BookingInquiry[]>([]);
+  1160→  const [loading, setLoading] = useState(true);
+  1161→  const [activeTab, setActiveTab] = useState('all');
+  1162→  const [createOpen, setCreateOpen] = useState(false);
+  1163→  const [selected, setSelected] = useState<BookingInquiry | null>(null);
+  1164→
+  1165→  const fetchInquiries = useCallback(async () => {
+  1166→    setLoading(true);
+  1167→    const { data } = await supabase.from('booking_inquiries').select('*').order('created_at', { ascending: false });
+  1168→    setInquiries(data ?? []);
+  1169→    setLoading(false);
+  1170→  }, []);
+  1171→
+  1172→  useEffect(() => { fetchInquiries(); }, [fetchInquiries]);
+  1173→
+  1174→  const filtered = activeTab === 'all' ? inquiries : inquiries.filter((i) => i.status === activeTab);
+  1175→
+  1176→  const updateStatus = async (id: string, status: string) => {
+  1177→    setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+  1178→    if (selected?.id === id) setSelected({ ...selected, status });
+  1179→    const { error } = await supabase.from('booking_inquiries').update({ status }).eq('id', id);
+  1180→    if (error) toast('error', 'Failed to update status');
+  1181→    else toast('success', 'Inquiry status updated');
+  1182→  };
+  1183→
+  1184→  return (
+  1185→    <div>
+  1186→      <PageHeader
+  1187→        title="Inquiries"
+  1188→        description="Booking inquiries from web forms, in-app, email, and DMs"
+  1189→        actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Inquiry</Button>}
+  1190→      />
+  1191→
+  1192→      <div className="flex gap-1 mb-4 border-b border-neutral-200">
+  1193→        {STATUS_TABS.map((tab) => (
+  1194→          <button
+  1195→            key={tab.key}
+  1196→            onClick={() => setActiveTab(tab.key)}
+  1197→            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+  1198→              activeTab === tab.key ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-500 hover:text-neutral-700'
+  1199→            }`}
+  1200→          >
+  1201→            {tab.label}
+  1202→            <span className="ml-1.5 text-xs text-neutral-400">
+  1203→              {tab.key === 'all' ? inquiries.length : inquiries.filter((i) => i.status === tab.key).length}
+  1204→            </span>
+  1205→          </button>
+  1206→        ))}
+  1207→      </div>
+  1208→
+  1209→      {loading ? (
+  1210→        <LoadingState />
+  1211→      ) : filtered.length === 0 ? (
+  1212→        <Card className="p-6">
+  1213→          <EmptyState icon={<Inbox size={48} />} title="No inquiries" description="Inquiries from your web form and in-app will appear here" />
+  1214→        </Card>
+  1215→      ) : (
+  1216→        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  1217→          {/* Inquiry list */}
+  1218→          <div className="lg:col-span-1 space-y-2 lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto">
+  1219→            {filtered.map((inq) => (
+  1220→              <Card
+  1221→                key={inq.id}
+  1222→                onClick={() => setSelected(inq)}
+  1223→                className={`p-4 ${selected?.id === inq.id ? 'ring-2 ring-neutral-900' : ''}`}
+  1224→              >
+  1225→                <div className="flex items-start justify-between mb-2">
+  1226→                  <div className="flex items-center gap-2">
+  1227→                    <div className="text-neutral-400">{sourceIcons[inq.source]}</div>
+  1228→                    <p className="text-sm font-medium text-neutral-900">{inq.contact_name}</p>
+  1229→                  </div>
+  1230→                  <StatusBadge status={inq.status} />
+  1231→                </div>
+  1232→                <p className="text-xs text-neutral-500 mb-1">{inq.contact_email}</p>
+  1233→                {inq.event_name && <p className="text-xs text-neutral-600">{inq.event_name}</p>}
+  1234→                {inq.event_date_requested && <p className="text-xs text-neutral-400">{formatDate(inq.event_date_requested)}</p>}
+  1235→                <p className="text-xs text-neutral-400 mt-1">{timeAgo(inq.created_at)}</p>
+  1236→              </Card>
+  1237→            ))}
+  1238→          </div>
+  1239→
+  1240→          {/* Inquiry detail */}
+  1241→          <div className="lg:col-span-2">
+  1242→            {selected ? (
+  1243→              <Card className="p-6">
+  1244→                <div className="flex items-start justify-between mb-4">
+  1245→                  <div>
+  1246→                    <h3 className="text-lg font-semibold text-neutral-900">{selected.contact_name}</h3>
+  1247→                    <p className="text-sm text-neutral-500">{selected.contact_email}</p>
+  1248→                    {selected.contact_phone && <p className="text-sm text-neutral-500">{selected.contact_phone}</p>}
+  1249→                  </div>
+  1250→                  <StatusBadge status={selected.status} />
+  1251→                </div>
+  1252→
+  1253→                <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+  1254→                  {selected.event_name && <div><span className="text-neutral-400">Event:</span> <span className="text-neutral-700">{selected.event_name}</span></div>}
+  1255→                  {selected.event_type && <div><span className="text-neutral-400">Type:</span> <span className="text-neutral-700 capitalize">{selected.event_type}</span></div>}
+  1256→                  {selected.event_date_requested && <div><span className="text-neutral-400">Date:</span> <span className="text-neutral-700">{formatDate(selected.event_date_requested)}</span></div>}
+  1257→                  {selected.city && <div><span className="text-neutral-400">Location:</span> <span className="text-neutral-700">{selected.city}{selected.state ? `, ${selected.state}` : ''}</span></div>}
+  1258→                  {selected.budget_range && <div><span className="text-neutral-400">Budget:</span> <span className="text-neutral-700">{selected.budget_range}</span></div>}
+  1259→                  <div><span className="text-neutral-400">Source:</span> <span className="text-neutral-700 capitalize">{selected.source.replace(/_/g, ' ')}</span></div>
+  1260→                </div>
+  1261→
+  1262→                {selected.message && (
+  1263→                  <div className="mb-4">
+  1264→                    <p className="text-xs font-semibold text-neutral-400 uppercase mb-1">Message</p>
+  1265→                    <p className="text-sm text-neutral-700 bg-neutral-50 rounded-lg p-3">{selected.message}</p>
+  1266→                  </div>
+  1267→                )}
+  1268→
+  1269→                <div>
+  1270→                  <p className="text-xs font-semibold text-neutral-400 uppercase mb-2">Update Status</p>
+  1271→                  <div className="flex flex-wrap gap-2">
+  1272→                    {['new', 'contacted', 'negotiating', 'won', 'lost', 'spam'].map((s) => (
+  1273→                      <Button
+  1274→                        key={s}
+  1275→                        size="sm"
+  1276→                        variant={selected.status === s ? 'primary' : 'secondary'}
+  1277→                        onClick={() => updateStatus(selected.id, s)}
+  1278→                      >
+  1279→                        {s.charAt(0).toUpperCase() + s.slice(1)}
+  1280→                      </Button>
+  1281→                    ))}
+  1282→                  </div>
+  1283→                </div>
+  1284→              </Card>
+  1285→            ) : (
+  1286→              <Card className="p-6">
+  1287→                <EmptyState icon={<Mail size={48} />} title="Select an inquiry" description="Click an inquiry from the list to view details" />
+  1288→              </Card>
+  1289→            )}
+  1290→          </div>
+  1291→        </div>
+  1292→      )}
+  1293→
+  1294→      <CreateInquiryModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={fetchInquiries} />
+  1295→    </div>
+  1296→  );
+  1297→}
+  1298→
+  1299→function CreateInquiryModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+  1300→  const [form, setForm] = useState({
+  1301→    contact_name: '', contact_email: '', contact_phone: '', event_name: '',
+  1302→    event_date_requested: '', event_type: 'club', city: '', state: '', budget_range: '', message: '', source: 'manual',
+  1303→  });
+  1304→  const [saving, setSaving] = useState(false);
+  1305→
+  1306→  const save = async () => {
+  1307→    if (!form.contact_name || !form.contact_email) { toast('error', 'Name and email are required'); return; }
+  1308→    setSaving(true);
+  1309→    const { error } = await supabase.from('booking_inquiries').insert({
+  1310→      ...form,
+  1311→      event_date_requested: form.event_date_requested || null,
+  1312→      status: 'new',
+  1313→    });
+  1314→    setSaving(false);
+  1315→    if (error) { toast('error', 'Failed to create inquiry'); return; }
+  1316→    toast('success', 'Inquiry created');
+  1317→    setForm({ contact_name: '', contact_email: '', contact_phone: '', event_name: '', event_date_requested: '', event_type: 'club', city: '', state: '', budget_range: '', message: '', source: 'manual' });
+  1318→    onClose();
+  1319→    onCreated();
+  1320→  };
+  1321→
+  1322→  return (
+  1323→    <Modal
+  1324→      open={open}
+  1325→      onClose={onClose}
+  1326→      title="New Inquiry"
+  1327→      size="lg"
+  1328→      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button></>}
+  1329→    >
+  1330→      <div className="space-y-4">
+  1331→        <div className="grid grid-cols-2 gap-4">
+  1332→          <Field label="Contact Name" required><Input value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })} /></Field>
+  1333→          <Field label="Contact Email" required><Input type="email" value={form.contact_email} onChange={(e) => setForm({ ...form, contact_email: e.target.value })} /></Field>
+  1334→        </div>
+  1335→        <div className="grid grid-cols-2 gap-4">
+  1336→          <Field label="Phone"><Input value={form.contact_phone} onChange={(e) => setForm({ ...form, contact_phone: e.target.value })} /></Field>
+  1337→          <Field label="Event Name"><Input value={form.event_name} onChange={(e) => setForm({ ...form, event_name: e.target.value })} /></Field>
+  1338→        </div>
+  1339→        <div className="grid grid-cols-3 gap-4">
+  1340→          <Field label="Date Requested"><Input type="date" value={form.event_date_requested} onChange={(e) => setForm({ ...form, event_date_requested: e.target.value })} /></Field>
+  1341→          <Field label="Event Type"><Select value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })}><option value="club">Club</option><option value="private">Private</option><option value="festival">Festival</option><option value="corporate">Corporate</option><option value="wedding">Wedding</option><option value="other">Other</option></Select></Field>
+  1342→          <Field label="Budget Range"><Input value={form.budget_range} onChange={(e) => setForm({ ...form, budget_range: e.target.value })} placeholder="$1k–$3k" /></Field>
+  1343→        </div>
+  1344→        <div className="grid grid-cols-2 gap-4">
+  1345→          <Field label="City"><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></Field>
+  1346→          <Field label="State"><Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} /></Field>
+  1347→        </div>
+  1348→        <Field label="Source"><Select value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })}><option value="manual">Manual</option><option value="web_form">Web Form</option><option value="in_app">In-App</option><option value="email">Email</option><option value="dm">DM</option></Select></Field>
+  1349→        <Field label="Message"><Textarea rows={3} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} /></Field>
+  1350→      </div>
+  1351→    </Modal>
+  1352→  );
+  1353→}
+  1354→
+  1355→===FILE:/tmp/dashboard-repo/src/pages/bookings/BookingDetailPage.tsx===
+  1356→import { useEffect, useState, useCallback } from 'react';
+  1357→import { useParams, Link, useNavigate } from 'react-router-dom';
+  1358→import { ArrowLeft, Plus, DollarSign, FileText, Calendar, MapPin, Clock, Trash2 } from 'lucide-react';
+  1359→import { Button } from '@/components/ui/Button';
+  1360→import { Card } from '@/components/ui/Card';
+  1361→import { StatusBadge } from '@/components/ui/Badge';
+  1362→import { LoadingState, ErrorState } from '@/components/ui/States';
+  1363→import { Field, Input, Select, Textarea } from '@/components/ui/Form';
+  1364→import { Modal } from '@/components/ui/Modal';
+  1365→import { toast } from '@/components/ui/Toast';
+  1366→import { supabase } from '@/lib/supabase';
+  1367→import { formatCents, formatDate, formatDateTime, centsToInput, inputToCents } from '@/lib/format';
+  1368→import type { Booking, BookingPayment } from '@/types/database';
+  1369→
+  1370→const TABS = [
+  1371→  { key: 'details', label: 'Details' },
+  1372→  { key: 'payments', label: 'Payments' },
+  1373→  { key: 'contract', label: 'Contract' },
+  1374→  { key: 'notes', label: 'Notes' },
+  1375→];
+  1376→
+  1377→const STATUSES = ['inquiry', 'hold', 'confirmed', 'contract_sent', 'contract_signed', 'deposit_paid', 'paid_in_full', 'completed', 'cancelled'];
+  1378→
+  1379→export default function BookingDetailPage() {
+  1380→  const { id } = useParams();
+  1381→  const navigate = useNavigate();
+  1382→  const [booking, setBooking] = useState<Booking | null>(null);
+  1383→  const [payments, setPayments] = useState<BookingPayment[]>([]);
+  1384→  const [loading, setLoading] = useState(true);
+  1385→  const [error, setError] = useState('');
+  1386→  const [activeTab, setActiveTab] = useState('details');
+  1387→  const [editMode, setEditMode] = useState(false);
+  1388→  const [payModalOpen, setPayModalOpen] = useState(false);
+  1389→
+  1390→  const fetchBooking = useCallback(async () => {
+  1391→    if (!id) return;
+  1392→    setLoading(true);
+  1393→    const [bookingRes, paymentsRes] = await Promise.all([
+  1394→      supabase.from('bookings').select('*').eq('id', id).maybeSingle(),
+  1395→      supabase.from('booking_payments').select('*').eq('booking_id', id).order('created_at', { ascending: false }),
+  1396→    ]);
+  1397→    if (bookingRes.error) setError(bookingRes.error.message);
+  1398→    setBooking(bookingRes.data as Booking | null);
+  1399→    setPayments(paymentsRes.data ?? []);
+  1400→    setLoading(false);
+  1401→  }, [id]);
+  1402→
+  1403→  useEffect(() => { fetchBooking(); }, [fetchBooking]);
+  1404→
+  1405→  const updateBooking = async (updates: Partial<Booking>) => {
+  1406→    if (!booking) return;
+  1407→    const { error } = await supabase.from('bookings').update(updates).eq('id', booking.id);
+  1408→    if (error) { toast('error', 'Failed to update'); return; }
+  1409→    setBooking({ ...booking, ...updates });
+  1410→    toast('success', 'Booking updated');
+  1411→  };
+  1412→
+  1413→  const deleteBooking = async () => {
+  1414→    if (!booking) return;
+  1415→    if (!confirm('Delete this booking? This cannot be undone.')) return;
+  1416→    const { error } = await supabase.from('bookings').delete().eq('id', booking.id);
+  1417→    if (error) { toast('error', 'Failed to delete'); return; }
+  1418→    toast('success', 'Booking deleted');
+  1419→    navigate('/bookings/pipeline');
+  1420→  };
+  1421→
+  1422→  if (loading) return <LoadingState />;
+  1423→  if (error) return <ErrorState message={error} />;
+  1424→  if (!booking) return <ErrorState message="Booking not found" />;
+  1425→
+  1426→  const totalPaid = payments.filter((p) => p.paid_at).reduce((sum, p) => sum + p.amount_cents, 0);
+  1427→  const balance = booking.fee_cents - totalPaid;
+  1428→
+  1429→  return (
+  1430→    <div>
+  1431→      <Link to="/bookings/pipeline" className="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 mb-4">
+  1432→        <ArrowLeft size={16} /> Back to Pipeline
+  1433→      </Link>
+  1434→
+  1435→      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+  1436→        <div>
+  1437→          <h1 className="text-2xl font-semibold text-neutral-900">{booking.event_name}</h1>
+  1438→          <p className="mt-1 text-sm text-neutral-500">{booking.venue_name} · {formatDate(booking.event_date)}</p>
+  1439→        </div>
+  1440→        <div className="flex items-center gap-2">
+  1441→          <StatusBadge status={booking.status} />
+  1442→          <Button variant="secondary" onClick={() => setEditMode(!editMode)}>{editMode ? 'Done' : 'Edit'}</Button>
+  1443→          <Button variant="danger" onClick={deleteBooking}><Trash2 size={16} /></Button>
+  1444→        </div>
+  1445→      </div>
+  1446→
+  1447→      {/* Summary cards */}
+  1448→      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  1449→        <Card className="p-4">
+  1450→          <div className="flex items-center gap-2 text-neutral-400 mb-1"><DollarSign size={16} /><span className="text-xs">Total Fee</span></div>
+  1451→          <p className="text-xl font-semibold text-neutral-900">{formatCents(booking.fee_cents)}</p>
+  1452→        </Card>
+  1453→        <Card className="p-4">
+  1454→          <div className="flex items-center gap-2 text-neutral-400 mb-1"><DollarSign size={16} /><span className="text-xs">Paid</span></div>
+  1455→          <p className="text-xl font-semibold text-green-600">{formatCents(totalPaid)}</p>
+  1456→        </Card>
+  1457→        <Card className="p-4">
+  1458→          <div className="flex items-center gap-2 text-neutral-400 mb-1"><DollarSign size={16} /><span className="text-xs">Balance</span></div>
+  1459→          <p className={`text-xl font-semibold ${balance > 0 ? 'text-amber-600' : 'text-green-600'}`}>{formatCents(balance)}</p>
+  1460→        </Card>
+  1461→      </div>
+  1462→
+  1463→      {/* Tabs */}
+  1464→      <div className="flex gap-1 mb-4 border-b border-neutral-200">
+  1465→        {TABS.map((tab) => (
+  1466→          <button
+  1467→            key={tab.key}
+  1468→            onClick={() => setActiveTab(tab.key)}
+  1469→            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+  1470→              activeTab === tab.key ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-500 hover:text-neutral-700'
+  1471→            }`}
+  1472→          >
+  1473→            {tab.label}
+  1474→          </button>
+  1475→        ))}
+  1476→      </div>
+  1477→
+  1478→      {activeTab === 'details' && (
+  1479→        <Card className="p-6">
+  1480→          {editMode ? (
+  1481→            <EditDetailsForm booking={booking} onSave={(u) => { updateBooking(u); setEditMode(false); }} />
+  1482→          ) : (
+  1483→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+  1484→              <DetailRow icon={<Calendar size={16} />} label="Event Date" value={formatDate(booking.event_date)} />
+  1485→              <DetailRow icon={<MapPin size={16} />} label="Venue" value={booking.venue_name} />
+  1486→              <DetailRow icon={<Clock size={16} />} label="Set Time" value={booking.set_time ?? '—'} />
+  1487→              <DetailRow icon={<Clock size={16} />} label="Load-in" value={booking.load_in_time ?? '—'} />
+  1488→              <DetailRow label="Event Type" value={booking.event_type ? booking.event_type.charAt(0).toUpperCase() + booking.event_type.slice(1) : '—'} />
+  1489→              <DetailRow label="Set Length" value={booking.set_length_minutes ? `${booking.set_length_minutes} min` : '—'} />
+  1490→              <DetailRow label="Address" value={booking.address ?? '—'} />
+  1491→              <DetailRow label="Deposit Due" value={formatDate(booking.deposit_due_date)} />
+  1492→              <DetailRow label="Balance Due" value={formatDate(booking.balance_due_date)} />
+  1493→              <div className="sm:col-span-2">
+  1494→                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-1">Status</label>
+  1495→                <Select value={booking.status} onChange={(e) => updateBooking({ status: e.target.value })} className="max-w-xs">
+  1496→                  {STATUSES.map((s) => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
+  1497→                </Select>
+  1498→              </div>
+  1499→            </div>
+  1500→          )}
+  1501→        </Card>
+  1502→      )}
+  1503→
+  1504→      {activeTab === 'payments' && (
+  1505→        <Card className="p-6">
+  1506→          <div className="flex items-center justify-between mb-4">
+  1507→            <h3 className="font-semibold text-neutral-900">Payment History</h3>
+  1508→            <Button variant="primary" size="sm" onClick={() => setPayModalOpen(true)}><Plus size={14} /> Record Payment</Button>
+  1509→          </div>
+  1510→          {payments.length === 0 ? (
+  1511→            <p className="text-sm text-neutral-400 text-center py-8">No payments recorded yet</p>
+  1512→          ) : (
+  1513→            <div className="space-y-2">
+  1514→              {payments.map((p) => (
+  1515→                <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-neutral-50">
+  1516→                  <div>
+  1517→                    <p className="text-sm font-medium text-neutral-900">{formatCents(p.amount_cents)}</p>
+  1518→                    <p className="text-xs text-neutral-500 capitalize">{p.type} · {p.method}{p.paid_at ? ` · ${formatDateTime(p.paid_at)}` : ''}</p>
+  1519→                  </div>
+  1520→                  <StatusBadge status={p.paid_at ? 'paid' : 'pending'} />
+  1521→                </div>
+  1522→              ))}
+  1523→            </div>
+  1524→          )}
+  1525→        </Card>
+  1526→      )}
+  1527→
+  1528→      {activeTab === 'contract' && (
+  1529→        <Card className="p-6">
+  1530→          <h3 className="font-semibold text-neutral-900 mb-4">Contract</h3>
+  1531→          {booking.contract_media_id ? (
+  1532→            <p className="text-sm text-neutral-600">Contract document attached (ID: {booking.contract_media_id})</p>
+  1533→          ) : (
+  1534→            <div className="text-center py-8">
+  1535→              <FileText size={48} className="text-neutral-300 mx-auto mb-3" />
+  1536→              <p className="text-sm text-neutral-500 mb-3">No contract uploaded yet</p>
+  1537→              <Button variant="secondary">Upload Contract</Button>
+  1538→            </div>
+  1539→          )}
+  1540→        </Card>
+  1541→      )}
+  1542→
+  1543→      {activeTab === 'notes' && (
+  1544→        <Card className="p-6">
+  1545→          <h3 className="font-semibold text-neutral-900 mb-4">Internal Notes</h3>
+  1546→          <Textarea
+  1547→            rows={6}
+  1548→            defaultValue={booking.internal_notes ?? ''}
+  1549→            onBlur={(e) => updateBooking({ internal_notes: e.target.value })}
+  1550→            placeholder="Add notes about this booking…"
+  1551→          />
+  1552→          <p className="text-xs text-neutral-400 mt-2">Notes are saved automatically when you click away</p>
+  1553→        </Card>
+  1554→      )}
+  1555→
+  1556→      <PaymentModal open={payModalOpen} onClose={() => setPayModalOpen(false)} bookingId={booking.id} onCreated={fetchBooking} />
+  1557→    </div>
+  1558→  );
+  1559→}
+  1560→
+  1561→function DetailRow({ icon, label, value }: { icon?: React.ReactNode; label: string; value: string }) {
+  1562→  return (
+  1563→    <div>
+  1564→      <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-400 uppercase mb-1">
+  1565→        {icon}{label}
+  1566→      </label>
+  1567→      <p className="text-sm text-neutral-700">{value}</p>
+  1568→    </div>
+  1569→  );
+  1570→}
+  1571→
+  1572→function EditDetailsForm({ booking, onSave }: { booking: Booking; onSave: (u: Partial<Booking>) => void }) {
+  1573→  const [form, setForm] = useState({
+  1574→    event_name: booking.event_name,
+  1575→    venue_name: booking.venue_name,
+  1576→    event_date: booking.event_date,
+  1577→    event_type: booking.event_type ?? 'club',
+  1578→    fee: centsToInput(booking.fee_cents),
+  1579→    deposit: centsToInput(booking.deposit_cents),
+  1580→    set_length_minutes: booking.set_length_minutes?.toString() ?? '',
+  1581→    address: booking.address ?? '',
+  1582→  });
+  1583→
+  1584→  return (
+  1585→    <div className="space-y-4">
+  1586→      <div className="grid grid-cols-2 gap-4">
+  1587→        <Field label="Event Name"><Input value={form.event_name} onChange={(e) => setForm({ ...form, event_name: e.target.value })} /></Field>
+  1588→        <Field label="Venue"><Input value={form.venue_name} onChange={(e) => setForm({ ...form, venue_name: e.target.value })} /></Field>
+  1589→      </div>
+  1590→      <div className="grid grid-cols-2 gap-4">
+  1591→        <Field label="Event Date"><Input type="date" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} /></Field>
+  1592→        <Field label="Event Type"><Select value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })}><option value="club">Club</option><option value="private">Private</option><option value="festival">Festival</option><option value="corporate">Corporate</option><option value="wedding">Wedding</option><option value="other">Other</option></Select></Field>
+  1593→      </div>
+  1594→      <div className="grid grid-cols-2 gap-4">
+  1595→        <Field label="Fee (USD)"><Input type="number" step="0.01" value={form.fee} onChange={(e) => setForm({ ...form, fee: e.target.value })} /></Field>
+  1596→        <Field label="Deposit (USD)"><Input type="number" step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></Field>
+  1597→      </div>
+  1598→      <div className="grid grid-cols-2 gap-4">
+  1599→        <Field label="Set Length (min)"><Input type="number" value={form.set_length_minutes} onChange={(e) => setForm({ ...form, set_length_minutes: e.target.value })} /></Field>
+  1600→        <Field label="Address"><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></Field>
+  1601→      </div>
+  1602→      <Button variant="primary" onClick={() => onSave({
+  1603→        event_name: form.event_name,
+  1604→        venue_name: form.venue_name,
+  1605→        event_date: form.event_date,
+  1606→        event_type: form.event_type,
+  1607→        fee_cents: inputToCents(form.fee),
+  1608→        deposit_cents: form.deposit ? inputToCents(form.deposit) : null,
+  1609→        set_length_minutes: form.set_length_minutes ? parseInt(form.set_length_minutes) : null,
+  1610→        address: form.address || null,
+  1611→      })}>Save Changes</Button>
+  1612→    </div>
+  1613→  );
+  1614→}
+  1615→
+  1616→function PaymentModal({ open, onClose, bookingId, onCreated }: { open: boolean; onClose: () => void; bookingId: string; onCreated: () => void }) {
+  1617→  const [form, setForm] = useState({ amount: '', type: 'deposit', method: 'stripe', paid: true });
+  1618→  const [saving, setSaving] = useState(false);
+  1619→
+  1620→  const save = async () => {
+  1621→    if (!form.amount) { toast('error', 'Amount is required'); return; }
+  1622→    setSaving(true);
+  1623→    const { error } = await supabase.from('booking_payments').insert({
+  1624→      booking_id: bookingId,
+  1625→      amount_cents: inputToCents(form.amount),
+  1626→      type: form.type,
+  1627→      method: form.method,
+  1628→      paid_at: form.paid ? new Date().toISOString() : null,
+  1629→    });
+  1630→    setSaving(false);
+  1631→    if (error) { toast('error', 'Failed to record payment'); return; }
+  1632→    toast('success', 'Payment recorded');
+  1633→    setForm({ amount: '', type: 'deposit', method: 'stripe', paid: true });
+  1634→    onClose();
+  1635→    onCreated();
+  1636→  };
+  1637→
+  1638→  return (
+  1639→    <Modal
+  1640→      open={open}
+  1641→      onClose={onClose}
+  1642→      title="Record Payment"
+  1643→      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Record'}</Button></>}
+  1644→    >
+  1645→      <div className="space-y-4">
+  1646→        <Field label="Amount (USD)" required><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" /></Field>
+  1647→        <div className="grid grid-cols-2 gap-4">
+  1648→          <Field label="Type"><Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}><option value="deposit">Deposit</option><option value="balance">Balance</option><option value="other">Other</option></Select></Field>
+  1649→          <Field label="Method"><Select value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}><option value="stripe">Stripe</option><option value="cash">Cash</option><option value="check">Check</option><option value="wire">Wire</option><option value="venmo">Venmo</option><option value="other">Other</option></Select></Field>
+  1650→        </div>
+  1651→        <label className="flex items-center gap-2 text-sm text-neutral-700">
+  1652→          <input type="checkbox" checked={form.paid} onChange={(e) => setForm({ ...form, paid: e.target.checked })} className="rounded" />
+  1653→          Mark as paid now
+  1654→        </label>
+  1655→      </div>
+  1656→    </Modal>
+  1657→  );
+  1658→}

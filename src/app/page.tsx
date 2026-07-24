@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useAppStore, type TabId } from "@/lib/store";
 import { EntryGate } from "@/components/adea/EntryGate";
 import { Landing } from "@/components/adea/Landing";
@@ -9,6 +10,11 @@ import { ShopPage, ProductDetailPage } from "@/components/adea/Shop";
 import { BookingPage } from "@/components/adea/Booking";
 import { BioPage, AccountPage } from "@/components/adea/BioAccount";
 import { SiteHeader, SiteFooter } from "@/components/adea/SiteChrome";
+import { OffPage, LoginPage } from "@/components/adea/OffLogin";
+
+// Lazy load dashboard/portal to reduce initial bundle
+const AdminPortal = dynamic(() => import("@/components/dashboard/AdminPortal").then(m => ({ default: m.AdminPortal })), { ssr: false });
+const UserPortal = dynamic(() => import("@/components/portal/UserPortal").then(m => ({ default: m.UserPortal })), { ssr: false });
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -26,6 +32,14 @@ function TabContent({ tab }: { tab: TabId }) {
       return <BioPage />;
     case "account":
       return <AccountPage />;
+    case "off":
+      return <OffPage />;
+    case "login":
+      return <LoginPage />;
+    case "admin":
+      return <AdminPortal />;
+    case "portal":
+      return <UserPortal />;
     default:
       return <Landing />;
   }
@@ -41,6 +55,11 @@ export default function Home() {
   // Detail pages have their own full shell
   if (detailSlug && detailType === "release") return <ReleaseDetailPage />;
   if (detailSlug && detailType === "product") return <ProductDetailPage />;
+
+  // Login and dashboard pages render without the main site chrome
+  if (activeTab === "login" || activeTab === "admin" || activeTab === "portal") {
+    return <TabContent tab={activeTab} />;
+  }
 
   const isHome = activeTab === "home";
 
