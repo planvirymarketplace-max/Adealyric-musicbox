@@ -11,24 +11,24 @@ function rand(seed: number) {
 
 const SHARDS = Array.from({ length: 48 }, (_, i) => {
   const angle = (i / 48) * Math.PI * 2;
-  const dist = 20 + rand(i * 6) * 60;
+  const dist = Math.round((20 + rand(i * 6) * 60) * 100) / 100;
   return {
     id: i,
-    cx: 50 + Math.cos(angle) * (10 + rand(i * 6 + 1) * 8),
-    cy: 50 + Math.sin(angle) * (10 + rand(i * 6 + 2) * 8),
-    tx: Math.cos(angle) * dist,
-    rot: (rand(i * 6 + 3) - 0.5) * 720,
-    size: 8 + rand(i * 6 + 4) * 22,
-    delay: rand(i * 6 + 5) * 0.15,
+    cx: Math.round((50 + Math.cos(angle) * (10 + rand(i * 6 + 1) * 8)) * 100) / 100,
+    cy: Math.round((50 + Math.sin(angle) * (10 + rand(i * 6 + 2) * 8)) * 100) / 100,
+    tx: Math.round(Math.cos(angle) * dist * 100) / 100,
+    rot: Math.round((rand(i * 6 + 3) - 0.5) * 720 * 100) / 100,
+    size: Math.round((8 + rand(i * 6 + 4) * 22) * 10) / 10,
+    delay: Math.round(rand(i * 6 + 5) * 0.15 * 1000) / 1000,
   };
 });
 
 const DROPS = Array.from({ length: 90 }, (_, i) => ({
-  left: rand(i * 5) * 100,
-  duration: 0.6 + rand(i * 5 + 1) * 1.2,
-  delay: rand(i * 5 + 2) * 2,
-  height: 40 + rand(i * 5 + 3) * 90,
-  opacity: 0.15 + rand(i * 5 + 4) * 0.5,
+  left: Math.round(rand(i * 5) * 10000) / 100,
+  duration: Math.round((0.6 + rand(i * 5 + 1) * 1.2) * 1000) / 1000,
+  delay: Math.round(rand(i * 5 + 2) * 2000) / 1000,
+  height: Math.round((40 + rand(i * 5 + 3) * 90) * 10) / 10,
+  opacity: Math.round((0.15 + rand(i * 5 + 4) * 0.5) * 1000) / 1000,
 }));
 
 export function EntryGate({ onEnter }: Props) {
