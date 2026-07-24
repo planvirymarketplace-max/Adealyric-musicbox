@@ -216,6 +216,132 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
+/* ---- SHOP ALBUMS ---- */
+
+export type AlbumMerchProduct = {
+  slug: string;
+  name: string;
+  price: number;
+  category: "Clothes" | "Product" | "Cups" | "Mugs" | "Hats";
+  sizes: string[];
+  image: string;
+  available: boolean;
+};
+
+export type Album = {
+  slug: string;
+  title: string;
+  releaseDate: string;
+  duration: string;
+  description: string;
+  quote: string;
+  singleTitle?: string;
+  cover: string;
+  merch: AlbumMerchProduct[];
+};
+
+export const ALBUMS: Album[] = [
+  {
+    slug: "cant-nobody-album",
+    title: "Can't Nobody",
+    releaseDate: "March 2022",
+    duration: "42:18",
+    description: "The debut album that introduced Adea Lyric to the world. Raw, unfiltered, and deeply rooted in West Philadelphia.",
+    quote: "\"Every word is a weapon, every note is a prayer.\"",
+    singleTitle: "Can't Nobody",
+    cover: cantnobodyAsset,
+    merch: [
+      { slug: "cn-hoodie", name: "Can't Nobody Hoodie", price: 88, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "cn-tee", name: "Can't Nobody Tee", price: 42, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "cn-vinyl", name: "Can't Nobody Vinyl", price: 34, category: "Product", sizes: [], image: "", available: true },
+      { slug: "cn-mug", name: "Can't Nobody Mug", price: 18, category: "Mugs", sizes: [], image: "", available: true },
+      { slug: "cn-poster", name: "Can't Nobody Poster", price: 25, category: "Product", sizes: [], image: "", available: true },
+      { slug: "cn-hat", name: "Can't Nobody Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: false },
+      { slug: "cn-cup", name: "Can't Nobody Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
+      { slug: "cn-tote", name: "Can't Nobody Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+    ],
+  },
+  {
+    slug: "after-lyric",
+    title: "After Lyric",
+    releaseDate: "January 2023",
+    duration: "48:35",
+    description: "The sophomore record. A deeper cut into the psyche — love, loss, and everything that comes after the bars fade.",
+    quote: "\"After the lyric, the silence speaks louder.\"",
+    singleTitle: "Fuck Boi",
+    cover: philly2,
+    merch: [
+      { slug: "al-hoodie", name: "After Lyric Hoodie", price: 88, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "al-tee", name: "After Lyric Tee", price: 42, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "al-vinyl", name: "After Lyric Vinyl", price: 34, category: "Product", sizes: [], image: "", available: true },
+      { slug: "al-mug", name: "After Lyric Mug", price: 18, category: "Mugs", sizes: [], image: "", available: true },
+      { slug: "al-poster", name: "After Lyric Poster", price: 25, category: "Product", sizes: [], image: "", available: false },
+      { slug: "al-hat", name: "After Lyric Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: true },
+      { slug: "al-cup", name: "After Lyric Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
+      { slug: "al-tote", name: "After Lyric Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+    ],
+  },
+  {
+    slug: "man-in-my-life",
+    title: "Man in My Life",
+    releaseDate: "July 2023",
+    duration: "45:52",
+    description: "An exploration of relationships, loyalty, and the men who shaped the narrative. Honest and unapologetic.",
+    quote: "\"You don't choose who changes you — they just do.\"",
+    singleTitle: "Side N****a",
+    cover: philly3,
+    merch: [
+      { slug: "ml-hoodie", name: "Man in My Life Hoodie", price: 88, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "ml-tee", name: "Man in My Life Tee", price: 42, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: false },
+      { slug: "ml-vinyl", name: "Man in My Life Vinyl", price: 34, category: "Product", sizes: [], image: "", available: true },
+      { slug: "ml-mug", name: "Man in My Life Mug", price: 18, category: "Mugs", sizes: [], image: "", available: true },
+      { slug: "ml-poster", name: "Man in My Life Poster", price: 25, category: "Product", sizes: [], image: "", available: true },
+      { slug: "ml-hat", name: "Man in My Life Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: true },
+      { slug: "ml-cup", name: "Man in My Life Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
+      { slug: "ml-tote", name: "Man in My Life Tote", price: 22, category: "Product", sizes: [], image: "", available: false },
+    ],
+  },
+  {
+    slug: "story-of-my-journey",
+    title: "Story of My Journey",
+    releaseDate: "November 2023",
+    duration: "51:07",
+    description: "A sonic autobiography. From the corners of West Philly to stages worldwide — every chapter told in verse.",
+    quote: "\"The journey doesn't end — it just finds new streets.\"",
+    singleTitle: "Drink on the Beach",
+    cover: philly1,
+    merch: [
+      { slug: "sj-hoodie", name: "Story of My Journey Hoodie", price: 88, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "sj-tee", name: "Story of My Journey Tee", price: 42, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "sj-vinyl", name: "Story of My Journey Vinyl", price: 34, category: "Product", sizes: [], image: "", available: true },
+      { slug: "sj-mug", name: "Story of My Journey Mug", price: 18, category: "Mugs", sizes: [], image: "", available: true },
+      { slug: "sj-poster", name: "Story of My Journey Poster", price: 25, category: "Product", sizes: [], image: "", available: true },
+      { slug: "sj-hat", name: "Story of My Journey Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: true },
+      { slug: "sj-cup", name: "Story of My Journey Cup", price: 15, category: "Cups", sizes: [], image: "", available: false },
+      { slug: "sj-tote", name: "Story of My Journey Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+    ],
+  },
+  {
+    slug: "tainted-love",
+    title: "Tainted Love",
+    releaseDate: "May 2024",
+    duration: "39:44",
+    description: "The aftermath of devotion. A darker, more vulnerable record that strips away the armor.",
+    quote: "\"Love is the wound that keeps teaching you how to heal.\"",
+    cover: fkboiAsset,
+    merch: [
+      { slug: "tl-hoodie", name: "Tainted Love Hoodie", price: 88, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "tl-tee", name: "Tainted Love Tee", price: 42, category: "Clothes", sizes: ["S", "M", "L", "XL"], image: "", available: true },
+      { slug: "tl-vinyl", name: "Tainted Love Vinyl", price: 34, category: "Product", sizes: [], image: "", available: true },
+      { slug: "tl-mug", name: "Tainted Love Mug", price: 18, category: "Mugs", sizes: [], image: "", available: true },
+      { slug: "tl-poster", name: "Tainted Love Poster", price: 25, category: "Product", sizes: [], image: "", available: true },
+      { slug: "tl-hat", name: "Tainted Love Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: false },
+      { slug: "tl-cup", name: "Tainted Love Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
+      { slug: "tl-tote", name: "Tainted Love Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+    ],
+  },
+];
+
 export const TOUR = [
   { date: "OCT 12", city: "Philadelphia, PA", venue: "The Fillmore", status: "On Sale" },
   { date: "OCT 19", city: "New York, NY", venue: "Bowery Ballroom", status: "On Sale" },

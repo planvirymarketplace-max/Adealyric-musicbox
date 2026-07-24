@@ -6,7 +6,7 @@ import { useAppStore, type TabId } from "@/lib/store";
 import { EntryGate } from "@/components/adea/EntryGate";
 import { Landing } from "@/components/adea/Landing";
 import { DiscographyPage, ReleaseDetailPage, TourPage } from "@/components/adea/MusicDiscography";
-import { ShopPage, ProductDetailPage } from "@/components/adea/Shop";
+import { ShopPage, ProductDetailPage, AlbumDetailPage } from "@/components/adea/Shop";
 import { BookingPage } from "@/components/adea/Booking";
 import { BioPage, AccountPage } from "@/components/adea/BioAccount";
 import { SiteHeader, SiteFooter } from "@/components/adea/SiteChrome";
@@ -55,6 +55,7 @@ export default function Home() {
   // Detail pages have their own full shell
   if (detailSlug && detailType === "release") return <ReleaseDetailPage />;
   if (detailSlug && detailType === "product") return <ProductDetailPage />;
+  if (detailSlug && detailType === "album") return <AlbumDetailPage />;
 
   // Login and dashboard pages render without the main site chrome
   if (activeTab === "login" || activeTab === "admin" || activeTab === "portal") {

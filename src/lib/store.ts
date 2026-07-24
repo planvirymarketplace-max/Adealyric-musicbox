@@ -12,7 +12,7 @@ export interface AppState {
   entered: boolean;
   cartCount: number;
   detailSlug: string | null;
-  detailType: "release" | "product" | null;
+  detailType: "release" | "product" | "album" | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   authUser: string | null;
@@ -20,7 +20,7 @@ export interface AppState {
   portalRoute: string;
   setActiveTab: (tab: TabId) => void;
   setEntered: (v: boolean) => void;
-  setDetailSlug: (slug: string | null, type: "release" | "product" | null) => void;
+  setDetailSlug: (slug: string | null, type: "release" | "product" | "album" | null) => void;
   addToCart: () => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;

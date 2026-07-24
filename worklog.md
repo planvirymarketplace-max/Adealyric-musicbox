@@ -126,3 +126,30 @@ Stage Summary:
 - Dashboard repo fully translated: 46 source files, exact same UI/design
 - Default admin auth: admin / adminphilly
 - Note: Dev server may OOM in this environment due to 46 additional files; code is compile-time verified via lint
+
+---
+Task ID: 4
+Agent: Main
+Task: Rebuild shop system with brutalist-minimalist design, album detail pages, and streaming modal
+
+Work Log:
+- Updated store.ts: Added "album" to detailType union type and setDetailSlug parameter
+- Updated catalog.ts: Added ALBUMS export with 5 albums (Can't Nobody, After Lyric, Man in My Life, Story of My Journey, Tainted Love), each with 8 associated merch products (hoodie, tee, vinyl, mug, poster, hat, cup, tote) with availability flags
+- Updated page.tsx: Added AlbumDetailPage import and detailType === "album" routing check
+- Completely rewrote Shop.tsx with three exported components:
+  - ShopPage: White background shop with Collections header row, 5-column album grid, Featured Merch row, plus-circle quick-add buttons
+  - AlbumDetailPage: Two-column hero with album art placeholder (image counter + nav arrows), album info (title, date, duration, description, quote), 4 action rows (Stream Album, Stream Single, Add Digital, Add Vinyl) with black dot ● indicators, merch grid (4×2), video section (2×2)
+  - ProductDetailPage: Two-column hero with product image (arrows + counter), product info (title uppercase, price, description, size guide link), size selector rows with ●/○ indicators, full-width add-to-cart button, shipping info, related products grid
+  - StreamingModal: Radix Dialog with 2×4 grid of streaming services (Spotify, Apple Music, TikTok, Instagram, Amazon Music, YouTube, Tidal, Pandora)
+- Design: Brutalist-minimalist — white #FFFFFF bg, #1A1A1A text, #E5E5E5 borders, #F5F5F5 placeholders, system sans-serif, clean layout
+- Lint clean: 0 errors, 1 pre-existing warning (AdminLayout alt text)
+- Dev server compiles successfully, all pages render
+
+Stage Summary:
+- Shop tab now shows a white-background brutalist e-commerce page breaking from the site's dark theme
+- 5 album cards with quick-add buttons, clicking opens AlbumDetailPage
+- Album detail page has streaming actions (opens modal), cart actions, merch grid, video section
+- Product detail page with size selector, add-to-cart, related products
+- Streaming modal with 8 platforms in clean grid layout
+- All products track availability (some marked SOLD OUT)
+- Navigation: ShopPage → AlbumDetailPage → ProductDetailPage → back navigation works correctly
