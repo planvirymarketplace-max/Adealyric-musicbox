@@ -6,6 +6,7 @@ import { RELEASES, PRODUCTS } from "@/lib/catalog";
 
 const fkboiAsset = "/fkboi.jpg";
 const heroBg = "/hero-muted.png";
+const sectionBanner = "/section-banner.png";
 const cantnobodyAsset = "/cantnobody.webp";
 const philly1 = "/philly-1.jpg";
 const philly2 = "/philly-2.jpg";
@@ -116,23 +117,31 @@ function Hero() {
   );
 }
 
-/* ---- Marquee ---- */
-function Marquee() {
-  const words = ["SOUL", "•", "RAW", "•", "WEST PHILLY", "•", "UNAPOLOGETIC", "•", "ADEA LYRIC", "•"];
+/* ---- Section Banner ---- */
+function SectionBanner() {
   return (
-    <div className="relative overflow-hidden border-y border-border bg-ink py-10">
-      <div className="marquee-track flex w-max whitespace-nowrap">
-        {[...Array(2)].map((_, k) => (
-          <div key={k} className="flex items-center gap-16 pr-16">
-            {words.map((w, i) => (
-              <span key={`${k}-${i}`} className="text-display text-[clamp(3rem,8vw,8rem)] text-bone">
-                {w}
-              </span>
-            ))}
-          </div>
-        ))}
+    <section className="relative w-full overflow-hidden" style={{ minHeight: 'clamp(320px, 50vw, 600px)' }}>
+      {/* Full-bleed image */}
+      <img
+        src={sectionBanner}
+        alt="The Sound of West Philly"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/50 to-ink/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/40" />
+      {/* Content — right-aligned stacked text */}
+      <div className="relative z-10 mx-auto flex h-full min-h-[inherit] max-w-[1600px] items-center px-6 md:px-12">
+        <div className="ml-auto w-full max-w-3xl text-right md:max-w-4xl">
+          <h2 className="text-display text-[clamp(2.5rem,8vw,8rem)] leading-none text-white">
+            The Sound
+          </h2>
+          <h2 className="mt-2 text-display text-[clamp(2.5rem,8vw,8rem)] leading-none italic text-white/80">
+            of West Philly
+          </h2>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -425,7 +434,7 @@ export function Landing() {
   return (
     <>
       <Hero />
-      <Marquee />
+      <SectionBanner />
       <BioSection />
       <SlidingCards />
       <DiscographyPath />

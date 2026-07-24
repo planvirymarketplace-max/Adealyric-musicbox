@@ -55,3 +55,21 @@ Stage Summary:
 - Double footer eliminated across all navigation tabs
 - All 8 main pages render with single global header/footer from page.tsx
 - Detail pages (ReleaseDetail, ProductDetail) retain their own PageShell as intended
+---
+Task ID: 1
+Agent: Main
+Task: Replace home page Marquee with full-bleed image banner section + fix footer logo scrolling
+
+Work Log:
+- Copied uploaded `section banner.png` (1376x683) to `/public/section-banner.png`
+- Replaced the `Marquee` component in Landing.tsx with a new `SectionBanner` component
+- SectionBanner: full-bleed image background, dark gradient overlays (left-to-right + bottom-to-top), right-aligned stacked white text "The Sound" / "of West Philly"
+- Updated `Landing` export to render `<SectionBanner />` instead of `<Marquee />`
+- Removed unused `fkboiAsset` reference (kept constant since SlidingCards still uses it)
+- Fixed footer logo scrolling: changed `@utility footer-marquee-track` to a regular `.footer-marquee-track` CSS class (Tailwind CSS 4 was not compiling the @utility with animation property)
+- Browser verified: image loads (1280x600 full-bleed), text right-aligned, footer marquee animation running (30s infinite, 3330px track width)
+
+Stage Summary:
+- Home page now has a color image banner beneath the hero with "The Sound of West Philly" stacked text
+- Footer platform logos now scroll/ticker correctly in an infinite loop
+- Files modified: `src/components/adea/Landing.tsx`, `src/app/globals.css`
