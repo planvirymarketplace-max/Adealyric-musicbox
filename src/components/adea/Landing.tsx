@@ -178,9 +178,8 @@ function BioSection() {
                 shown ? "opacity-100" : "opacity-0 translate-y-8"
               }`}
             >
-              Not chasing
-              <br />
-              <span className="italic text-ink/40">a sound.</span>
+              heart and
+              <span className="italic text-ink/40">soul.</span>
             </h2>
           </div>
         </div>
@@ -188,16 +187,16 @@ function BioSection() {
         <div className={`md:col-span-7 md:col-start-6 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="bento-float grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
             {/* Row 1 — Large card (2col 2row) + 1 small */}
-            <BentoCard index={0} colSpan={2} rowSpan={2} label="SOUL" />
+            <BentoCard index={0} colSpan={2} rowSpan={2} />
             <BentoCard index={1} colSpan={1} rowSpan={1} />
             {/* Row 2 — Large continues + 1 small */}
             <BentoCard index={2} colSpan={1} rowSpan={1} />
             {/* Row 3 — 1 small + wide (2col) */}
             <BentoCard index={3} colSpan={1} rowSpan={1} />
-            <BentoCard index={4} colSpan={2} rowSpan={1} label="RAW" />
+            <BentoCard index={4} colSpan={2} rowSpan={1} />
             {/* Row 4 — 3 small */}
             <BentoCard index={5} colSpan={1} rowSpan={1} />
-            <BentoCard index={6} colSpan={1} rowSpan={1} label="PHILLY" />
+            <BentoCard index={6} colSpan={1} rowSpan={1} />
             <BentoCard index={7} colSpan={1} rowSpan={1} />
           </div>
           <div className="mt-10">
