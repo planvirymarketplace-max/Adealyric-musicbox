@@ -6,7 +6,6 @@ import { RELEASES, PRODUCTS } from "@/lib/catalog";
 
 const fkboiAsset = "/fkboi.jpg";
 const heroBg = "/hero-muted.png";
-const sectionBanner = "/section-banner.png";
 const cantnobodyAsset = "/cantnobody.webp";
 const philly1 = "/philly-1.jpg";
 const philly2 = "/philly-2.jpg";
@@ -117,31 +116,49 @@ function Hero() {
   );
 }
 
-/* ---- Section Banner ---- */
-function SectionBanner() {
+/* ---- Marquee ---- */
+function Marquee() {
+  const words = ["SOUL", "•", "RAW", "•", "WEST PHILLY", "•", "UNAPOLOGETIC", "•", "ADEA LYRIC", "•"];
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: 'clamp(320px, 50vw, 600px)' }}>
-      {/* Full-bleed image */}
-      <img
-        src={sectionBanner}
-        alt="The Sound of West Philly"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/50 to-ink/30" />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/40" />
-      {/* Content — right-aligned stacked text */}
-      <div className="relative z-10 mx-auto flex h-full min-h-[inherit] max-w-[1600px] items-center px-6 md:px-12">
-        <div className="ml-auto w-full max-w-3xl text-right md:max-w-4xl">
-          <h2 className="text-display text-[clamp(2.5rem,8vw,8rem)] leading-none text-white">
-            The Sound
-          </h2>
-          <h2 className="mt-2 text-display text-[clamp(2.5rem,8vw,8rem)] leading-none italic text-white/80">
-            of West Philly
-          </h2>
-        </div>
+    <div className="relative overflow-hidden border-y border-border bg-ink py-10">
+    <div className="marquee-track flex w-max whitespace-nowrap">
+        {[...Array(2)].map((_, k) => (
+          <div key={k} className="flex items-center gap-16 pr-16">
+            {words.map((w, i) => (
+              <span key={`${k}-${i}`} className="text-display text-[clamp(3rem,8vw,8rem)] text-bone">
+                {w}
+              </span>
+            ))}
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
+  );
+}
+
+/* ---- Bento Card ---- */
+function BentoCard({ index, colSpan, rowSpan, label }: { index: number; colSpan: number; rowSpan: number; label?: string }) {
+  const delay = index * 0.4;
+  return (
+    <div
+      className={`bento-float-item group relative overflow-hidden border border-border bg-mist ${colSpan === 2 ? "md:col-span-2" : ""} ${rowSpan === 2 ? "md:row-span-2" : ""}`}
+      style={{ animationDelay: `${delay}s` }}
+    >
+      {/* Placeholder fill */}
+      <div className="absolute inset-0 bg-smoke" />
+      {/* Image placeholder shimmer */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="h-8 w-8 rounded-full border border-ash/30" />
+      </div>
+      {/* Bottom gradient for future text overlay */}
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      {/* Future word label placeholder */}
+      {label && (
+        <div className="absolute bottom-4 left-4 z-10 text-eyebrow text-ash/50 transition-colors duration-500 group-hover:text-bone">
+          {label}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -151,7 +168,8 @@ function BioSection() {
   const { setActiveTab } = useAppStore();
   return (
     <section id="bio" ref={ref} className="relative bg-ink px-6 py-32 md:px-12 md:py-48">
-      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
+        {/* Left — Headline */}
         <div className="md:col-span-4">
           <div className="sticky top-32">
             <div className="text-eyebrow text-ash">01 — Bio</div>
@@ -166,24 +184,23 @@ function BioSection() {
             </h2>
           </div>
         </div>
-        <div className="space-y-8 text-lg leading-relaxed text-bone/80 md:col-span-7 md:col-start-6">
-          <p className={`transition-all duration-1000 ${shown ? "opacity-100" : "opacity-0 translate-y-8"}`}>
-            Since stepping into the public spotlight in 2017, Adea has remained true to her artistry
-            — refusing to compromise her sound or vision.
-          </p>
-          <p className={`transition-all delay-200 duration-1000 ${shown ? "opacity-100" : "opacity-0 translate-y-8"}`}>
-            She isn&apos;t following trends. She&apos;s <span className="text-bone italic">defining</span>{" "}
-            them. Her music is raw, soulful, unapologetic, and rooted in the culture that raised her.
-          </p>
-          <p
-            className={`text-display text-[clamp(2rem,4vw,4rem)] leading-tight text-bone transition-all delay-500 duration-1000 ${
-              shown ? "opacity-100" : "opacity-0 translate-y-8"
-            }`}
-          >
-            Adea Lyric isn&apos;t chasing a sound.{" "}
-            <span className="italic text-ash">She is the sound of West Philly.</span>
-          </p>
-          <div className="pt-4">
+        {/* Right — Bento Grid */}
+        <div className={`md:col-span-7 md:col-start-6 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          <div className="bento-float grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
+            {/* Row 1 — Large card (2col 2row) + 1 small */}
+            <BentoCard index={0} colSpan={2} rowSpan={2} label="SOUL" />
+            <BentoCard index={1} colSpan={1} rowSpan={1} />
+            {/* Row 2 — Large continues + 1 small */}
+            <BentoCard index={2} colSpan={1} rowSpan={1} />
+            {/* Row 3 — 1 small + wide (2col) */}
+            <BentoCard index={3} colSpan={1} rowSpan={1} />
+            <BentoCard index={4} colSpan={2} rowSpan={1} label="RAW" />
+            {/* Row 4 — 3 small */}
+            <BentoCard index={5} colSpan={1} rowSpan={1} />
+            <BentoCard index={6} colSpan={1} rowSpan={1} label="PHILLY" />
+            <BentoCard index={7} colSpan={1} rowSpan={1} />
+          </div>
+          <div className="mt-10">
             <button onClick={() => setActiveTab("bio")} className="inline-flex items-center gap-4 text-eyebrow text-bone cursor-pointer">
               <span className="block h-px w-16 bg-bone" />
               Read the full story
@@ -434,7 +451,7 @@ export function Landing() {
   return (
     <>
       <Hero />
-      <SectionBanner />
+      <Marquee />
       <BioSection />
       <SlidingCards />
       <DiscographyPath />

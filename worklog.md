@@ -73,3 +73,24 @@ Stage Summary:
 - Home page now has a color image banner beneath the hero with "The Sound of West Philly" stacked text
 - Footer platform logos now scroll/ticker correctly in an infinite loop
 - Files modified: `src/components/adea/Landing.tsx`, `src/app/globals.css`
+---
+Task ID: 2
+Agent: Main
+Task: Restore Marquee, add bento card placeholders to Bio section with floating animation
+
+Work Log:
+- Restored the Marquee scroll bar (SOUL • RAW • WEST PHILLY • UNAPOLOGETIC • ADEA LYRIC) beneath the hero
+- Removed the mistakenly added SectionBanner component
+- Replaced Bio Section right-side text with a bento grid of 8 placeholder cards
+- Bento grid layout: 3-column CSS grid with varying spans (one 2col×2row featured, one 2col×1row wide, six 1col×1row)
+- Added `bento-float` keyframe animation (translateY 0 → -6px → 0, 4s ease-in-out infinite)
+- Each card has staggered delay (0.4s increments) for a wave-like floating effect
+- Cards have 6px border-radius, `bg-smoke` fill with placeholder circle
+- 3 sample labels placed (SOUL, RAW, PHILLY) — ready for user to provide 8 images + words
+- Fixed Tailwind CSS 4 issue: `> *` selector not compiled, changed to explicit `.bento-float-item` class
+- Browser verified: 8 cards rendering with correct sizes, animation running, staggered delays, marquee scrolling
+
+Stage Summary:
+- Home page flow restored: Hero → Marquee → Bio (bento grid) → rest
+- Bento cards are placeholders with subtle floating animation — ready for 8 images + word labels
+- Files modified: `src/components/adea/Landing.tsx`, `src/app/globals.css`
