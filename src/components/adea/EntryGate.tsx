@@ -61,6 +61,16 @@ export function EntryGate({ onEnter, onLogin }: Props) {
 
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden bg-ink text-bone">
+      {/* Background image */}
+      <img
+        src="/splash-bg.jpg"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        aria-hidden="true"
+      />
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-ink/60" />
+
       {/* Rain layer */}
       <div className="pointer-events-none absolute inset-0">
         {DROPS.map((d, i) => (
@@ -84,25 +94,11 @@ export function EntryGate({ onEnter, onLogin }: Props) {
       >
         <div className="text-eyebrow text-ash/60 animate-flicker">Est. West Philadelphia — MMXVII</div>
 
-        {/* Main logo area: text + silhouette */}
-        <div className="relative mt-8 flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
-          {/* ADEA text */}
-          <h1 className="text-display text-center text-[clamp(3.5rem,14vw,16rem)] leading-none">
-            <span className="block italic">Adea</span>
-            <span className="-mt-4 block font-display font-black tracking-tighter">LYRIC</span>
-          </h1>
-
-          {/* Silhouette */}
-          <svg
-            viewBox="0 0 120 340"
-            fill="currentColor"
-            className="h-[clamp(4rem,16vw,18rem)] w-auto text-bone/80"
-            aria-hidden="true"
-          >
-            <path d="M60 8C53.4 8 48 13.4 48 20C48 26.6 53.4 32 60 32C66.6 32 72 26.6 72 20C72 13.4 66.6 8 60 8Z
-              M70 36C67 35 63 34 60 34C57 34 53 35 50 36L42 68L48 70L54 50L54 110L44 112L44 124L56 124L56 200L50 260L48 300L60 304L72 300L70 260L64 200L64 124L76 124L76 112L66 110L66 50L72 70L78 68Z" />
-          </svg>
-        </div>
+        {/* ADEA text */}
+        <h1 className="text-display mt-8 text-center text-[clamp(3.5rem,14vw,16rem)] leading-none">
+          <span className="block italic">Adea</span>
+          <span className="-mt-4 block font-display font-black tracking-tighter">LYRIC</span>
+        </h1>
 
         <div className="text-eyebrow mt-6 text-ash/50">Soul · Raw · Unapologetic</div>
 
