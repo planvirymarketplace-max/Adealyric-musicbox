@@ -8,19 +8,12 @@ import { MusicPage, DiscographyPage, ReleaseDetailPage, TourPage } from "@/compo
 import { ShopPage, ProductDetailPage } from "@/components/adea/Shop";
 import { BookingPage } from "@/components/adea/Booking";
 import { BioPage, AccountPage } from "@/components/adea/BioAccount";
-
-function HomePage() {
-  return (
-    <div className="relative w-full bg-ink text-bone">
-      <Landing />
-    </div>
-  );
-}
+import { SiteHeader, SiteFooter } from "@/components/adea/SiteChrome";
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
     case "home":
-      return <HomePage />;
+      return <Landing />;
     case "music":
       return <MusicPage />;
     case "discography":
@@ -36,7 +29,7 @@ function TabContent({ tab }: { tab: TabId }) {
     case "account":
       return <AccountPage />;
     default:
-      return <HomePage />;
+      return <Landing />;
   }
 }
 
@@ -44,22 +37,32 @@ export default function Home() {
   const { entered, setEntered, activeTab, detailSlug, detailType } = useAppStore();
 
   useEffect(() => {
-    // Scroll to top when tab changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeTab, detailSlug]);
 
-  // If viewing a detail page, show that instead
-  if (detailSlug && detailType === "release") {
-    return <ReleaseDetailPage />;
-  }
-  if (detailSlug && detailType === "product") {
-    return <ProductDetailPage />;
-  }
+  // Detail pages have their own full shell
+  if (detailSlug && detailType === "release") return <ReleaseDetailPage />;
+  if (detailSlug && detailType === "product") return <ProductDetailPage />;
+
+  const isHome = activeTab === "home";
 
   return (
-    <>
+    <div className="relative w-full bg-ink text-bone">
+      {/* Splash gate */}
       {!entered && <EntryGate onEnter={() => setEntered(true)} onLogin={() => {}} />}
-      <TabContent tab={activeTab} />
-    </>
+
+      {/* After entering: show nav + content + footer */}
+      {entered && (
+        <>
+          <SiteHeader />
+          {isHome ? (
+            <main><TabContent tab={activeTab} /></main>
+          ) : (
+            <TabContent tab={activeTab} />
+          )}
+          <SiteFooter />
+        </>
+      )}
+    </div>
   );
 }

@@ -97,7 +97,7 @@ export function EntryGate({ onEnter, onLogin }: Props) {
         {/* ADEA text */}
         <h1 className="text-display mt-8 text-center text-[clamp(3.5rem,14vw,16rem)] leading-none">
           <span className="block italic">Adea</span>
-          <span className="-mt-4 block font-display font-black tracking-tighter">LYRIC</span>
+          <span className="-mt-4 block font-display font-black tracking-tighter text-yellow-400">LYRIC</span>
         </h1>
 
         <div className="text-eyebrow mt-6 text-ash/50">Soul · Raw · Unapologetic</div>

@@ -23,7 +23,7 @@ export function MusicPage() {
   const t = all[current];
 
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="Music" title="Continuous," italic="uninterrupted." sub="The full catalog, in a single player." />
       <section className="px-6 pb-24 md:px-12">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
@@ -95,7 +95,7 @@ export function MusicPage() {
           </div>
         </div>
       </section>
-    </PageShell>
+    </>
   );
 }
 
@@ -120,7 +120,7 @@ export function DiscographyPage() {
   const active = filtered.find((r) => r.slug === hover) ?? filtered[0];
 
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="Volume — Discography" title="The Ledger," italic="year by year." sub="Every release, in the order the world got to hear it." />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-30">
         {filtered.map((r) => (
@@ -202,7 +202,7 @@ export function DiscographyPage() {
           </div>
         </section>
       )}
-    </PageShell>
+    </>
   );
 }
 
@@ -297,7 +297,7 @@ export function ReleaseDetailPage() {
 
 export function TourPage() {
   return (
-    <PageShell>
+    <>
       <PageIntro eyebrow="On the road" title="Tour," italic="live." sub="Direct ticket purchase. Calendar links. Automated map at every stop." />
       <section className="px-6 pb-24 md:px-12">
         <div className="mx-auto max-w-[1600px]">
@@ -325,6 +325,6 @@ export function TourPage() {
           </ul>
         </div>
       </section>
-    </PageShell>
+    </>
   );
 }

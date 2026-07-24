@@ -48,56 +48,6 @@ function useReveal<T extends HTMLElement>() {
   return { ref, shown };
 }
 
-/* ---- Header ---- */
-function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const { setActiveTab } = useAppStore();
-  useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 40);
-    on();
-    window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
-  }, []);
-  return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-ink/70 backdrop-blur-xl border-b border-border" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-5 md:px-12">
-        <button onClick={() => setActiveTab("home")} className="text-eyebrow text-bone cursor-pointer">
-          Adea<span className="mx-2 text-ash">/</span>Lyric
-        </button>
-        <nav className="hidden items-center gap-10 md:flex">
-          {[
-            { label: "Music", id: "music" },
-            { label: "Discography", id: "discography" },
-            { label: "Tour", id: "tour" },
-            { label: "Booking", id: "booking" },
-            { label: "Shop", id: "shop" },
-            { label: "Bio", id: "bio" },
-          ].map((n) => (
-            <button
-              key={n.id}
-              onClick={() => setActiveTab(n.id as "music" | "discography" | "tour" | "booking" | "shop" | "bio")}
-              className="group relative text-eyebrow text-bone/80 transition-colors hover:text-bone cursor-pointer"
-            >
-              {n.label}
-              <span className="absolute -bottom-1 left-0 h-px w-0 bg-bone transition-all duration-500 group-hover:w-full" />
-            </button>
-          ))}
-        </nav>
-        <button onClick={() => setActiveTab("music")} className="group flex items-center gap-3 text-eyebrow text-bone cursor-pointer">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-bone opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-bone" />
-          </span>
-          Listen
-        </button>
-      </div>
-    </header>
-  );
-}
 
 /* ---- Hero ---- */
 function Hero() {
@@ -469,35 +419,10 @@ function Newsletter() {
   );
 }
 
-/* ---- Footer ---- */
-function LandingFooter() {
-  return (
-    <footer id="shop" className="relative bg-ink px-6 py-16 md:px-12">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-10 border-t border-border pt-10 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="text-display text-6xl text-bone md:text-8xl">Adea Lyric</div>
-          <div className="text-eyebrow mt-4 text-ash">West Philadelphia · Est. 2017</div>
-        </div>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {["Spotify", "Apple Music", "Instagram", "YouTube"].map((l) => (
-            <a key={l} href="#" className="text-eyebrow text-bone/70 transition-colors hover:text-bone">
-              {l}
-            </a>
-          ))}
-        </div>
-      </div>
-      <div className="mx-auto mt-10 flex max-w-[1600px] justify-between text-xs text-ash">
-        <span>© {new Date().getFullYear()} Adea Lyric. All rights reserved.</span>
-        <span>Sound of West Philly.</span>
-      </div>
-    </footer>
-  );
-}
 
-/* ---- Landing Export ---- */
 export function Landing() {
   return (
-    <div className="relative w-full bg-ink text-bone">
+    <>
       <Hero />
       <Marquee />
       <BioSection />
@@ -505,7 +430,6 @@ export function Landing() {
       <DiscographyPath />
       <Video />
       <Newsletter />
-      <LandingFooter />
-    </div>
+    </>
   );
 }
