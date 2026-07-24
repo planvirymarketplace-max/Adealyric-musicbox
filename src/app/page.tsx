@@ -58,7 +58,7 @@ export default function Home() {
 
   return (
     <>
-      {!entered && <EntryGate onEnter={() => setEntered(true)} />}
+      {!entered && <EntryGate onEnter={() => setEntered(true)} onLogin={() => {}} />}
       <TabContent tab={activeTab} />
     </>
   );
