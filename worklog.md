@@ -153,3 +153,57 @@ Stage Summary:
 - Streaming modal with 8 platforms in clean grid layout
 - All products track availability (some marked SOLD OUT)
 - Navigation: ShopPage → AlbumDetailPage → ProductDetailPage → back navigation works correctly
+
+---
+Task ID: 5
+Agent: Main
+Task: Complete rewrite of Shop page with design-token-compliant architecture
+
+Work Log:
+- Added "Bottle Openers" to AlbumMerchProduct category type in catalog.ts
+- Added bottle opener products to 3 albums (Can't Nobody, After Lyric, Tainted Love)
+- Exported PlatformIcon from SiteChrome.tsx for reuse in streaming overlay
+- Completely rewrote Shop.tsx (~970 lines) with three exported components:
+  - ShopPage: Dark ink header with grain overlay → gradient transition → white editorial body
+    - Massive "SHOP" display text (Fraunces serif, clamp 4rem-16rem)
+    - Eyebrow mono labels for section numbering
+    - Collections tabs (All Albums, Apparel, Accessories, Vinyl, Digital)
+    - 5 album hero blocks with alternating 2-column layout (image left/right)
+    - Each album: display title, date, duration, description, quote, 4 action rows
+    - Merch thumbnails row (8 per album with quick-add)
+    - All Merchandise section with 7 category filter buttons (All, Clothes, Product, Cups, Mugs, Bottle Openers, Hats)
+    - Full product grid filtered by category
+  - AlbumDetailPage: Dark header with album art + info → transition → white body
+    - Back to Shop navigation
+    - Two-column hero with album image and metadata
+    - 4 action rows (Stream Album, Stream Single, Add Digital, Add Vinyl)
+    - Merch grid (4 columns)
+    - Video grid (2x2)
+    - Streaming overlay integration
+  - ProductDetailPage: Dark header → transition → white body
+    - Back navigation (returns to album or shop)
+    - Product image with prev/next arrows and counter
+    - Category label, display title, price
+    - Size selector with ●/○ indicators
+    - Add to Cart button (or disabled SOLD OUT)
+    - Notify Me email form for sold-out products
+    - Shipping info (ships 3-5 days, 30 day returns)
+    - Related products grid
+- StreamingOverlay: Full-screen dark overlay with grain texture
+  - Uses same 8 platform SVG icons as footer (Spotify, Apple Music, TikTok, Instagram, Amazon Music, YouTube, Tidal, Pandora)
+  - Dramatic display text for album/single title
+  - Play button indicator
+  - 2x4 grid of platforms with hover states
+- Design tokens used throughout: ink, bone, ash, smoke, mist, text-display, text-eyebrow, font-display, grain, grain-overlay
+- VLM visual verification confirmed: clean dark-to-white transition, editorial typography, magazine-like layout
+- Applied spacing refinements: tighter album sections, reduced gradient strips, line-clamped product names, placeholder borders
+- Lint: 0 errors, 1 pre-existing warning
+
+Stage Summary:
+- Shop page completely rebuilt following the site's monochrome editorial design system
+- Three-page architecture: Shop listing → Album detail → Product detail
+- Dark-to-white signature transition on every page entry
+- All streaming interactions use footer-matched platform icons in dramatic full-screen overlay
+- Categories include Bottle Openers as requested
+- Sold-out products show Notify Me email form
+- All 5 albums with correct lead singles: Can't Nobody, Fuck Boi, Side N****a, Drink on the Beach, Tainted Love

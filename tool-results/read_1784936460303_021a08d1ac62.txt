@@ -1,0 +1,688 @@
+     1→"use client";
+     2→
+     3→import { useState, useMemo } from "react";
+     4→import { PageShell } from "./SiteChrome";
+     5→import { useAppStore } from "@/lib/store";
+     6→import { ALBUMS, type AlbumMerchProduct } from "@/lib/catalog";
+     7→import {
+     8→  Dialog,
+     9→  DialogContent,
+    10→  DialogHeader,
+    11→  DialogTitle,
+    12→  DialogDescription,
+    13→} from "@/components/ui/dialog";
+    14→import { Plus, ChevronLeft, ChevronRight, Play } from "lucide-react";
+    15→
+    16→/* ─────────────────────────────────────────────
+    17→   CONSTANTS
+    18→   ───────────────────────────────────────────── */
+    19→
+    20→const COLLECTIONS = ["All Albums", "Apparel", "Accessories", "Vinyl", "Digital"];
+    21→
+    22→const STREAMING_SERVICES = [
+    23→  { key: "spotify", label: "Spotify" },
+    24→  { key: "appleMusic", label: "Apple Music" },
+    25→  { key: "tiktok", label: "TikTok" },
+    26→  { key: "instagram", label: "Instagram" },
+    27→  { key: "amazonMusic", label: "Amazon Music" },
+    28→  { key: "youtube", label: "YouTube" },
+    29→  { key: "tidal", label: "Tidal" },
+    30→  { key: "pandora", label: "Pandora" },
+    31→];
+    32→
+    33→/* ─────────────────────────────────────────────
+    34→   STREAMING MODAL
+    35→   ───────────────────────────────────────────── */
+    36→
+    37→function StreamingModal({
+    38→  open,
+    39→  onOpenChange,
+    40→  title,
+    41→}: {
+    42→  open: boolean;
+    43→  onOpenChange: (v: boolean) => void;
+    44→  title: string;
+    45→}) {
+    46→  return (
+    47→    <Dialog open={open} onOpenChange={onOpenChange}>
+    48→      <DialogContent className="bg-white text-[#1A1A1A] sm:max-w-md rounded-none p-0 gap-0">
+    49→        <DialogHeader className="p-6 pb-4">
+    50→          <DialogTitle className="text-lg font-normal tracking-wide uppercase">
+    51→            Stream — {title}
+    52→          </DialogTitle>
+    53→          <DialogDescription className="text-sm text-gray-500">
+    54→            Choose your preferred platform
+    55→          </DialogDescription>
+    56→        </DialogHeader>
+    57→        <div className="grid grid-cols-2 gap-0 px-6 pb-6">
+    58→          {STREAMING_SERVICES.map((s) => (
+    59→            <a
+    60→              key={s.key}
+    61→              href="#"
+    62→              onClick={(e) => e.preventDefault()}
+    63→              className="flex items-center gap-3 border border-[#E5E5E5] px-4 py-3 text-sm text-[#1A1A1A] transition-colors hover:bg-[#F5F5F5] cursor-pointer"
+    64→            >
+    65→              <span className="text-base">●</span>
+    66→              {s.label}
+    67→            </a>
+    68→          ))}
+    69→        </div>
+    70→      </DialogContent>
+    71→    </Dialog>
+    72→  );
+    73→}
+    74→
+    75→/* ─────────────────────────────────────────────
+    76→   HELPERS
+    77→   ───────────────────────────────────────────── */
+    78→
+    79→function PlaceholderImage({ label = "Image", className = "" }: { label?: string; className?: string }) {
+    80→  return (
+    81→    <div
+    82→      className={`flex items-center justify-center bg-[#F5F5F5] text-gray-400 text-xs uppercase tracking-widest select-none ${className}`}
+    83→    >
+    84→      {label}
+    85→    </div>
+    86→  );
+    87→}
+    88→
+    89→function MerchCard({ product, onSelect }: { product: AlbumMerchProduct; onSelect: () => void }) {
+    90→  return (
+    91→    <div
+    92→      className="group cursor-pointer"
+    93→      onClick={onSelect}
+    94→    >
+    95→      <div className="relative aspect-square bg-[#F5F5F5]">
+    96→        <PlaceholderImage label={product.category} className="absolute inset-0" />
+    97→        {/* Quick add button */}
+    98→        {product.available && (
+    99→          <button
+   100→            onClick={(e) => {
+   101→              e.stopPropagation();
+   102→              product.onSelect?.();
+   103→            }}
+   104→            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#1A1A1A] text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+   105→            aria-label="Quick add to cart"
+   106→          >
+   107→            <Plus className="h-4 w-4" />
+   108→          </button>
+   109→        )}
+   110→        {/* Sold out overlay */}
+   111→        {!product.available && (
+   112→          <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5F5]/80">
+   113→            <span className="text-xs uppercase tracking-widest text-gray-400">Sold out</span>
+   114→          </div>
+   115→        )}
+   116→      </div>
+   117→      <div className="mt-3">
+   118→        <p className="text-xs uppercase tracking-wide text-[#1A1A1A] truncate">{product.name}</p>
+   119→        <p className={`mt-1 text-xs ${product.available ? "text-[#1A1A1A]" : "text-gray-400"}`}>
+   120→          {product.available ? `$${product.price}.00` : "SOLD OUT"}
+   121→        </p>
+   122→      </div>
+   123→    </div>
+   124→  );
+   125→}
+   126→
+   127→function ActionRow({
+   128→  label,
+   129→  onClick,
+   130→}: {
+   131→  label: string;
+   132→  onClick: () => void;
+   133→}) {
+   134→  return (
+   135→    <button
+   136→      onClick={onClick}
+   137→      className="flex w-full items-center justify-between border-t border-[#E5E5E5] py-4 text-sm text-[#1A1A1A] transition-colors hover:bg-[#FAFAFA] cursor-pointer"
+   138→    >
+   139→      <span>{label}</span>
+   140→      <span className="text-[#1A1A1A]">●</span>
+   141→    </button>
+   142→  );
+   143→}
+   144→
+   145→function SectionHeader({ title }: { title: string }) {
+   146→  return (
+   147→    <div className="pb-4 mb-8 text-center">
+   148→      <h2 className="text-sm uppercase tracking-widest text-[#1A1A1A] pb-4 border-b border-[#E5E5E5]">
+   149→        {title}
+   150→      </h2>
+   151→    </div>
+   152→  );
+   153→}
+   154→
+   155→/* ─────────────────────────────────────────────
+   156→   SHOP PAGE
+   157→   ───────────────────────────────────────────── */
+   158→
+   159→export function ShopPage() {
+   160→  const { setDetailSlug, addToCart } = useAppStore();
+   161→  const [activeCollection, setActiveCollection] = useState("All Albums");
+   162→
+   163→  return (
+   164→    <div className="min-h-screen bg-white text-[#1A1A1A]">
+   165→      {/* Header */}
+   166→      <div className="px-6 pt-28 pb-8 md:px-12 md:pt-36 md:pb-12 max-w-[1600px] mx-auto">
+   167→        <h1 className="text-4xl md:text-6xl font-light tracking-tight">Shop</h1>
+   168→        <p className="mt-4 text-sm text-gray-500 max-w-md">
+   169→          Official Adea Lyric merchandise, vinyl, and digital releases. Everything ships worldwide.
+   170→        </p>
+   171→      </div>
+   172→
+   173→      {/* Collections row */}
+   174→      <div className="border-b border-[#E5E5E5]">
+   175→        <div className="px-6 md:px-12 max-w-[1600px] mx-auto">
+   176→          <div className="flex gap-0 overflow-x-auto">
+   177→            {COLLECTIONS.map((c) => (
+   178→              <button
+   179→                key={c}
+   180→                onClick={() => setActiveCollection(c)}
+   181→                className={`shrink-0 px-5 py-4 text-xs uppercase tracking-widest transition-colors cursor-pointer ${
+   182→                  activeCollection === c
+   183→                    ? "text-[#1A1A1A] border-b-2 border-[#1A1A1A]"
+   184→                    : "text-gray-400 hover:text-[#1A1A1A]"
+   185→                }`}
+   186→              >
+   187→                {c}
+   188→              </button>
+   189→            ))}
+   190→          </div>
+   191→        </div>
+   192→      </div>
+   193→
+   194→      {/* Album Grid */}
+   195→      <div className="px-6 py-12 md:px-12 md:py-16 max-w-[1600px] mx-auto">
+   196→        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+   197→          {ALBUMS.map((album) => (
+   198→            <div
+   199→              key={album.slug}
+   200→              className="group cursor-pointer"
+   201→              onClick={() => setDetailSlug(album.slug, "album")}
+   202→            >
+   203→              <div className="relative aspect-square bg-[#F5F5F5] overflow-hidden">
+   204→                <PlaceholderImage label="Album Art" className="absolute inset-0 transition-transform duration-500 group-hover:scale-105" />
+   205→                <button
+   206→                  onClick={(e) => {
+   207→                    e.stopPropagation();
+   208→                    addToCart();
+   209→                  }}
+   210→                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1A1A] text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+   211→                  aria-label="Quick add to cart"
+   212→                >
+   213→                  <Plus className="h-4 w-4" />
+   214→                </button>
+   215→              </div>
+   216→              <div className="mt-3">
+   217→                <p className="text-sm font-medium text-[#1A1A1A]">{album.title}</p>
+   218→                <p className="mt-1 text-xs text-gray-400">{album.releaseDate}</p>
+   219→              </div>
+   220→            </div>
+   221→          ))}
+   222→        </div>
+   223→      </div>
+   224→
+   225→      {/* Featured Merch Row */}
+   226→      <div className="border-t border-[#E5E5E5]">
+   227→        <div className="px-6 pt-12 pb-4 md:px-12">
+   228→          <div className="mb-8 text-center">
+   229→            <h2 className="text-sm uppercase tracking-widest text-[#1A1A1A] pb-4 border-b border-[#E5E5E5]">
+   230→              Featured Merch
+   231→            </h2>
+   232→          </div>
+   233→        </div>
+   234→        <div className="px-6 pb-12 md:px-12 max-w-[1600px] mx-auto">
+   235→          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+   236→            {/* Show first merch item from each album */}
+   237→            {ALBUMS.slice(0, 4).map((album) =>
+   238→              album.merch.slice(0, 2).map((product) => (
+   239→                <div key={product.slug} className="group cursor-pointer">
+   240→                  <div className="relative aspect-square bg-[#F5F5F5]">
+   241→                    <PlaceholderImage label={product.category} className="absolute inset-0" />
+   242→                    {!product.available && (
+   243→                      <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+   244→                        <span className="text-[10px] uppercase tracking-widest text-gray-400">Sold out</span>
+   245→                      </div>
+   246→                    )}
+   247→                    {product.available && (
+   248→                      <button
+   249→                        onClick={(e) => {
+   250→                          e.stopPropagation();
+   251→                          addToCart();
+   252→                        }}
+   253→                        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#1A1A1A] text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+   254→                        aria-label="Quick add"
+   255→                      >
+   256→                        <Plus className="h-3 w-3" />
+   257→                      </button>
+   258→                    )}
+   259→                  </div>
+   260→                  <div className="mt-2">
+   261→                    <p className="text-[10px] uppercase tracking-wider text-[#1A1A1A] truncate">{product.name}</p>
+   262→                    <p className={`mt-0.5 text-[10px] ${product.available ? "text-[#1A1A1A]" : "text-gray-400"}`}>
+   263→                      {product.available ? `$${product.price}.00` : "SOLD OUT"}
+   264→                    </p>
+   265→                  </div>
+   266→                </div>
+   267→              ))
+   268→            )}
+   269→          </div>
+   270→        </div>
+   271→      </div>
+   272→    </div>
+   273→  );
+   274→}
+   275→
+   276→/* ─────────────────────────────────────────────
+   277→   ALBUM DETAIL PAGE
+   278→   ───────────────────────────────────────────── */
+   279→
+   280→export function AlbumDetailPage() {
+   281→  const { detailSlug, setDetailSlug, addToCart } = useAppStore();
+   282→  const album = ALBUMS.find((a) => a.slug === detailSlug);
+   283→  const [streamOpen, setStreamOpen] = useState(false);
+   284→  const [streamTitle, setStreamTitle] = useState("");
+   285→  const [imgIdx, setImgIdx] = useState(0);
+   286→
+   287→  if (!album) return null;
+   288→
+   289→  const totalImgs = 2;
+   290→
+   291→  const openStream = (label: string) => {
+   292→    setStreamTitle(label);
+   293→    setStreamOpen(true);
+   294→  };
+   295→
+   296→  const addDigital = () => {
+   297→    addToCart();
+   298→  };
+   299→
+   300→  const addVinyl = () => {
+   301→    addToCart();
+   302→  };
+   303→
+   304→  return (
+   305→    <PageShell>
+   306→      <div className="min-h-screen bg-white text-[#1A1A1A]">
+   307→        {/* Hero */}
+   308→        <section className="px-6 pt-28 md:px-12 md:pt-36">
+   309→          <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+   310→            {/* Left: Album art */}
+   311→            <div>
+   312→              <button
+   313→                onClick={() => setDetailSlug(null, null)}
+   314→                className="text-xs text-gray-400 hover:text-[#1A1A1A] cursor-pointer uppercase tracking-widest mb-6 inline-block"
+   315→              >
+   316→                ← Back to Shop
+   317→              </button>
+   318→              <div className="relative aspect-square bg-[#F5F5F5]">
+   319→                <PlaceholderImage label="Album Art" className="absolute inset-0" />
+   320→                {/* Nav arrows */}
+   321→                <button
+   322→                  onClick={() => setImgIdx((p) => (p > 0 ? p - 1 : totalImgs - 1))}
+   323→                  className="absolute left-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5] cursor-pointer"
+   324→                  aria-label="Previous image"
+   325→                >
+   326→                  <ChevronLeft className="h-4 w-4" />
+   327→                </button>
+   328→                <button
+   329→                  onClick={() => setImgIdx((p) => (p < totalImgs - 1 ? p + 1 : 0))}
+   330→                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5] cursor-pointer"
+   331→                  aria-label="Next image"
+   332→                >
+   333→                  <ChevronRight className="h-4 w-4" />
+   334→                </button>
+   335→                {/* Counter */}
+   336→                <span className="absolute left-3 bottom-3 text-xs text-gray-400">
+   337→                  {imgIdx + 1}/{totalImgs}
+   338→                </span>
+   339→              </div>
+   340→            </div>
+   341→
+   342→            {/* Right: Info */}
+   343→            <div className="flex flex-col justify-center">
+   344→              <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight">
+   345→                {album.title}
+   346→              </h1>
+   347→              <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
+   348→                <span>{album.releaseDate}</span>
+   349→                <span>·</span>
+   350→                <span>{album.duration}</span>
+   351→              </div>
+   352→
+   353→              {/* Artist note */}
+   354→              <p className="mt-8 text-xs uppercase tracking-widest text-gray-500 leading-relaxed">
+   355→                {album.description}
+   356→              </p>
+   357→
+   358→              {/* Quote */}
+   359→              <blockquote className="mt-6 pl-4 border-l-2 border-[#1A1A1A] text-sm italic text-[#1A1A1A]/70">
+   360→                {album.quote}
+   361→              </blockquote>
+   362→
+   363→              {/* Action rows */}
+   364→              <div className="mt-10">
+   365→                <ActionRow label="Stream Album" onClick={() => openStream(album.title)} />
+   366→                {album.singleTitle && (
+   367→                  <ActionRow
+   368→                    label={`Stream Single — ${album.singleTitle}`}
+   369→                    onClick={() => openStream(album.singleTitle)}
+   370→                  />
+   371→                )}
+   372→                <ActionRow
+   373→                  label="Add to Cart (Digital)"
+   374→                  onClick={addDigital}
+   375→                />
+   376→                <ActionRow
+   377→                  label="Add to Cart (Vinyl)"
+   378→                  onClick={addVinyl}
+   379→                />
+   380→              </div>
+   381→            </div>
+   382→          </div>
+   383→        </section>
+   384→
+   385→        {/* Associated Merch */}
+   386→        <section className="px-6 py-16 md:px-12">
+   387→          <div className="max-w-[1600px] mx-auto">
+   388→            <SectionHeader title={`${album.title} Merch`} />
+   389→            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+   390→              {album.merch.map((product) => (
+   391→                <div key={product.slug} className="group cursor-pointer" onClick={() => setDetailSlug(product.slug, "product")}>
+   392→                  <div className="relative aspect-square bg-[#F5F5F5]">
+   393→                    <PlaceholderImage label={product.category} className="absolute inset-0" />
+   394→                    {!product.available && (
+   395→                      <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+   396→                        <span className="text-xs uppercase tracking-widest text-gray-400">Sold out</span>
+   397→                      </div>
+   398→                    )}
+   399→                    {product.available && (
+   400→                      <button
+   401→                        onClick={(e) => {
+   402→                          e.stopPropagation();
+   403→                          addToCart();
+   404→                        }}
+   405→                        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#1A1A1A] text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+   406→                        aria-label="Quick add to cart"
+   407→                      >
+   408→                        <Plus className="h-4 w-4" />
+   409→                      </button>
+   410→                    )}
+   411→                  </div>
+   412→                  <div className="mt-3">
+   413→                    <p className="text-xs uppercase tracking-wide text-[#1A1A1A] truncate">{product.name}</p>
+   414→                    <p className={`mt-1 text-xs ${product.available ? "text-[#1A1A1A]" : "text-gray-400"}`}>
+   415→                      {product.available ? `$${product.price}.00` : "SOLD OUT"}
+   416→                    </p>
+   417→                  </div>
+   418→                </div>
+   419→              ))}
+   420→            </div>
+   421→          </div>
+   422→        </section>
+   423→
+   424→        {/* Video Section */}
+   425→        <section className="px-6 py-16 md:px-12 border-t border-[#E5E5E5]">
+   426→          <div className="max-w-[1600px] mx-auto">
+   427→            <SectionHeader title="Videos" />
+   428→            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+   429→              {[1, 2, 3, 4].map((n) => (
+   430→                <div key={n} className="relative aspect-video bg-[#F5F5F5] flex items-center justify-center group cursor-pointer">
+   431→                  <PlaceholderImage label={`Video ${n}`} className="absolute inset-0" />
+   432→                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#1A1A1A]/80 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer">
+   433→                    <Play className="h-5 w-5 ml-0.5" />
+   434→                  </div>
+   435→                </div>
+   436→              ))}
+   437→            </div>
+   438→          </div>
+   439→        </section>
+   440→      </div>
+   441→
+   442→      {/* Streaming Modal */}
+   443→      <StreamingModal
+   444→        open={streamOpen}
+   445→        onOpenChange={setStreamOpen}
+   446→        title={streamTitle}
+   447→      />
+   448→    </PageShell>
+   449→  );
+   450→}
+   451→
+   452→/* ─────────────────────────────────────────────
+   453→   PRODUCT DETAIL PAGE
+   454→   ───────────────────────────────────────────── */
+   455→
+   456→export function ProductDetailPage() {
+   457→  const { detailSlug, setDetailSlug, addToCart } = useAppStore();
+   458→  const [imgIdx, setImgIdx] = useState(0);
+   459→  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+   460→  const [added, setAdded] = useState(false);
+   461→
+   462→  // Find the product across all albums
+   463→  const allProducts = useMemo(() => {
+   464→    const products: (AlbumMerchProduct & { albumSlug: string; albumTitle: string })[] = [];
+   465→    ALBUMS.forEach((album) => {
+   466→      album.merch.forEach((p) => {
+   467→        products.push({ ...p, albumSlug: album.slug, albumTitle: album.title });
+   468→      });
+   469→    });
+   470→    return products;
+   471→  }, []);
+   472→
+   473→  const product = allProducts.find((p) => p.slug === detailSlug);
+   474→
+   475→  // Related products: same album, excluding current
+   476→  const related = useMemo(() => {
+   477→    if (!product) return [];
+   478→    return allProducts.filter((p) => p.slug !== product.slug).slice(0, 4);
+   479→  }, [product, allProducts]);
+   480→
+   481→  if (!product) return null;
+   482→
+   483→  const totalImgs = 3;
+   484→  const hasSizes = product.sizes && product.sizes.length > 0;
+   485→
+   486→  // Auto-select first size when product changes
+   487→  if (hasSizes && !selectedSize) {
+   488→    const firstAvailable = product.sizes[0];
+   489→    setSelectedSize(firstAvailable);
+   490→  }
+   491→
+   492→  const handleAdd = () => {
+   493→    setAdded(true);
+   494→    addToCart();
+   495→    setTimeout(() => setAdded(false), 1500);
+   496→  };
+   497→
+   498→  const goBack = () => {
+   499→    // Go back to the album if we came from one
+   500→    if (product.albumSlug) {
+   501→      setDetailSlug(product.albumSlug, "album");
+   502→    } else {
+   503→      setDetailSlug(null, null);
+   504→    }
+   505→  };
+   506→
+   507→  return (
+   508→    <PageShell>
+   509→      <div className="min-h-screen bg-white text-[#1A1A1A]">
+   510→        {/* Hero */}
+   511→        <section className="px-6 pt-28 md:px-12 md:pt-36">
+   512→          <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+   513→            {/* Left: Product images */}
+   514→            <div>
+   515→              <button
+   516→                onClick={goBack}
+   517→                className="text-xs text-gray-400 hover:text-[#1A1A1A] cursor-pointer uppercase tracking-widest mb-6 inline-block"
+   518→              >
+   519→                ← Back
+   520→              </button>
+   521→              <div className="relative aspect-square bg-[#F5F5F5]">
+   522→                <PlaceholderImage label={product.name} className="absolute inset-0" />
+   523→                {/* Nav arrows */}
+   524→                <button
+   525→                  onClick={() => setImgIdx((p) => (p > 0 ? p - 1 : totalImgs - 1))}
+   526→                  className="absolute left-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5] cursor-pointer"
+   527→                  aria-label="Previous image"
+   528→                >
+   529→                  <ChevronLeft className="h-4 w-4" />
+   530→                </button>
+   531→                <button
+   532→                  onClick={() => setImgIdx((p) => (p < totalImgs - 1 ? p + 1 : 0))}
+   533→                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5] cursor-pointer"
+   534→                  aria-label="Next image"
+   535→                >
+   536→                  <ChevronRight className="h-4 w-4" />
+   537→                </button>
+   538→                {/* Counter */}
+   539→                <span className="absolute left-3 bottom-3 text-xs text-gray-400">
+   540→                  {imgIdx + 1}/{totalImgs}
+   541→                </span>
+   542→              </div>
+   543→            </div>
+   544→
+   545→            {/* Right: Product info */}
+   546→            <div className="flex flex-col justify-center">
+   547→              <h1 className="text-3xl md:text-4xl lg:text-5xl font-light uppercase tracking-wide">
+   548→                {product.name}
+   549→              </h1>
+   550→
+   551→              <p className="mt-4 text-2xl text-[#1A1A1A]">
+   552→                {product.available ? `$${product.price}.00` : <span className="text-gray-400">SOLD OUT</span>}
+   553→              </p>
+   554→
+   555→              <p className="mt-6 text-sm text-gray-500 leading-relaxed max-w-md">
+   556→                Official Adea Lyric merchandise. Designed in West Philadelphia. High-quality print on premium materials.
+   557→              </p>
+   558→
+   559→              {/* Size Guide */}
+   560→              <button className="mt-4 text-xs underline text-gray-500 hover:text-[#1A1A1A] cursor-pointer text-left">
+   561→                Size Guide
+   562→              </button>
+   563→
+   564→              {/* Size selector */}
+   565→              {hasSizes && (
+   566→                <div className="mt-8">
+   567→                  <div className="flex items-center justify-between text-xs text-gray-500">
+   568→                    <span>Size</span>
+   569→                    {selectedSize && <span className="text-[#1A1A1A]">●</span>}
+   570→                  </div>
+   571→                  <div className="mt-2">
+   572→                    {product.sizes.map((size) => {
+   573→                      const isSelected = selectedSize === size;
+   574→                      const isAvailable = product.available;
+   575→                      return (
+   576→                        <button
+   577→                          key={size}
+   578→                          onClick={() => isAvailable && setSelectedSize(size)}
+   579→                          disabled={!isAvailable}
+   580→                          className={`flex w-full items-center justify-between border-b border-[#E5E5E5] py-3 text-sm cursor-pointer transition-colors ${
+   581→                            !isAvailable
+   582→                              ? "text-gray-300 cursor-not-allowed"
+   583→                              : isSelected
+   584→                                ? "text-[#1A1A1A]"
+   585→                                : "text-gray-500 hover:text-[#1A1A1A]"
+   586→                          }`}
+   587→                        >
+   588→                          <span>{size}</span>
+   589→                          <span className={isAvailable ? "text-[#1A1A1A]" : "text-gray-300"}>
+   590→                            {isAvailable ? "●" : "○"}
+   591→                          </span>
+   592→                        </button>
+   593→                      );
+   594→                    })}
+   595→                  </div>
+   596→                </div>
+   597→              )}
+   598→
+   599→              {/* Add to cart */}
+   600→              <button
+   601→                onClick={handleAdd}
+   602→                disabled={!product.available}
+   603→                className={`mt-8 w-full py-4 text-sm uppercase tracking-widest transition-colors cursor-pointer ${
+   604→                  added
+   605→                    ? "bg-[#1A1A1A] text-white"
+   606→                    : product.available
+   607→                      ? "bg-[#1A1A1A] text-white hover:bg-[#333]"
+   608→                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+   609→                }`}
+   610→              >
+   611→                {added
+   612→                  ? "Added to Cart"
+   613→                  : product.available
+   614→                    ? "Add to Cart"
+   615→                    : "Sold Out"}
+   616→              </button>
+   617→
+   618→              {/* Shipping info */}
+   619→              <div className="mt-8 grid grid-cols-2 gap-4 text-xs text-gray-400">
+   620→                <div className="border-t border-[#E5E5E5] pt-3">
+   621→                  <span className="block text-gray-500">Ships</span>
+   622→                  <span className="mt-1 block">3–5 business days</span>
+   623→                </div>
+   624→                <div className="border-t border-[#E5E5E5] pt-3">
+   625→                  <span className="block text-gray-500">Returns</span>
+   626→                  <span className="mt-1 block">30 days</span>
+   627→                </div>
+   628→              </div>
+   629→            </div>
+   630→          </div>
+   631→        </section>
+   632→
+   633→        {/* Related Products */}
+   634→        <section className="px-6 py-16 md:px-12 border-t border-[#E5E5E5]">
+   635→          <div className="max-w-[1600px] mx-auto">
+   636→            <div className="mb-8 text-center">
+   637→              <h2 className="text-sm uppercase tracking-widest text-[#1A1A1A] pb-4 border-b border-[#E5E5E5]">
+   638→                Related Products
+   639→              </h2>
+   640→            </div>
+   641→            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+   642→              {related.map((r) => (
+   643→                <div
+   644→                  key={r.slug}
+   645→                  className="group cursor-pointer"
+   646→                  onClick={() => {
+   647→                    setDetailSlug(r.slug, "product");
+   648→                    setImgIdx(0);
+   649→                    setSelectedSize(null);
+   650→                    setAdded(false);
+   651→                  }}
+   652→                >
+   653→                  <div className="relative aspect-square bg-[#F5F5F5]">
+   654→                    <PlaceholderImage label={r.category} className="absolute inset-0" />
+   655→                    {!r.available && (
+   656→                      <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+   657→                        <span className="text-xs uppercase tracking-widest text-gray-400">Sold out</span>
+   658→                      </div>
+   659→                    )}
+   660→                    {r.available && (
+   661→                      <button
+   662→                        onClick={(e) => {
+   663→                          e.stopPropagation();
+   664→                          addToCart();
+   665→                        }}
+   666→                        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#1A1A1A] text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+   667→                        aria-label="Quick add to cart"
+   668→                      >
+   669→                        <Plus className="h-4 w-4" />
+   670→                      </button>
+   671→                    )}
+   672→                  </div>
+   673→                  <div className="mt-3">
+   674→                    <p className="text-xs uppercase tracking-wide text-[#1A1A1A] truncate">{r.name}</p>
+   675→                    <p className={`mt-1 text-xs ${r.available ? "text-[#1A1A1A]" : "text-gray-400"}`}>
+   676→                      {r.available ? `$${r.price}.00` : "SOLD OUT"}
+   677→                    </p>
+   678→                  </div>
+   679→                </div>
+   680→              ))}
+   681→            </div>
+   682→          </div>
+   683→        </section>
+   684→      </div>
+   685→    </PageShell>
+   686→  );
+   687→}
+   688→

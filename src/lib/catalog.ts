@@ -222,7 +222,7 @@ export type AlbumMerchProduct = {
   slug: string;
   name: string;
   price: number;
-  category: "Clothes" | "Product" | "Cups" | "Mugs" | "Hats";
+  category: "Clothes" | "Product" | "Cups" | "Mugs" | "Hats" | "Bottle Openers";
   sizes: string[];
   image: string;
   available: boolean;
@@ -259,6 +259,7 @@ export const ALBUMS: Album[] = [
       { slug: "cn-hat", name: "Can't Nobody Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: false },
       { slug: "cn-cup", name: "Can't Nobody Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
       { slug: "cn-tote", name: "Can't Nobody Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+      { slug: "cn-bottle-opener", name: "Can't Nobody Bottle Opener", price: 12, category: "Bottle Openers", sizes: [], image: "", available: true },
     ],
   },
   {
@@ -279,6 +280,7 @@ export const ALBUMS: Album[] = [
       { slug: "al-hat", name: "After Lyric Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: true },
       { slug: "al-cup", name: "After Lyric Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
       { slug: "al-tote", name: "After Lyric Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+      { slug: "al-bottle-opener", name: "After Lyric Bottle Opener", price: 12, category: "Bottle Openers", sizes: [], image: "", available: true },
     ],
   },
   {
@@ -338,6 +340,7 @@ export const ALBUMS: Album[] = [
       { slug: "tl-hat", name: "Tainted Love Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], image: "", available: false },
       { slug: "tl-cup", name: "Tainted Love Cup", price: 15, category: "Cups", sizes: [], image: "", available: true },
       { slug: "tl-tote", name: "Tainted Love Tote", price: 22, category: "Product", sizes: [], image: "", available: true },
+      { slug: "tl-bottle-opener", name: "Tainted Love Bottle Opener", price: 12, category: "Bottle Openers", sizes: [], image: "", available: false },
     ],
   },
 ];
