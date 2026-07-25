@@ -196,21 +196,6 @@ function BioSection() {
             <BentoCard index={1} colSpan={1} rowSpan={1} />
             {/* Row 2 — Large continues + 1 small */}
             <BentoCard index={2} colSpan={1} rowSpan={1} />
-            {/* Middle vertical — Video */}
-            <div className={`col-span-2 relative overflow-hidden border border-ink/10 bg-smoke md:col-span-3 bento-float-item`} style={{ animationDelay: "1.6s" }}>
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                poster={fkboiAsset}
-                className="absolute inset-0 h-full w-full object-cover grayscale"
-              >
-                <source src="https://cdn.coverr.co/videos/coverr-a-woman-singing-in-a-recording-studio-4949/1080p.mp4" type="video/mp4" />
-              </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
-              <div className="absolute bottom-3 left-4 text-eyebrow text-white/80">Studio Session</div>
-            </div>
             {/* Row 3 — 1 small + wide (2col) */}
             <BentoCard index={3} colSpan={1} rowSpan={1} />
             <BentoCard index={4} colSpan={2} rowSpan={1} />
