@@ -136,7 +136,55 @@ function Marquee() {
   );
 }
 
-/* ---- Bento Card ---- */
+/* ---- Flip Card for bento grid ---- */
+const NAME_CARDS = [
+  { letter: "A", word: "Authentic", desc: "Unfiltered. Unapologetic. Real." },
+  { letter: "D", word: "Determined", desc: "Built through discipline and purpose." },
+  { letter: "E", word: "Expressive", desc: "Every lyric tells a story." },
+  { letter: "A", word: "Artistry", desc: "Singer. Songwriter. Producer." },
+  { letter: "L", word: "Legacy", desc: "Creating music that outlives trends." },
+  { letter: "Y", word: "Yang", desc: "Strength, balance, and creative energy." },
+  { letter: "R", word: "Resilient", desc: "Rising stronger through every challenge." },
+  { letter: "I", word: "Independent", desc: "Creating on her own terms." },
+  { letter: "C", word: "Culture", desc: "The unmistakable sound of West Philadelphia." },
+];
+
+/* Layout: which cards get col-span/row-span in 3-col grid */
+const CARD_LAYOUT = [
+  { colSpan: 2, rowSpan: 2 },  // A — Authentic (large)
+  { colSpan: 1, rowSpan: 1 },  // D
+  { colSpan: 1, rowSpan: 1 },  // E
+  { colSpan: 1, rowSpan: 1 },  // A — Artistry
+  { colSpan: 2, rowSpan: 1 },  // L (wide)
+  { colSpan: 1, rowSpan: 1 },  // Y
+  { colSpan: 1, rowSpan: 1 },  // R
+  { colSpan: 1, rowSpan: 1 },  // I
+  { colSpan: 3, rowSpan: 1 },  // C — Culture (full width)
+];
+
+function FlipCard({ card, layout, index }: { card: typeof NAME_CARDS[0]; layout: typeof CARD_LAYOUT[0]; index: number }) {
+  const delay = index * 0.4;
+  return (
+    <div
+      className={`flip-card bento-float-item border border-ink/10 ${layout.colSpan === 2 ? "md:col-span-2" : ""} ${layout.colSpan === 3 ? "col-span-2 md:col-span-3" : ""} ${layout.rowSpan === 2 ? "md:row-span-2" : ""}`}
+      style={{ animationDelay: `${delay}s` }}
+    >
+      <div className="flip-inner">
+        {/* Front — Letter */}
+        <div className="flip-front flex items-center justify-center bg-ink">
+          <span className="text-display text-[clamp(3rem,10vw,8rem)] leading-none select-none text-bone">{card.letter}</span>
+        </div>
+        {/* Back — Word + description */}
+        <div className="flip-back flex flex-col items-center justify-center bg-white px-4 py-4">
+          <span className="text-display text-[clamp(1.5rem,4vw,3rem)] leading-none text-ink">{card.word}</span>
+          <p className={`mt-2 text-center leading-snug text-ink/50 ${layout.colSpan >= 2 ? "text-sm max-w-sm" : "text-xs max-w-[140px]"}`}>{card.desc}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Bento Card (deprecated — kept for reference) ---- */
 function BentoCard({ index, colSpan, rowSpan, label }: { index: number; colSpan: number; rowSpan: number; label?: string }) {
   const delay = index * 0.4;
   return (
@@ -144,15 +192,11 @@ function BentoCard({ index, colSpan, rowSpan, label }: { index: number; colSpan:
       className={`bento-float-item group relative overflow-hidden border border-border bg-mist ${colSpan === 2 ? "md:col-span-2" : ""} ${rowSpan === 2 ? "md:row-span-2" : ""}`}
       style={{ animationDelay: `${delay}s` }}
     >
-      {/* Placeholder fill */}
       <div className="absolute inset-0 bg-smoke" />
-      {/* Image placeholder shimmer */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="h-8 w-8 rounded-full border border-ash/30" />
       </div>
-      {/* Bottom gradient for future text overlay */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      {/* Future word label placeholder */}
       {label && (
         <div className="absolute bottom-4 left-4 z-10 text-eyebrow text-ash/50 transition-colors duration-500 group-hover:text-bone">
           {label}
@@ -186,27 +230,10 @@ function BioSection() {
         </div>
         {/* Right — Bento Grid */}
         <div className={`md:col-span-7 md:col-start-6 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <div className="bento-float grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
-            {/* Top vertical — Name letter */}
-            <div className={`col-span-2 flex items-center justify-center border border-ink/10 bg-ink text-ink md:col-span-3 bento-float-item`} style={{ animationDelay: "0s" }}>
-              <span className="text-display text-[clamp(5rem,14vw,12rem)] leading-none select-none text-white">A</span>
-            </div>
-            {/* Row 1 — Large card (2col 2row) + 1 small */}
-            <BentoCard index={0} colSpan={2} rowSpan={2} />
-            <BentoCard index={1} colSpan={1} rowSpan={1} />
-            {/* Row 2 — Large continues + 1 small */}
-            <BentoCard index={2} colSpan={1} rowSpan={1} />
-            {/* Row 3 — 1 small + wide (2col) */}
-            <BentoCard index={3} colSpan={1} rowSpan={1} />
-            <BentoCard index={4} colSpan={2} rowSpan={1} />
-            {/* Row 4 — 3 small */}
-            <BentoCard index={5} colSpan={1} rowSpan={1} />
-            <BentoCard index={6} colSpan={1} rowSpan={1} />
-            <BentoCard index={7} colSpan={1} rowSpan={1} />
-            {/* Bottom vertical — Name letter */}
-            <div className={`col-span-2 flex items-center justify-center border border-ink/10 bg-ink text-ink md:col-span-3 bento-float-item`} style={{ animationDelay: "3.2s" }}>
-              <span className="text-display text-[clamp(5rem,14vw,12rem)] leading-none select-none text-white">A</span>
-            </div>
+          <div className="grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
+            {NAME_CARDS.map((card, i) => (
+              <FlipCard key={card.word} card={card} layout={CARD_LAYOUT[i]} index={i} />
+            ))}
           </div>
           <div className="mt-10">
             <button onClick={() => setActiveTab("bio")} className="inline-flex items-center gap-4 text-eyebrow text-ink cursor-pointer">

@@ -237,42 +237,12 @@ function ActionRow({
    ═══════════════════════════════════════════════════ */
 
 export function ShopPage() {
-  const { setDetailSlug, addToCart } = useAppStore();
-  const [activeCollection, setActiveCollection] = useState("All Albums");
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [streamOpen, setStreamOpen] = useState(false);
-  const [streamTitle, setStreamTitle] = useState("");
-
-  const openStream = useCallback((title: string) => {
-    setStreamTitle(title);
-    setStreamOpen(true);
-  }, []);
-
-  // All merch products flattened with album context
-  const allMerch = useMemo(() => {
-    const list: (AlbumMerchProduct & { albumTitle: string; albumSlug: string })[] =
-      [];
-    ALBUMS.forEach((album) => {
-      album.merch.forEach((p) => {
-        list.push({
-          ...p,
-          albumTitle: album.title,
-          albumSlug: album.slug,
-        });
-      });
-    });
-    return list;
-  }, []);
-
-  const filteredMerch = useMemo(() => {
-    if (activeCategory === "All") return allMerch;
-    return allMerch.filter((p) => p.category === activeCategory);
-  }, [allMerch, activeCategory]);
+  const { setDetailSlug } = useAppStore();
 
   return (
     <>
       {/* ─── DARK HEADER ─── */}
-      <section className="relative bg-ink grain px-6 pt-40 pb-24 md:px-12 md:pt-56 md:pb-32">
+      <section className="relative bg-ink grain px-6 pt-40 pb-16 md:px-12 md:pt-56 md:pb-20">
         <div className="grain-overlay" />
         <div className="relative z-10 mx-auto max-w-[1600px]">
           <div className="text-eyebrow text-ash">05 — Shop</div>
@@ -281,7 +251,6 @@ export function ShopPage() {
           </h1>
           <p className="mt-8 max-w-md text-base leading-relaxed text-ash">
             Official Adea Lyric merchandise, vinyl, and digital releases.
-            Everything ships worldwide.
           </p>
         </div>
       </section>
@@ -289,84 +258,49 @@ export function ShopPage() {
       {/* ─── GRADIENT TRANSITION ─── */}
       <div className="h-24 bg-gradient-to-b from-ink via-ink/40 to-white md:h-32" />
 
-      {/* ─── WHITE BODY ─── */}
-      <div className="bg-white text-ink">
-        {/* Collections tabs */}
-        <nav className="border-b border-ink/10">
-          <div className="mx-auto max-w-[1600px] px-6 md:px-12">
-            <div className="flex gap-0 overflow-x-auto">
-              {COLLECTIONS.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setActiveCollection(c)}
-                  className={`shrink-0 px-5 py-4 text-eyebrow transition-colors cursor-pointer ${
-                    activeCollection === c
-                      ? "text-ink border-b border-ink"
-                      : "text-ink/30 hover:text-ink/60"
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
+      {/* ─── ALBUM CATALOG ─── */}
+      <section className="bg-white px-6 py-16 md:px-12 md:py-20">
+        <div className="mx-auto max-w-[1600px]">
+          <SectionLabel>Albums</SectionLabel>
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            {ALBUMS.map((album) => (
+              <button
+                key={album.slug}
+                onClick={() => setDetailSlug(album.slug, "album")}
+                className="group cursor-pointer text-left"
+              >
+                <div className="relative aspect-square overflow-hidden border border-ink/5 bg-ink/[0.03]">
+                  {album.cover ? (
+                    <img
+                      src={album.cover}
+                      alt={album.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-eyebrow text-ink/20">
+                      Album Art
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/10" />
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-display text-2xl leading-tight text-ink md:text-3xl">
+                    {album.title}
+                  </h3>
+                  <div className="mt-2 flex items-center gap-3 text-eyebrow text-ink/40">
+                    <span>{album.releaseDate}</span>
+                    <span className="text-ink/20">·</span>
+                    <span>{album.duration}</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-ink/50 line-clamp-2">
+                    {album.description}
+                  </p>
+                </div>
+              </button>
+            ))}
           </div>
-        </nav>
-
-        {/* ─── ALBUM SECTIONS ─── */}
-        {ALBUMS.map((album, idx) => {
-  const even = idx % 2 === 0;
-  return <AlbumBlock key={album.slug} album={album} even={even} onStream={openStream} />; })}
-
-        {/* ─── ALL MERCH SECTION ─── */}
-        <section className="px-6 py-16 md:px-12 md:py-20">
-          <div className="mx-auto max-w-[1600px]">
-            <SectionLabel>All Merchandise</SectionLabel>
-
-            {/* Category filters */}
-            <div className="mb-10 flex flex-wrap gap-2">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setActiveCategory(c)}
-                  className={`px-4 py-2 text-eyebrow transition-colors cursor-pointer ${
-                    activeCategory === c
-                      ? "bg-ink text-bone"
-                      : "border border-ink/10 text-ink/40 hover:text-ink hover:border-ink/30"
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-
-            {/* Merch grid */}
-            <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-              {filteredMerch.map((product) => (
-                <MerchCard
-                  key={product.slug}
-                  product={product}
-                  showAlbum
-                  onSelect={() =>
-                    setDetailSlug(product.slug, "product")
-                  }
-                  onQuickAdd={
-                    product.available
-                      ? () => addToCart()
-                      : undefined
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* Streaming Overlay */}
-      <StreamingOverlay
-        open={streamOpen}
-        onOpenChange={setStreamOpen}
-        title={streamTitle}
-      />
+        </div>
+      </section>
     </>
   );
 }
