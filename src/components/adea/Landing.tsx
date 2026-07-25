@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "@/lib/store";
-import { RELEASES, PRODUCTS } from "@/lib/catalog";
 
 const fkboiAsset = "/fkboi.jpg";
 const heroBg = "/hero-muted.png";
@@ -180,28 +179,6 @@ function FlipCard({ card, layout, index }: { card: typeof NAME_CARDS[0]; layout:
           <p className={`mt-2 text-center leading-snug text-ink/50 ${layout.colSpan >= 2 ? "text-sm max-w-sm" : "text-xs max-w-[140px]"}`}>{card.desc}</p>
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ---- Bento Card (deprecated — kept for reference) ---- */
-function BentoCard({ index, colSpan, rowSpan, label }: { index: number; colSpan: number; rowSpan: number; label?: string }) {
-  const delay = index * 0.4;
-  return (
-    <div
-      className={`bento-float-item group relative overflow-hidden border border-border bg-mist ${colSpan === 2 ? "md:col-span-2" : ""} ${rowSpan === 2 ? "md:row-span-2" : ""}`}
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="absolute inset-0 bg-smoke" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="h-8 w-8 rounded-full border border-ash/30" />
-      </div>
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      {label && (
-        <div className="absolute bottom-4 left-4 z-10 text-eyebrow text-ash/50 transition-colors duration-500 group-hover:text-bone">
-          {label}
-        </div>
-      )}
     </div>
   );
 }

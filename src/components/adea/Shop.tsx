@@ -238,7 +238,16 @@ function ActionRow({
 
 export function ShopPage() {
   const { setDetailSlug, addToCart } = useAppStore();
-  const [activeTab, setActiveTab] = useState("All");
+  const [shopTab, setShopTab] = useState("All");
+
+  const CATEGORY_MAP: Record<string, string[]> = {
+    "All": [],
+    "Albums": [],
+    "Apparel": ["Clothes"],
+    "Accessories": ["Hats", "Bottle Openers"],
+    "Vinyl": ["Product"],
+    "Digital": ["Cups", "Mugs"],
+  };
 
   // Flatten all merch with album context
   const allMerch = useMemo(() => {
@@ -251,28 +260,18 @@ export function ShopPage() {
     return list;
   }, []);
 
-  // Map collection names to categories
-  const CATEGORY_MAP: Record<string, string[]> = {
-    "All": [],
-    "Albums": [],
-    "Apparel": ["Clothes"],
-    "Accessories": ["Hats", "Bottle Openers"],
-    "Vinyl": ["Product"],
-    "Digital": ["Cups", "Mugs"],
-  };
-
   const filtered = useMemo(() => {
-    if (activeTab === "Albums") return null;
-    if (activeTab === "All") return allMerch;
-    const cats = CATEGORY_MAP[activeTab] ?? [];
+    if (shopTab === "Albums") return null;
+    if (shopTab === "All") return allMerch;
+    const cats = CATEGORY_MAP[shopTab] ?? [];
     return allMerch.filter((p) => cats.includes(p.category));
-  }, [activeTab, allMerch]);
+  }, [shopTab, allMerch]);
 
   const COLLECTIONS = ["All", "Albums", "Apparel", "Accessories", "Vinyl", "Digital"];
 
   return (
     <>
-      {/* ─── DARK HEADER ─── */}
+      {/* DARK HEADER */}
       <section className="relative bg-ink grain px-6 pt-40 pb-16 md:px-12 md:pt-56 md:pb-20">
         <div className="grain-overlay" />
         <div className="relative z-10 mx-auto max-w-[1600px]">
@@ -286,10 +285,10 @@ export function ShopPage() {
         </div>
       </section>
 
-      {/* ─── GRADIENT TRANSITION ─── */}
+      {/* GRADIENT TRANSITION */}
       <div className="h-24 bg-gradient-to-b from-ink via-ink/40 to-white md:h-32" />
 
-      {/* ─── BODY ─── */}
+      {/* BODY */}
       <div className="bg-white text-ink">
         {/* Collection tabs */}
         <nav className="border-b border-ink/10">
@@ -298,9 +297,9 @@ export function ShopPage() {
               {COLLECTIONS.map((c) => (
                 <button
                   key={c}
-                  onClick={() => setActiveTab(c)}
+                  onClick={() => setShopTab(c)}
                   className={`shrink-0 px-5 py-4 text-eyebrow transition-colors cursor-pointer ${
-                    activeTab === c
+                    shopTab === c
                       ? "text-ink border-b-2 border-ink"
                       : "text-ink/30 hover:text-ink/60"
                   }`}
@@ -312,8 +311,8 @@ export function ShopPage() {
           </div>
         </nav>
 
-        {/* ─── ALBUMS TAB ─── */}
-        {activeTab === "Albums" && (
+        {/* ALBUMS TAB */}
+        {shopTab === "Albums" && (
           <section className="px-6 py-16 md:px-12 md:py-20">
             <div className="mx-auto max-w-[1600px]">
               <SectionLabel>Albums</SectionLabel>
@@ -358,11 +357,11 @@ export function ShopPage() {
           </section>
         )}
 
-        {/* ─── PRODUCT TABS (All, Apparel, Accessories, Vinyl, Digital) ─── */
-        {activeTab !== "Albums" && filtered && (
+        {/* ---- PRODUCT TABS (All, Apparel, Accessories, Vinyl, Digital) ---- */
+        {shopTab !== "Albums" && filtered && (
           <section className="px-6 py-16 md:px-12 md:py-20">
             <div className="mx-auto max-w-[1600px]">
-              <SectionLabel>{activeTab === "All" ? "All Merchandise" : activeTab}</SectionLabel>
+              <SectionLabel>{shopTab === "All" ? "All Merchandise" : shopTab}</SectionLabel>
               <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
                 {filtered.map((product) => (
                   <MerchCard
@@ -382,7 +381,7 @@ export function ShopPage() {
   );
 }
 
-/* ─── ALBUM BLOCK (used in ShopPage) ─── */
+/* ---- ALBUM BLOCK (used in ShopPage) ---- */
 function AlbumBlock({
   album,
   even,
