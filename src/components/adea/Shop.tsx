@@ -237,7 +237,38 @@ function ActionRow({
    ═══════════════════════════════════════════════════ */
 
 export function ShopPage() {
-  const { setDetailSlug } = useAppStore();
+  const { setDetailSlug, addToCart } = useAppStore();
+  const [activeTab, setActiveTab] = useState("All");
+
+  // Flatten all merch with album context
+  const allMerch = useMemo(() => {
+    const list: (AlbumMerchProduct & { albumTitle: string })[] = [];
+    ALBUMS.forEach((album) => {
+      album.merch.forEach((p) => {
+        list.push({ ...p, albumTitle: album.title });
+      });
+    });
+    return list;
+  }, []);
+
+  // Map collection names to categories
+  const CATEGORY_MAP: Record<string, string[]> = {
+    "All": [],
+    "Albums": [],
+    "Apparel": ["Clothes"],
+    "Accessories": ["Hats", "Bottle Openers"],
+    "Vinyl": ["Product"],
+    "Digital": ["Cups", "Mugs"],
+  };
+
+  const filtered = useMemo(() => {
+    if (activeTab === "Albums") return null;
+    if (activeTab === "All") return allMerch;
+    const cats = CATEGORY_MAP[activeTab] ?? [];
+    return allMerch.filter((p) => cats.includes(p.category));
+  }, [activeTab, allMerch]);
+
+  const COLLECTIONS = ["All", "Albums", "Apparel", "Accessories", "Vinyl", "Digital"];
 
   return (
     <>
@@ -258,49 +289,95 @@ export function ShopPage() {
       {/* ─── GRADIENT TRANSITION ─── */}
       <div className="h-24 bg-gradient-to-b from-ink via-ink/40 to-white md:h-32" />
 
-      {/* ─── ALBUM CATALOG ─── */}
-      <section className="bg-white px-6 py-16 md:px-12 md:py-20">
-        <div className="mx-auto max-w-[1600px]">
-          <SectionLabel>Albums</SectionLabel>
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {ALBUMS.map((album) => (
-              <button
-                key={album.slug}
-                onClick={() => setDetailSlug(album.slug, "album")}
-                className="group cursor-pointer text-left"
-              >
-                <div className="relative aspect-square overflow-hidden border border-ink/5 bg-ink/[0.03]">
-                  {album.cover ? (
-                    <img
-                      src={album.cover}
-                      alt={album.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-eyebrow text-ink/20">
-                      Album Art
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/10" />
-                </div>
-                <div className="mt-4">
-                  <h3 className="font-display text-2xl leading-tight text-ink md:text-3xl">
-                    {album.title}
-                  </h3>
-                  <div className="mt-2 flex items-center gap-3 text-eyebrow text-ink/40">
-                    <span>{album.releaseDate}</span>
-                    <span className="text-ink/20">·</span>
-                    <span>{album.duration}</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-ink/50 line-clamp-2">
-                    {album.description}
-                  </p>
-                </div>
-              </button>
-            ))}
+      {/* ─── BODY ─── */}
+      <div className="bg-white text-ink">
+        {/* Collection tabs */}
+        <nav className="border-b border-ink/10">
+          <div className="mx-auto max-w-[1600px] px-6 md:px-12">
+            <div className="flex gap-0 overflow-x-auto">
+              {COLLECTIONS.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setActiveTab(c)}
+                  className={`shrink-0 px-5 py-4 text-eyebrow transition-colors cursor-pointer ${
+                    activeTab === c
+                      ? "text-ink border-b-2 border-ink"
+                      : "text-ink/30 hover:text-ink/60"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </nav>
+
+        {/* ─── ALBUMS TAB ─── */}
+        {activeTab === "Albums" && (
+          <section className="px-6 py-16 md:px-12 md:py-20">
+            <div className="mx-auto max-w-[1600px]">
+              <SectionLabel>Albums</SectionLabel>
+              <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                {ALBUMS.map((album) => (
+                  <button
+                    key={album.slug}
+                    onClick={() => setDetailSlug(album.slug, "album")}
+                    className="group cursor-pointer text-left"
+                  >
+                    <div className="relative aspect-square overflow-hidden border border-ink/5 bg-ink/[0.03]">
+                      {album.cover ? (
+                        <img
+                          src={album.cover}
+                          alt={album.title}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-eyebrow text-ink/20">
+                          Album Art
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/10" />
+                    </div>
+                    <div className="mt-4">
+                      <h3 className="font-display text-2xl leading-tight text-ink md:text-3xl">
+                        {album.title}
+                      </h3>
+                      <div className="mt-2 flex items-center gap-3 text-eyebrow text-ink/40">
+                        <span>{album.releaseDate}</span>
+                        <span className="text-ink/20">·</span>
+                        <span>{album.duration}</span>
+                      </div>
+                      <p className="mt-3 text-sm leading-relaxed text-ink/50 line-clamp-2">
+                        {album.description}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ─── PRODUCT TABS (All, Apparel, Accessories, Vinyl, Digital) ─── */
+        {activeTab !== "Albums" && filtered && (
+          <section className="px-6 py-16 md:px-12 md:py-20">
+            <div className="mx-auto max-w-[1600px]">
+              <SectionLabel>{activeTab === "All" ? "All Merchandise" : activeTab}</SectionLabel>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+                {filtered.map((product) => (
+                  <MerchCard
+                    key={product.slug}
+                    product={product}
+                    showAlbum
+                    onSelect={() => setDetailSlug(product.slug, "product")}
+                    onQuickAdd={product.available ? () => addToCart() : undefined}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
     </>
   );
 }
