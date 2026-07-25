@@ -1,21 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  /* config options here */
+  output: "export",
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
   devIndicators: false,
-  async rewrites() {
-    return [
-      {
-        source: "/index.html",
-        destination: "/index.html",
-      },
-    ];
-  },
 };
 
 export default nextConfig;
