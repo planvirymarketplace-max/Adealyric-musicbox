@@ -80,7 +80,7 @@ export function OffPage() {
   );
 }
 
-/* ---- Login Page ---- */
+/* ---- Login Page — Two-column editorial ---- */
 export function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -110,64 +110,87 @@ export function LoginPage() {
   if (isAuthenticated && isAdmin) return null;
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-ink px-6">
-      <div className="w-full max-w-sm">
-        <div className="text-center">
-          <div className="text-eyebrow text-ash">Adea Lyric</div>
-          <h1 className="mt-6 text-display text-3xl text-bone">
-            Sign in
+    <div className="flex min-h-screen w-full flex-col md:flex-row">
+      {/* Left — Dark editorial panel */}
+      <div className="flex flex-1 items-center justify-center bg-ink px-8 py-20 md:px-16">
+        <div className="max-w-xl">
+          <div className="text-eyebrow text-ash">Admin</div>
+          <h1 className="mt-6 text-display text-[clamp(3rem,8vw,9rem)] leading-[0.9] text-bone">
+            Behind the
+            <br />
+            <span className="italic text-ash">sound.</span>
           </h1>
-          <p className="mt-3 text-sm text-ash">
-            Sync agents & admin portal
+          <p className="mt-8 max-w-md text-lg leading-relaxed text-bone/70">
+            Sync agents, catalog managers, and the inner team.
+            This is where the business of the music lives.
           </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-10">
-          <div className="space-y-6">
-            <div>
-              <label className="text-eyebrow text-ash">Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mt-2 w-full border-b border-bone/20 bg-transparent px-0 py-3 text-bone placeholder:text-ash/30 focus:border-bone focus:outline-none"
-                placeholder="Enter username"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-eyebrow text-ash">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-2 w-full border-b border-bone/20 bg-transparent px-0 py-3 text-bone placeholder:text-ash/30 focus:border-bone focus:outline-none"
-                placeholder="Enter password"
-                required
-              />
-            </div>
+          <div className="mt-10 flex items-center gap-4">
+            <span className="block h-px w-16 bg-bone/30" />
+            <span className="text-eyebrow text-ash">Adea Lyric — Admin</span>
           </div>
+        </div>
+      </div>
 
-          {error && (
-            <p className="mt-6 text-center text-sm text-red-400">{error}</p>
-          )}
+      {/* Right — White login form */}
+      <div className="flex flex-1 items-center justify-center bg-white px-8 py-20 md:px-16">
+        <div className="w-full max-w-md">
+          <div className="text-eyebrow text-ink/40">Secure Access</div>
+          <h2 className="mt-4 text-display text-3xl text-ink md:text-4xl">
+            Sign in
+            <br />
+            <span className="italic text-ink/50">to continue.</span>
+          </h2>
+          <p className="mt-6 text-base leading-relaxed text-ink/60">
+            Enter your credentials to access the admin dashboard.
+          </p>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-8 w-full border border-bone py-4 text-eyebrow text-bone transition-all hover:bg-bone hover:text-ink disabled:opacity-50 cursor-pointer"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="mt-10">
+            <div className="space-y-6">
+              <div>
+                <label className="text-eyebrow text-ink/40">Username</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="mt-2 w-full border-b border-ink/20 bg-transparent px-0 py-3 text-lg text-ink placeholder:text-ink/30 focus:border-ink focus:outline-none"
+                  placeholder="Enter username"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-eyebrow text-ink/40">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-2 w-full border-b border-ink/20 bg-transparent px-0 py-3 text-lg text-ink placeholder:text-ink/30 focus:border-ink focus:outline-none"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => setActiveTab("off")}
-            className="text-sm text-ash transition-colors hover:text-bone cursor-pointer"
-          >
-            ← Back to Off Page
-          </button>
+            {error && (
+              <p className="mt-6 text-sm text-red-500">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-8 w-full border border-ink bg-ink py-4 text-eyebrow text-bone transition-all hover:bg-ink/80 disabled:opacity-50 cursor-pointer"
+            >
+              {loading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+
+          <div className="mt-10 border-t border-ink/10 pt-6">
+            <button
+              onClick={() => setActiveTab("off")}
+              className="text-sm text-ink/40 transition-colors hover:text-ink cursor-pointer"
+            >
+              ← Back to Off Page
+            </button>
+          </div>
         </div>
       </div>
     </div>

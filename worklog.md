@@ -232,3 +232,22 @@ Stage Summary:
 - After successful login, auto-redirects to admin dashboard
 - Bento grid now has: [A letter row] → [existing cards top] → [video row] → [existing cards bottom] → [A letter row]
 - Files modified: page.tsx, OffLogin.tsx, Landing.tsx
+
+---
+Task ID: 2
+Agent: Main
+Task: Rewrite LoginPage as two-column editorial layout
+
+Work Log:
+- Replaced single-column centered login card with full two-column editorial layout
+- Left panel: dark bg-ink with display headline 'Behind the sound.' in Fraunces, italic ash subtitle, body copy, horizontal rule + eyebrow label
+- Right panel: white background with 'Secure Access' eyebrow, 'Sign in / to continue.' headline, username/password inputs with ink tokens, full-width dark submit button, back link
+- Matches OffPage two-column pattern exactly (dark left / white right)
+- Fixed literal \n in JSX that was rendering as text
+- Lint: 0 errors
+
+Stage Summary:
+- LoginPage now matches the site's editorial two-column design language
+- Left: dark editorial panel with 'Behind the sound.' headline
+- Right: white form panel with ink-colored inputs
+- Credentials admin/adminphilly → routes to AdminPortal (full GitHub dashboard clone)
