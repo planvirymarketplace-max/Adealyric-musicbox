@@ -187,11 +187,30 @@ function BioSection() {
         {/* Right — Bento Grid */}
         <div className={`md:col-span-7 md:col-start-6 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="bento-float grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
+            {/* Top vertical — Name letter */}
+            <div className={`col-span-2 flex items-center justify-center border border-ink/10 bg-ink text-ink md:col-span-3 bento-float-item`} style={{ animationDelay: "0s" }}>
+              <span className="text-display text-[clamp(5rem,14vw,12rem)] leading-none select-none text-white">A</span>
+            </div>
             {/* Row 1 — Large card (2col 2row) + 1 small */}
             <BentoCard index={0} colSpan={2} rowSpan={2} />
             <BentoCard index={1} colSpan={1} rowSpan={1} />
             {/* Row 2 — Large continues + 1 small */}
             <BentoCard index={2} colSpan={1} rowSpan={1} />
+            {/* Middle vertical — Video */}
+            <div className={`col-span-2 relative overflow-hidden border border-ink/10 bg-smoke md:col-span-3 bento-float-item`} style={{ animationDelay: "1.6s" }}>
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                poster={fkboiAsset}
+                className="absolute inset-0 h-full w-full object-cover grayscale"
+              >
+                <source src="https://cdn.coverr.co/videos/coverr-a-woman-singing-in-a-recording-studio-4949/1080p.mp4" type="video/mp4" />
+              </video>
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
+              <div className="absolute bottom-3 left-4 text-eyebrow text-white/80">Studio Session</div>
+            </div>
             {/* Row 3 — 1 small + wide (2col) */}
             <BentoCard index={3} colSpan={1} rowSpan={1} />
             <BentoCard index={4} colSpan={2} rowSpan={1} />
@@ -199,6 +218,10 @@ function BioSection() {
             <BentoCard index={5} colSpan={1} rowSpan={1} />
             <BentoCard index={6} colSpan={1} rowSpan={1} />
             <BentoCard index={7} colSpan={1} rowSpan={1} />
+            {/* Bottom vertical — Name letter */}
+            <div className={`col-span-2 flex items-center justify-center border border-ink/10 bg-ink text-ink md:col-span-3 bento-float-item`} style={{ animationDelay: "3.2s" }}>
+              <span className="text-display text-[clamp(5rem,14vw,12rem)] leading-none select-none text-white">A</span>
+            </div>
           </div>
           <div className="mt-10">
             <button onClick={() => setActiveTab("bio")} className="inline-flex items-center gap-4 text-eyebrow text-ink cursor-pointer">

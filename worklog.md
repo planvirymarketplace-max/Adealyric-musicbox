@@ -207,3 +207,28 @@ Stage Summary:
 - Categories include Bottle Openers as requested
 - Sold-out products show Notify Me email form
 - All 5 albums with correct lead singles: Can't Nobody, Fuck Boi, Side N****a, Drink on the Beach, Tainted Love
+
+---
+Task ID: 1
+Agent: Main
+Task: Fix LOGIN button, bento grid vertical rows, and dev server stability
+
+Work Log:
+- Found root cause of login not working: `onLogin` callback in page.tsx was an empty function `() => {}`
+- Fixed: changed `onLogin={() => {}}` to `onLogin={() => setActiveTab("login")}`
+- LoginPage renders outside the `entered` gate check (line 61-63 in page.tsx), so it works even when `entered` is false
+- Added `useEffect` to LoginPage for auto-redirect when already authenticated as admin
+- Added `useEffect` import to OffLogin.tsx
+- Added two full-span vertical rows to bento grid in BioSection (Landing.tsx):
+  - Top row: dark bg with large "A" letter (bookend of name ADEA)
+  - Middle row: video element with autoplay/muted/loop (studio session placeholder)
+  - Bottom row: dark bg with large "A" letter
+- All three new rows use `bento-float-item` class and staggered animation delays
+- Dev server stability: requires `--hostname 0.0.0.0` flag for proper binding, running with while-loop auto-restart
+- Lint: 0 errors (1 pre-existing warning in AdminLayout.tsx)
+
+Stage Summary:
+- LOGIN button on splash screen now navigates to the login form (admin / adminphilly)
+- After successful login, auto-redirects to admin dashboard
+- Bento grid now has: [A letter row] → [existing cards top] → [video row] → [existing cards bottom] → [A letter row]
+- Files modified: page.tsx, OffLogin.tsx, Landing.tsx

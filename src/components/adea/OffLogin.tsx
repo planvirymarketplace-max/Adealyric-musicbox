@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { PageShell } from "./SiteChrome";
 
@@ -88,6 +88,10 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login, setActiveTab, isAuthenticated, isAdmin } = useAppStore();
 
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) setActiveTab("admin");
+  }, [isAuthenticated, isAdmin, setActiveTab]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -103,10 +107,7 @@ export function LoginPage() {
     }, 500);
   };
 
-  if (isAuthenticated && isAdmin) {
-    // Will redirect to admin
-    return null;
-  }
+  if (isAuthenticated && isAdmin) return null;
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-ink px-6">

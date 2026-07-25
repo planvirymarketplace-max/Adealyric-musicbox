@@ -67,7 +67,7 @@ export default function Home() {
   return (
     <div className="relative w-full bg-ink text-bone">
       {/* Splash gate */}
-      {!entered && <EntryGate onEnter={() => setEntered(true)} onLogin={() => {}} />}
+      {!entered && <EntryGate onEnter={() => setEntered(true)} onLogin={() => setActiveTab("login")} />}
 
       {/* After entering: show nav + content + footer */}
       {entered && (
