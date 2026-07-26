@@ -1,68 +1,81 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { LayoutTemplate, Plus, Trash2, Edit, Eye, EyeOff, ExternalLink } from 'lucide-react';
+import { LayoutTemplate, Plus, Trash2, Edit, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/dashboard/ui/Button';
 import { Card } from '@/components/dashboard/ui/Card';
 import { Badge } from '@/components/dashboard/ui/Badge';
 import { LoadingState, EmptyState } from '@/components/dashboard/ui/States';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { Modal } from '@/components/dashboard/ui/Modal';
-import { Field, Input, Textarea, Select } from '@/components/dashboard/ui/Form';
+import { Field, Input, Select } from '@/components/dashboard/ui/Form';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
-import type { CmsBanner, TicketEvent } from '@/lib/dashboard/database';
+
+type Banner = {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  imageUrl: string | null;
+  ctaText: string | null;
+  ctaLink: string | null;
+  position: string;
+  published: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const POSITIONS = [
   { value: 'hero', label: 'Hero (top of page)' },
   { value: 'promo', label: 'Promo strip' },
-  { value: 'sidebar', label: 'Sidebar' },
-  { value: 'footer', label: 'Footer' },
+  { value: 'letter', label: 'Letter section' },
 ];
 
 export default function BannersPage() {
-  const [banners, setBanners] = useState<CmsBanner[]>([]);
-  const [events, setEvents] = useState<TicketEvent[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editing, setEditing] = useState<CmsBanner | null>(null);
+  const [editing, setEditing] = useState<Banner | null>(null);
 
-  const fetch = useCallback(async () => {
+  const fetchBanners = useCallback(async () => {
     setLoading(true);
-    const [b, e] = await Promise.all([
-      supabase.from('cms_banners').select('*').order('sort_order', { ascending: true }),
-      supabase.from('ticket_events').select('id, title'),
-    ]);
-    setBanners(b.data ?? []);
-    setEvents(e.data ?? []);
+    try {
+      const res = await fetch('/api/banners');
+      const data = await res.json();
+      setBanners(data.banners ?? []);
+    } catch { setBanners([]); }
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { fetchBanners(); }, [fetchBanners]);
 
-  const togglePublish = async (b: CmsBanner) => {
-    await supabase.from('cms_banners').update({ published: !b.published }).eq('id', b.id);
-    fetch();
+  const togglePublish = async (b: Banner) => {
+    await fetch(`/api/banners/${b.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ published: !b.published }),
+    });
+    fetchBanners();
     toast('success', b.published ? 'Unpublished' : 'Published');
   };
 
-  const del = async (b: CmsBanner) => {
+  const del = async (b: Banner) => {
     if (!confirm(`Delete banner "${b.title}"?`)) return;
-    await supabase.from('cms_banners').delete().eq('id', b.id);
-    fetch();
+    await fetch(`/api/banners/${b.id}`, { method: 'DELETE' });
+    fetchBanners();
     toast('success', 'Banner deleted');
   };
 
   return (
     <div>
-      <PageHeader title="Banners" description="Promotional banners shown on your user portal — promote events, sell tickets, or link to anything" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Banner</Button>} />
+      <PageHeader title="Banners" description="Promotional banners on the homepage — tour dates, flyers, ticket links" actions={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Banner</Button>} />
       {loading ? <LoadingState /> : banners.length === 0 ? (
-        <Card className="p-6"><EmptyState icon={<LayoutTemplate size={48} />} title="No banners yet" description="Create banners to promote events and sell tickets on your portal" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Banner</Button>} /></Card>
+        <Card className="p-6"><EmptyState icon={<LayoutTemplate size={48} />} title="No banners yet" description="Create banners to promote events on your homepage" action={<Button variant="primary" onClick={() => setCreateOpen(true)}><Plus size={16} /> New Banner</Button>} /></Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {banners.map((b) => (
             <Card key={b.id} className="p-0 overflow-hidden">
-              {b.image_url && <img src={b.image_url} alt={b.title} className="w-full h-40 object-cover" />}
+              {b.imageUrl && <img src={b.imageUrl} alt={b.title} className="w-full h-40 object-cover" />}
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div>
@@ -73,7 +86,7 @@ export default function BannersPage() {
                 </div>
                 <div className="flex items-center gap-2 mb-3">
                   <Badge color="blue">{POSITIONS.find((p) => p.value === b.position)?.label ?? b.position}</Badge>
-                  {b.cta_text && <span className="text-xs text-neutral-500">CTA: {b.cta_text}</span>}
+                  {b.ctaText && <span className="text-xs text-neutral-500">CTA: {b.ctaText}</span>}
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="ghost" onClick={() => setEditing(b)}><Edit size={14} /></Button>
@@ -85,47 +98,59 @@ export default function BannersPage() {
           ))}
         </div>
       )}
-      <BannerModal open={createOpen || editing !== null} banner={editing} events={events} onClose={() => { setCreateOpen(false); setEditing(null); }} onSaved={fetch} />
+      <BannerModal open={createOpen || editing !== null} banner={editing} onClose={() => { setCreateOpen(false); setEditing(null); }} onSaved={fetchBanners} />
     </div>
   );
 }
 
-function BannerModal({ open, banner, events, onClose, onSaved }: { open: boolean; banner: CmsBanner | null; events: TicketEvent[]; onClose: () => void; onSaved: () => void }) {
-  const [form, setForm] = useState({ title: '', subtitle: '', image_url: '', cta_text: '', cta_link: '', linked_event_id: '', position: 'hero', published: false, sort_order: 0 });
+function BannerModal({ open, banner, onClose, onSaved }: { open: boolean; banner: Banner | null; onClose: () => void; onSaved: () => void }) {
+  const [form, setForm] = useState({ title: '', subtitle: '', imageUrl: '', ctaText: '', ctaLink: '', position: 'hero', published: false, sortOrder: 0 });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (banner) setForm({ title: banner.title, subtitle: banner.subtitle ?? '', image_url: banner.image_url, cta_text: banner.cta_text ?? '', cta_link: banner.cta_link ?? '', linked_event_id: banner.linked_event_id ?? '', position: banner.position, published: banner.published, sort_order: banner.sort_order });
-    else setForm({ title: '', subtitle: '', image_url: '', cta_text: '', cta_link: '', linked_event_id: '', position: 'hero', published: false, sort_order: 0 });
+    if (banner) setForm({ title: banner.title, subtitle: banner.subtitle ?? '', imageUrl: banner.imageUrl ?? '', ctaText: banner.ctaText ?? '', ctaLink: banner.ctaLink ?? '', position: banner.position, published: banner.published, sortOrder: banner.sortOrder });
+    else setForm({ title: '', subtitle: '', imageUrl: '', ctaText: '', ctaLink: '', position: 'hero', published: false, sortOrder: 0 });
   }, [banner, open]);
 
   const save = async () => {
-    if (!form.title || !form.image_url) { toast('error', 'Title and image URL are required'); return; }
+    if (!form.title) { toast('error', 'Title is required'); return; }
     setSaving(true);
-    const payload = { ...form, linked_event_id: form.linked_event_id || null };
-    if (banner) await supabase.from('cms_banners').update(payload).eq('id', banner.id);
-    else await supabase.from('cms_banners').insert(payload);
+    try {
+      if (banner) {
+        await fetch(`/api/banners/${banner.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+      } else {
+        await fetch('/api/banners', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+      }
+      toast('success', 'Banner saved');
+      onClose(); onSaved();
+    } catch { toast('error', 'Failed to save'); }
     setSaving(false);
-    toast('success', 'Banner saved');
-    onClose(); onSaved();
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={banner ? 'Edit Banner' : 'New Banner'} size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button></>}>
+    <Modal open={open} onClose={onClose} title={banner ? 'Edit Banner' : 'New Banner'} size="lg" footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button></>}>
       <div className="space-y-4">
         <Field label="Title" required><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
         <Field label="Subtitle"><Input value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} /></Field>
-        <Field label="Image URL" required><Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://images.pexels.com/..." /></Field>
-        {form.image_url && <img src={form.image_url} alt="Preview" className="w-full h-32 object-cover rounded-lg" />}
+        <Field label="Image URL"><Input value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://images.pexels.com/..." /></Field>
+        {form.imageUrl && <img src={form.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-lg" />}
         <div className="grid grid-cols-2 gap-4">
-          <Field label="CTA Text"><Input value={form.cta_text} onChange={(e) => setForm({ ...form, cta_text: e.target.value })} placeholder="Buy Tickets" /></Field>
-          <Field label="CTA Link"><Input value={form.cta_link} onChange={(e) => setForm({ ...form, cta_link: e.target.value })} placeholder="https://..." /></Field>
+          <Field label="CTA Text"><Input value={form.ctaText} onChange={(e) => setForm({ ...form, ctaText: e.target.value })} placeholder="Get Tickets" /></Field>
+          <Field label="CTA Link"><Input value={form.ctaLink} onChange={(e) => setForm({ ...form, ctaLink: e.target.value })} placeholder="https://..." /></Field>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Field label="Position"><Select value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })}>{POSITIONS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</Select></Field>
-          <Field label="Link to Event"><Select value={form.linked_event_id} onChange={(e) => setForm({ ...form, linked_event_id: e.target.value })}><option value="">— None —</option>{events.map((ev) => <option key={ev.id} value={ev.id}>{ev.title}</option>)}</Select></Field>
+          <Field label="Sort Order"><Input type="number" value={form.sortOrder} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })} /></Field>
         </div>
-        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Publish to user portal</label>
+        <label className="flex items-center gap-2 text-sm text-neutral-700"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Publish to homepage</label>
       </div>
     </Modal>
   );

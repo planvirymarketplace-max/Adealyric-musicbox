@@ -357,7 +357,7 @@ export function ShopPage() {
           </section>
         )}
 
-        {/* ---- PRODUCT TABS (All, Apparel, Accessories, Vinyl, Digital) ---- */
+        {/* ---- PRODUCT TABS (All, Apparel, Accessories, Vinyl, Digital) ---- */}
         {shopTab !== "Albums" && filtered && (
           <section className="px-6 py-16 md:px-12 md:py-20">
             <div className="mx-auto max-w-[1600px]">

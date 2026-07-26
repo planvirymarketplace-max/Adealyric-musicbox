@@ -2,33 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "@/lib/store";
+import { LetterToMyFans } from "./LetterToMyFans";
+import { HomeBanner } from "./HomeBanner";
 
 const fkboiAsset = "/fkboi.jpg";
 const heroBg = "/hero-muted.png";
-const cantnobodyAsset = "/cantnobody.webp";
-const philly1 = "/philly-1.jpg";
-const philly2 = "/philly-2.jpg";
-const philly3 = "/philly-3.jpg";
+
+const timelineVideos = [
+  "/Screen Recording 2026-07-24 034249.mp4",
+  "/Screen Recording 2026-07-24 034528.mp4",
+  "/Screen Recording 2026-07-24 035242.mp4",
+  "/Screen Recording 2026-07-24 035616.mp4",
+  "/Screen Recording 2026-07-24 035951.mp4",
+];
 
 /* ---- Icons ---- */
 function PlayIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
       <path d="M8 5v14l11-7z" />
-    </svg>
-  );
-}
-function PauseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-8 w-8" fill="currentColor" aria-hidden>
-      <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
-    </svg>
-  );
-}
-function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }
@@ -47,7 +39,6 @@ function useReveal<T extends HTMLElement>() {
   }, []);
   return { ref, shown };
 }
-
 
 /* ---- Hero ---- */
 function Hero() {
@@ -120,13 +111,11 @@ function Marquee() {
   const words = ["SOUL", "•", "RAW", "•", "WEST PHILLY", "•", "UNAPOLOGETIC", "•", "ADEA LYRIC", "•"];
   return (
     <div className="relative overflow-hidden border-y border-border bg-ink py-10">
-    <div className="marquee-track flex w-max whitespace-nowrap">
+      <div className="marquee-track flex w-max whitespace-nowrap">
         {[...Array(2)].map((_, k) => (
           <div key={k} className="flex items-center gap-16 pr-16">
             {words.map((w, i) => (
-              <span key={`${k}-${i}`} className="text-display text-[clamp(3rem,8vw,8rem)] text-bone">
-                {w}
-              </span>
+              <span key={`${k}-${i}`} className="text-display text-[clamp(3rem,8vw,8rem)] text-bone">{w}</span>
             ))}
           </div>
         ))}
@@ -148,20 +137,19 @@ const NAME_CARDS = [
   { letter: "C", word: "Culture", desc: "The unmistakable sound of West Philadelphia." },
 ];
 
-/* Layout: which cards get col-span/row-span in 3-col grid */
 const CARD_LAYOUT = [
-  { colSpan: 2, rowSpan: 2 },  // A — Authentic (large)
-  { colSpan: 1, rowSpan: 1 },  // D
-  { colSpan: 1, rowSpan: 1 },  // E
-  { colSpan: 1, rowSpan: 1 },  // A — Artistry
-  { colSpan: 2, rowSpan: 1 },  // L (wide)
-  { colSpan: 1, rowSpan: 1 },  // Y
-  { colSpan: 1, rowSpan: 1 },  // R
-  { colSpan: 1, rowSpan: 1 },  // I
-  { colSpan: 3, rowSpan: 1 },  // C — Culture (full width)
+  { colSpan: 2, rowSpan: 2 },
+  { colSpan: 1, rowSpan: 1 },
+  { colSpan: 1, rowSpan: 1 },
+  { colSpan: 1, rowSpan: 1 },
+  { colSpan: 2, rowSpan: 1 },
+  { colSpan: 1, rowSpan: 1 },
+  { colSpan: 1, rowSpan: 1 },
+  { colSpan: 1, rowSpan: 1 },
+  { colSpan: 3, rowSpan: 1 },
 ];
 
-function FlipCard({ card, layout, index }: { card: typeof NAME_CARDS[0]; layout: typeof CARD_LAYOUT[0]; index: number }) {
+function FlipCard({ card, layout, index }: { card: (typeof NAME_CARDS)[0]; layout: (typeof CARD_LAYOUT)[0]; index: number }) {
   const delay = index * 0.4;
   return (
     <div
@@ -169,11 +157,9 @@ function FlipCard({ card, layout, index }: { card: typeof NAME_CARDS[0]; layout:
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="flip-inner">
-        {/* Front — Letter */}
         <div className="flip-front flex items-center justify-center bg-ink">
           <span className="text-display text-[clamp(3rem,10vw,8rem)] leading-none select-none text-bone">{card.letter}</span>
         </div>
-        {/* Back — Word + description */}
         <div className="flip-back flex flex-col items-center justify-center bg-white px-4 py-4">
           <span className="text-display text-[clamp(1.5rem,4vw,3rem)] leading-none text-ink">{card.word}</span>
           <p className={`mt-2 text-center leading-snug text-ink/50 ${layout.colSpan >= 2 ? "text-sm max-w-sm" : "text-xs max-w-[140px]"}`}>{card.desc}</p>
@@ -190,22 +176,16 @@ function BioSection() {
   return (
     <section id="bio" ref={ref} className="relative bg-white px-6 py-32 md:px-12 md:py-48">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
-        {/* Left — Headline */}
         <div className="md:col-span-4">
           <div className="sticky top-32">
             <div className="text-eyebrow text-ink/40">01 — Bio</div>
-            <h2
-              className={`mt-6 text-display text-[clamp(5rem,13vw,16rem)] leading-[0.85] text-ink transition-all duration-1000 ${
-                shown ? "opacity-100" : "opacity-0 translate-y-8"
-              }`}
-            >
+            <h2 className={`mt-6 text-display text-[clamp(5rem,13vw,16rem)] leading-[0.85] text-ink transition-all duration-1000 ${shown ? "opacity-100" : "opacity-0 translate-y-8"}`}>
               heart and
               <br />
               <span className="text-yellow-400">soul.</span>
             </h2>
           </div>
         </div>
-        {/* Right — Bento Grid */}
         <div className={`md:col-span-7 md:col-start-6 transition-all duration-1000 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[200px] md:grid-cols-3 md:gap-4">
             {NAME_CARDS.map((card, i) => (
@@ -224,89 +204,15 @@ function BioSection() {
   );
 }
 
-/* ---- Sliding Cards ---- */
-function SlidingCards() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const { setActiveTab, setDetailSlug } = useAppStore();
-  const cards = [
-    { src: fkboiAsset, title: "F**K Boi", year: "2024", type: "Single", slug: "fk-boi" },
-    { src: cantnobodyAsset, title: "Can't Nobody", year: "2022", type: "Single", slug: "cant-nobody" },
-    { src: philly3, title: "The Lyric EP", year: "2023", type: "EP", slug: "the-lyric-ep" },
-    { src: philly2, title: "West Philly", year: "2021", type: "Mixtape", slug: "west-philly" },
-  ];
-  const scroll = (dir: number) => {
-    if (!trackRef.current) return;
-    const i = Math.max(0, Math.min(cards.length - 1, dir));
-    trackRef.current.scrollTo({
-      left: i * (trackRef.current.clientWidth * 0.72),
-      behavior: "smooth",
-    });
-  };
-  return (
-    <section id="music" className="relative bg-ink py-32 md:py-48">
-      <div className="mx-auto max-w-[1600px] px-6 md:px-12">
-        <div className="mb-16 flex items-end justify-between">
-          <div>
-            <div className="text-eyebrow text-ash">02 — Catalog</div>
-            <h2 className="mt-6 text-display text-[clamp(3rem,7vw,7rem)] text-bone">Now Playing</h2>
-          </div>
-          <div className="hidden gap-3 md:flex">
-            <button onClick={() => scroll(-1)} className="grid h-14 w-14 place-items-center border border-border text-bone transition-all hover:bg-bone hover:text-ink cursor-pointer">
-              <ArrowIcon className="rotate-180" />
-            </button>
-            <button onClick={() => scroll(1)} className="grid h-14 w-14 place-items-center border border-border text-bone transition-all hover:bg-bone hover:text-ink cursor-pointer">
-              <ArrowIcon />
-            </button>
-          </div>
-        </div>
-      </div>
-      <div ref={trackRef} className="scrollbar-none flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-8 md:gap-10 md:px-12" style={{ scrollbarWidth: "none" }}>
-        {cards.map((c, idx) => (
-          <button
-            key={idx}
-            onClick={() => { setActiveTab("discography"); setDetailSlug(c.slug, "release"); }}
-            className="group relative aspect-[3/4] w-[72vw] shrink-0 snap-start overflow-hidden border border-border bg-mist md:w-[36vw] lg:w-[28vw] cursor-pointer"
-          >
-            <img
-              src={c.src}
-              alt={c.title}
-              className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-[1200ms] group-hover:scale-105 group-hover:grayscale-0"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent opacity-90" />
-            <div className="absolute inset-0 flex flex-col justify-between p-8">
-              <div className="flex items-center justify-between">
-                <span className="text-eyebrow text-bone">{c.type}</span>
-                <span className="text-eyebrow text-bone">{c.year}</span>
-              </div>
-              <div>
-                <h3 className="text-display text-4xl text-bone md:text-6xl">{c.title}</h3>
-                <div className="mt-6 flex items-center gap-3 text-eyebrow text-bone opacity-0 translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
-                  <PlayIcon className="h-3 w-3" />
-                  <span>Stream</span>
-                </div>
-              </div>
-            </div>
-          </button>
-        ))}
-        <div className="w-6 shrink-0 md:w-12" />
-      </div>
-    </section>
-  );
-}
-
-/* ---- Discography Path ---- */
-function StepRow({
-  step,
-  left,
-  index,
-  total,
-}: {
-  step: { year: string; title: string; note: string; img: string; slug: string };
+/* ---- Discography Path (video timeline) ---- */
+function StepRow({ step, left, index, total }: {
+  step: { year: string; title: string; note: string; video: string; slug: string };
   left: boolean;
   index: number;
   total: number;
 }) {
   const { ref, shown } = useReveal<HTMLDivElement>();
+  const vidRef = useRef<HTMLVideoElement>(null);
   const { setActiveTab, setDetailSlug } = useAppStore();
   const gradeOpacity = 0.35 + (index / (total - 1)) * 0.65;
   return (
@@ -316,13 +222,20 @@ function StepRow({
           className={`relative aspect-[4/5] w-full overflow-hidden border border-border transition-all duration-1000 ${
             shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
           }`}
+          onMouseEnter={() => vidRef.current?.play()}
+          onMouseLeave={() => { vidRef.current?.pause(); vidRef.current!.currentTime = 0; }}
         >
-          <img
-            src={step.img}
-            alt={step.title}
+          <video
+            ref={vidRef}
+            muted
+            loop
+            playsInline
+            preload="metadata"
             className="h-full w-full object-cover"
             style={{ opacity: gradeOpacity, filter: `grayscale(1) contrast(${1 + index * 0.05})` }}
-          />
+          >
+            <source src={step.video} type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-tr from-ink via-ink/30 to-transparent" />
           <div className="absolute bottom-8 left-8 text-display text-6xl text-bone md:text-8xl">
             {step.year}
@@ -352,11 +265,11 @@ function StepRow({
 
 function DiscographyPath() {
   const steps = [
-    { year: "2017", title: "Debut", note: "West Philly emerges.", img: philly1, slug: "debut-2017" },
-    { year: "2019", title: "Underground", note: "Building the culture.", img: philly3, slug: "west-philly" },
-    { year: "2021", title: "West Philly", note: "The mixtape that defined a block.", img: philly2, slug: "west-philly" },
-    { year: "2023", title: "The Lyric EP", note: "Refusing every trend.", img: philly1, slug: "the-lyric-ep" },
-    { year: "2024", title: "F**K Boi", note: "Unapologetic. Undeniable.", img: philly3, slug: "fk-boi" },
+    { year: "2017", title: "Debut", note: "West Philly emerges.", video: timelineVideos[0], slug: "debut-2017" },
+    { year: "2019", title: "Underground", note: "Building the culture.", video: timelineVideos[1], slug: "west-philly" },
+    { year: "2021", title: "West Philly", note: "The mixtape that defined a block.", video: timelineVideos[2], slug: "west-philly" },
+    { year: "2023", title: "The Lyric EP", note: "Refusing every trend.", video: timelineVideos[3], slug: "the-lyric-ep" },
+    { year: "2024", title: "F**K Boi", note: "Unapologetic. Undeniable.", video: timelineVideos[4], slug: "fk-boi" },
   ];
   return (
     <section id="discography" className="relative overflow-hidden bg-ink px-6 py-32 md:px-12 md:py-48">
@@ -385,25 +298,14 @@ function Video() {
         <h2 className="mt-6 text-display text-[clamp(3rem,7vw,7rem)] text-bone">In motion.</h2>
         <div className="mt-16 grid grid-cols-1 gap-10 md:grid-cols-5">
           <div className="relative aspect-video overflow-hidden border border-border md:col-span-3">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              poster={fkboiAsset}
-              className="h-full w-full object-cover grayscale"
-            >
+            <video autoPlay muted loop playsInline poster={fkboiAsset} className="h-full w-full object-cover grayscale">
               <source src="https://cdn.coverr.co/videos/coverr-a-woman-singing-in-a-recording-studio-4949/1080p.mp4" type="video/mp4" />
             </video>
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
-            <div className="absolute bottom-6 left-6 text-eyebrow text-bone">
-              Live Session — West Philly, 2024
-            </div>
+            <div className="absolute bottom-6 left-6 text-eyebrow text-bone">Live Session — West Philly, 2024</div>
           </div>
           <div className="flex flex-col justify-between md:col-span-2">
-            <p className="text-2xl leading-tight text-bone md:text-3xl">
-              A recording booth, a heavy chain, and a voice that refuses to fold.
-            </p>
+            <p className="text-2xl leading-tight text-bone md:text-3xl">A recording booth, a heavy chain, and a voice that refuses to fold.</p>
             <div className="mt-8 grid grid-cols-2 gap-6 text-bone">
               <Stat k="Since" v="2017" />
               <Stat k="Home" v="West Philly" />
@@ -442,14 +344,8 @@ function Newsletter() {
         <form className="md:col-span-5 md:pt-16" onSubmit={(e) => e.preventDefault()}>
           <label className="text-eyebrow text-ink/60">Enter your email</label>
           <div className="mt-4 flex border-b border-ink pb-4">
-            <input
-              type="email"
-              placeholder="you@somewhere.com"
-              className="flex-1 bg-transparent text-2xl text-ink placeholder:text-ink/30 focus:outline-none"
-            />
-            <button className="text-eyebrow text-ink transition-opacity hover:opacity-60 cursor-pointer">
-              Subscribe →
-            </button>
+            <input type="email" placeholder="you@somewhere.com" className="flex-1 bg-transparent text-2xl text-ink placeholder:text-ink/30 focus:outline-none" />
+            <button className="text-eyebrow text-ink transition-opacity hover:opacity-60 cursor-pointer">Subscribe →</button>
           </div>
           <p className="mt-4 text-sm text-ink/60">No spam. Only the sound.</p>
         </form>
@@ -458,14 +354,14 @@ function Newsletter() {
   );
 }
 
-
 export function Landing() {
   return (
     <>
       <Hero />
+      <HomeBanner />
       <Marquee />
       <BioSection />
-      <SlidingCards />
+      <LetterToMyFans />
       <DiscographyPath />
       <Video />
       <Newsletter />
