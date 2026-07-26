@@ -426,7 +426,21 @@ export const ALL_CATEGORIES: ShopCategory[] = [
 ];
 
 /* Tab labels for the shop navigation */
-export const SHOP_TABS = ["Shop All", ...SHOP_ALBUMS.map((a) => a.title)];
+export const SHOP_TABS = ["Shop All", "Collections"];
+
+/* Product group filters for Shop All */
+export type ProductGroup = {
+  label: string;
+  categories: ShopCategory[] | null;
+};
+export const PRODUCT_GROUPS: ProductGroup[] = [
+  { label: "All", categories: null },
+  { label: "Clothes", categories: ["T-Shirts", "Hoodies", "Sweaters", "Sweatpants", "Joggers", "Pants", "Socks"] },
+  { label: "Products", categories: ["Vinyl", "Posters", "Accessories"] },
+  { label: "Cups", categories: ["Cups"] },
+  { label: "Mugs", categories: ["Mugs"] },
+  { label: "Hats", categories: ["Hats"] },
+];
 
 export const TOUR = [
   { date: "OCT 12", city: "Philadelphia, PA", venue: "The Fillmore", status: "On Sale" },

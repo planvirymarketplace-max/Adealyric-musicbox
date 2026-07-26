@@ -303,3 +303,46 @@ Stage Summary:
 - Letter to My Fans parchment now bleeds edge-to-edge with gradient fade transitions at top/bottom
 - The letter section integrates naturally between white Bio section and dark Discography section
 - No parse errors, clean dev server, all 200s
+
+---
+Task ID: 2
+Agent: Main
+Task: Mute footer logo + complete Shop page rebuild with album association
+
+Work Log:
+- Muted footer logo: added opacity-40 (rises to 0.70 on hover)
+- Updated catalog.ts: SHOP_TABS changed from 6 album-named tabs to ["Shop All", "Collections"]
+- Added PRODUCT_GROUPS to catalog.ts: maps high-level groups (All, Clothes, Products, Cups, Mugs, Hats) to individual categories
+- Complete rewrite of Shop.tsx (~600 lines, 3 exported components):
+  - ShopPage: Dark header ("SHOP." display text) → white body
+    - Two tabs: Shop All | Collections
+    - Shop All: Group filter pills + color filter pills + Clear button + product/available count + product grid
+    - Collections: 5 album cards in 5-column grid with cover, title, date, description
+  - AlbumDetailPage: Dark two-column hero (album image left, title/date/quote right) → white body
+    - Back to Shop navigation
+    - 4 action rows: Stream Album, Stream Single, Add Digital ($12), Add Vinyl
+    - Streaming overlay with 8 platforms + PlatformIcon + Play button on hover
+    - 4-column merch grid (all album products)
+    - 2x2 video grid placeholder section
+  - ProductDetailPage: Dark header (category + product name) → white body
+    - Back navigation (returns to parent album or shop)
+    - Two-column: image left, info right
+    - Price, stock count, collection name, description
+    - Size selector buttons, color swatches
+    - Add to Cart (or Notify Me email form for sold-out)
+    - Shipping info (3-5 days, $100+ free, 30-day returns)
+    - Related products grid (same album, different products)
+  - StreamingOverlay: Dark modal with 8 platform icons from SiteChrome, Play icon on hover, close button
+  - ProductCard: Image + hover quick-add + sold-out overlay + name + price + sizes + color swatches
+  - AlbumCard: Cover image + title + release date + description snippet
+  - ShopDarkHeader: Reusable dark section with eyebrow + display title + gradient fade to white
+- Lint: 0 errors (1 pre-existing warning in AdminLayout)
+- Browser verified full flow: Shop All → filter Clothes → Collections → click album → Stream Album overlay → click product → size select → Add to Cart → back to album → back to shop
+
+Stage Summary:
+- Footer logo muted to 40% opacity
+- Shop has two clear paths: Shop All (browse everything with group/color filters) and Collections (album-based)
+- Each album has its own detail page with stream/cart actions + associated merch
+- Every product is associated with a song/EP/album (the core integration pattern)
+- Discography page can link to shop via album slug → album detail → merch
+- Clean dark-to-white transition, editorial typography, no black e-commerce bg

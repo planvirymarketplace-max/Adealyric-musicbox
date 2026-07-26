@@ -1,17 +1,25 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { PageShell } from "./SiteChrome";
+import { useState, useMemo, useCallback } from "react";
 import { useAppStore } from "@/lib/store";
+import { PlatformIcon } from "./SiteChrome";
 import {
   SHOP_ALBUMS,
   ALL_PRODUCTS,
-  ALL_CATEGORIES,
   SHOP_TABS,
+  PRODUCT_GROUPS,
   type ShopProduct,
   type ShopAlbum,
 } from "@/lib/catalog";
-import { Play, Plus, X, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Play,
+  Plus,
+  X,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  ShoppingBag,
+} from "lucide-react";
 
 /* ═══════════════════════════════════════════════════
    STREAMING OVERLAY
@@ -37,38 +45,40 @@ function StreamingOverlay({
   onOpenChange: (v: boolean) => void;
   title: string;
 }) {
+  if (!open) return null;
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
-        open
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div className="absolute inset-0 bg-black/60" onClick={() => onOpenChange(false)} />
-      <div className="relative bg-black text-white rounded-sm w-full max-w-lg mx-4 p-10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={() => onOpenChange(false)}
+      />
+      <div className="relative bg-ink text-bone w-full max-w-2xl mx-4 p-8 sm:p-12 border border-border">
         <button
           onClick={() => onOpenChange(false)}
-          className="absolute top-4 right-4 text-white/50 hover:text-white cursor-pointer"
+          className="absolute top-4 right-4 text-ash hover:text-bone cursor-pointer"
+          aria-label="Close"
         >
           <X className="h-5 w-5" />
         </button>
-        <h2 className="text-center text-xs uppercase tracking-[0.25em] text-white/40">
-          Stream Now
-        </h2>
-        <h3 className="mt-4 text-center text-3xl font-light">{title}</h3>
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-ash">
+            Stream Now
+          </p>
+          <h3 className="mt-3 text-2xl sm:text-3xl text-bone">{title}</h3>
+        </div>
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {STREAM_PLATFORMS.map((p) => (
             <a
               key={p.key}
               href="#"
               onClick={(e) => e.preventDefault()}
-              className="flex flex-col items-center gap-2 border border-white/10 px-3 py-5 text-center hover:border-white/30 hover:bg-white/5 transition-all cursor-pointer"
+              className="group/plt flex items-center gap-3 border border-border px-4 py-4 hover:border-bone/40 hover:bg-bone/5 transition-all cursor-pointer"
             >
-              <Play className="h-5 w-5 text-white/40" />
-              <span className="text-[10px] uppercase tracking-[0.2em] text-white/60">
+              <PlatformIcon name={p.key} className="h-4 w-4 text-ash group-hover/plt:text-bone shrink-0" />
+              <span className="text-[11px] uppercase tracking-[0.15em] text-ash group-hover/plt:text-bone">
                 {p.label}
               </span>
+              <Play className="ml-auto h-3.5 w-3.5 text-ash/40 group-hover/plt:text-bone opacity-0 group-hover/plt:opacity-100 transition-opacity shrink-0" />
             </a>
           ))}
         </div>
@@ -78,7 +88,7 @@ function StreamingOverlay({
 }
 
 /* ═══════════════════════════════════════════════════
-   PRODUCT CARD (grid item)
+   PRODUCT CARD
    ═══════════════════════════════════════════════════ */
 
 function ProductCard({
@@ -93,8 +103,18 @@ function ProductCard({
   const available = product.stock > 0;
   return (
     <div className="group cursor-pointer" onClick={onSelect}>
-      {/* Image area */}
       <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <ShoppingBag className="h-8 w-8 text-black/10" />
+          </div>
+        )}
         {available && onQuickAdd && (
           <button
             onClick={(e) => {
@@ -115,38 +135,26 @@ function ProductCard({
           </div>
         )}
       </div>
-
-      {/* Info */}
       <div className="mt-3">
-        <p className="text-[13px] font-medium uppercase tracking-wide text-black leading-tight">
+        <p className="text-[12px] font-medium uppercase tracking-wide text-black/80 leading-tight line-clamp-1">
           {product.name}
         </p>
-        <div className="mt-1.5 flex items-center gap-3">
-          <span
-            className={`text-sm ${available ? "text-black" : "text-black/30"}`}
-          >
+        <div className="mt-1 flex items-center gap-3">
+          <span className={`text-sm ${available ? "text-black" : "text-black/30"}`}>
             {available ? `$${product.price}.00` : "Sold Out"}
           </span>
-          {available && onQuickAdd && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onQuickAdd();
-              }}
-              className="flex h-6 w-6 items-center justify-center border border-black/20 text-black/60 hover:bg-black hover:text-white hover:border-black transition-colors cursor-pointer"
-              aria-label="Add to cart"
-            >
-              <Plus className="h-3 w-3" />
-            </button>
+          {available && product.sizes.length > 0 && (
+            <span className="text-[10px] text-black/30">
+              {product.sizes.join(" / ")}
+            </span>
           )}
         </div>
-        {/* Color swatches */}
         {product.colors.length > 0 && (
           <div className="mt-2 flex gap-1.5">
             {product.colors.map((c) => (
               <span
                 key={c.hex}
-                className="block h-3.5 w-3.5 rounded-full border border-black/10"
+                className="block h-3 w-3 rounded-full border border-black/10"
                 style={{ backgroundColor: c.hex }}
                 title={c.name}
               />
@@ -159,490 +167,515 @@ function ProductCard({
 }
 
 /* ═══════════════════════════════════════════════════
-   IMAGE GALLERY
+   ALBUM COLLECTION CARD
    ═══════════════════════════════════════════════════ */
 
-function ImageGallery({
-  total,
-  label,
-  bgClass = "bg-[#f0f0f0]",
+function AlbumCard({
+  album,
+  onSelect,
 }: {
-  total: number;
-  label: string;
-  bgClass?: string;
+  album: ShopAlbum;
+  onSelect: () => void;
 }) {
-  const [idx, setIdx] = useState(0);
   return (
-    <div className={`relative aspect-square overflow-hidden ${bgClass}`}>
-      <div className="flex h-full w-full items-center justify-center text-sm text-black/20">
-        {label}
+    <div
+      className="group cursor-pointer"
+      onClick={onSelect}
+    >
+      <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+        {album.cover ? (
+          <img
+            src={album.cover}
+            alt={album.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <ShoppingBag className="h-10 w-10 text-black/10" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
       </div>
-      {total > 1 && (
-        <>
-          <button
-            onClick={() => setIdx((p) => (p > 0 ? p - 1 : total - 1))}
-            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white/80 border border-black/5 hover:bg-white transition-colors cursor-pointer"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setIdx((p) => (p < total - 1 ? p + 1 : 0))}
-            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white/80 border border-black/5 hover:bg-white transition-colors cursor-pointer"
-            aria-label="Next"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-          <span className="absolute left-3 bottom-3 text-[11px] text-black/30">
-            {idx + 1}/{total}
-          </span>
-        </>
-      )}
+      <div className="mt-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-black">
+          {album.title}
+        </h3>
+        <p className="mt-1 text-[11px] text-black/40 uppercase tracking-wider">
+          {album.releaseDate}
+        </p>
+        <p className="mt-2 text-[12px] text-black/60 line-clamp-2 leading-relaxed">
+          {album.description}
+        </p>
+      </div>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════
-   SHOP MAIN PAGE
+   DARK HEADER (shared)
+   ═══════════════════════════════════════════════════ */
+
+function ShopDarkHeader({
+  eyebrow,
+  title,
+  italic,
+}: {
+  eyebrow: string;
+  title: string;
+  italic?: string;
+}) {
+  return (
+    <section className="relative bg-ink px-6 pb-20 pt-40 md:px-12 md:pb-28 md:pt-56">
+      <div className="mx-auto max-w-[1600px]">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-ash">
+          {eyebrow}
+        </p>
+        <h1 className="mt-6 text-display text-[clamp(4rem,14vw,14rem)] leading-[0.9] text-bone">
+          {title}
+          {italic && (
+            <span className="block italic text-ash">{italic}</span>
+          )}
+        </h1>
+      </div>
+      {/* Gradient transition to white */}
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   SHOP PAGE
    ═══════════════════════════════════════════════════ */
 
 export function ShopPage() {
-  const { cartCount, setDetailSlug, addToCart } = useAppStore();
-  const [activeTab, setActiveTab] = useState(0); // index into SHOP_TABS
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [colorFilter, setColorFilter] = useState<string | null>(null);
+  const { setDetailSlug } = useAppStore();
+  const [shopTab, setShopTab] = useState(SHOP_TABS[0]);
+  const [activeGroup, setActiveGroup] = useState(PRODUCT_GROUPS[0]);
+  const [activeColor, setActiveColor] = useState<string | null>(null);
+  const { addToCart } = useAppStore();
 
-  const tabLabel = SHOP_TABS[activeTab];
-  const selectedAlbum =
-    activeTab > 0 ? SHOP_ALBUMS[activeTab - 1] : null;
-
-  // Products for the current tab
-  const products = useMemo(() => {
-    let list: ShopProduct[] = selectedAlbum
-      ? selectedAlbum.merch
-      : ALL_PRODUCTS;
-
-    if (categoryFilter) {
-      list = list.filter((p) => p.category === categoryFilter);
+  /* All unique colors */
+  const allColors = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of ALL_PRODUCTS) {
+      for (const c of p.colors) {
+        if (!map.has(c.name)) map.set(c.name, c.hex);
+      }
     }
-    if (colorFilter) {
+    return Array.from(map.entries()).map(([name, hex]) => ({ name, hex }));
+  }, []);
+
+  /* Filter products */
+  const filtered = useMemo(() => {
+    let list = ALL_PRODUCTS;
+    if (activeGroup.categories) {
       list = list.filter((p) =>
-        p.colors.some((c) => c.name.toLowerCase() === colorFilter)
+        activeGroup.categories!.includes(p.category)
+      );
+    }
+    if (activeColor) {
+      list = list.filter((p) =>
+        p.colors.some((c) => c.name === activeColor)
       );
     }
     return list;
-  }, [selectedAlbum, categoryFilter, colorFilter]);
+  }, [activeGroup, activeColor]);
 
-  // Count available
-  const availableCount = useMemo(
-    () => products.filter((p) => p.stock > 0).length,
-    [products]
+  const availableCount = filtered.filter((p) => p.stock > 0).length;
+
+  const openProduct = useCallback(
+    (p: ShopProduct) => {
+      setDetailSlug(p.slug, "product");
+    },
+    [setDetailSlug]
   );
 
-  // All unique color names across current products
-  const availableColors = useMemo(() => {
-    const names = new Set<string>();
-    const baseList = selectedAlbum
-      ? selectedAlbum.merch
-      : ALL_PRODUCTS;
-    baseList.forEach((p) =>
-      p.colors.forEach((c) => names.add(c.name.toLowerCase()))
-    );
-    return [...names].sort();
-  }, [selectedAlbum]);
+  const openAlbum = useCallback(
+    (album: ShopAlbum) => {
+      setDetailSlug(album.slug, "album");
+    },
+    [setDetailSlug]
+  );
 
-  const resetFilters = () => {
-    setCategoryFilter(null);
-    setColorFilter(null);
-  };
-
-  const handleTabChange = (idx: number) => {
-    setActiveTab(idx);
-    resetFilters();
-  };
+  const handleQuickAdd = useCallback(() => {
+    addToCart();
+  }, [addToCart]);
 
   return (
-    <PageShell>
-      <div className="min-h-screen bg-white text-black">
-        {/* Top bar: tabs + cart */}
-        <nav className="border-b border-black/10">
-          <div className="mx-auto max-w-[1400px] px-6">
-            <div className="flex items-center justify-between">
-              {/* Tabs */}
-              <div className="flex gap-0 overflow-x-auto scrollbar-hide">
-                {SHOP_TABS.map((tab, i) => (
-                  <button
-                    key={tab}
-                    onClick={() => handleTabChange(i)}
-                    className={`shrink-0 px-4 py-4 text-[12px] uppercase tracking-[0.15em] transition-colors cursor-pointer border-b-2 -mb-px ${
-                      activeTab === i
-                        ? "text-black border-black"
-                        : "text-black/30 border-transparent hover:text-black/60"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+    <>
+      <ShopDarkHeader eyebrow="06 — Shop" title="Shop." />
 
-              {/* Cart */}
-              <button className="shrink-0 px-4 py-4 text-[12px] uppercase tracking-[0.15em] text-black/40 hover:text-black transition-colors cursor-pointer">
-                Cart ({cartCount})
+      <section className="bg-white px-6 py-12 md:px-12 md:py-16">
+        <div className="mx-auto max-w-[1400px]">
+          {/* Tab bar */}
+          <div className="flex items-center gap-8 border-b border-black/10 pb-0">
+            {SHOP_TABS.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setShopTab(tab)}
+                className={`relative pb-3 text-[12px] font-medium uppercase tracking-[0.15em] transition-colors cursor-pointer ${
+                  shopTab === tab
+                    ? "text-black border-b-2 border-black"
+                    : "text-black/40 hover:text-black/70"
+                }`}
+              >
+                {tab}
               </button>
-            </div>
+            ))}
           </div>
-        </nav>
 
-        {/* Featured album header (when on an album tab) */}
-        {selectedAlbum && (
-          <section className="border-b border-black/10">
-            <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
-              <div className="grid grid-cols-1 gap-10 md:gap-16 md:grid-cols-2">
-                {/* Album art gallery */}
-                <ImageGallery
-                  total={2}
-                  label={selectedAlbum.title}
-                />
-
-                {/* Album info */}
-                <div className="flex flex-col justify-center">
-                  <h1 className="text-3xl font-bold uppercase tracking-tight md:text-4xl">
-                    {selectedAlbum.title}
-                  </h1>
-                  <div className="mt-3 flex items-center gap-3 text-[13px] text-black/40">
-                    <span>{selectedAlbum.releaseDate}</span>
-                    <span>·</span>
-                    <span>{selectedAlbum.duration}</span>
-                  </div>
-
-                  <p className="mt-6 text-sm leading-relaxed text-black/50 max-w-md">
-                    {selectedAlbum.description}
-                  </p>
-
-                  {selectedAlbum.quote && (
-                    <blockquote className="mt-4 border-l-2 border-black/10 pl-4 text-sm italic text-black/40">
-                      {selectedAlbum.quote}
-                    </blockquote>
-                  )}
-
-                  {/* Action list */}
-                  <div className="mt-8">
-                    <ActionButton
-                      icon={<Play className="h-3.5 w-3.5" />}
-                      label="Stream"
-                      albumTitle={selectedAlbum.title}
-                    />
-                    <ActionButton
-                      icon={<Plus className="h-3.5 w-3.5" />}
-                      label="Add to Cart (Digital)"
-                    />
-                    <ActionButton
-                      icon={<Plus className="h-3.5 w-3.5" />}
-                      label="Add to Cart (Vinyl)"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Filters + product grid */}
-        <section className="px-6 py-12 md:py-16">
-          <div className="mx-auto max-w-[1400px]">
-            {/* Section header + filters */}
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30">
-                  {selectedAlbum ? selectedAlbum.title : "All Merchandise"}
-                </h2>
-                <p className="mt-1 text-[12px] text-black/30">
-                  {products.length} product{products.length !== 1 ? "s" : ""}{" "}
-                  · {availableCount} available
-                </p>
-              </div>
-
-              {/* Category filter pills */}
-              <div className="flex flex-wrap gap-2">
-                {/* Category dropdown */}
-                <select
-                  value={categoryFilter ?? ""}
-                  onChange={(e) =>
-                    setCategoryFilter(e.target.value || null)
-                  }
-                  className="appearance-none border border-black/15 px-3 py-2 text-[12px] uppercase tracking-wider bg-white text-black/70 cursor-pointer hover:border-black/40 transition-colors pr-8"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 8px center",
-                  }}
-                >
-                  <option value="">Category</option>
-                  {ALL_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+          {shopTab === "Shop All" && (
+            <div className="mt-10">
+              {/* Group filter pills */}
+              <div className="flex flex-wrap items-center gap-2">
+                {PRODUCT_GROUPS.map((g) => {
+                  const isActive =
+                    activeGroup.label === g.label;
+                  return (
+                    <button
+                      key={g.label}
+                      onClick={() => setActiveGroup(g)}
+                      className={`px-4 py-2 text-[11px] uppercase tracking-[0.15em] border transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-black/60 border-black/15 hover:border-black/40"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  );
+                })}
 
                 {/* Color filter pills */}
-                {availableColors.map((c) => (
+                {allColors.length > 0 && (
+                  <span className="mx-2 h-5 w-px bg-black/10" />
+                )}
+                {allColors.map((c) => (
                   <button
-                    key={c}
-                    onClick={() => setColorFilter(colorFilter === c ? null : c)}
-                    className={`px-3 py-2 text-[12px] uppercase tracking-wider border transition-colors cursor-pointer ${
-                      colorFilter === c
-                        ? "border-black bg-black text-white"
-                        : "border-black/15 text-black/50 hover:border-black/40"
+                    key={c.name}
+                    onClick={() =>
+                      setActiveColor((prev) =>
+                        prev === c.name ? null : c.name
+                      )
+                    }
+                    className={`flex items-center gap-1.5 px-3 py-2 text-[10px] uppercase tracking-wider border transition-all cursor-pointer ${
+                      activeColor === c.name
+                        ? "border-black bg-black/5"
+                        : "border-transparent hover:border-black/20"
                     }`}
+                    title={c.name}
                   >
-                    {c}
+                    <span
+                      className="block h-3 w-3 rounded-full border border-black/10"
+                      style={{ backgroundColor: c.hex }}
+                    />
+                    <span className="text-black/50">{c.name}</span>
                   </button>
                 ))}
 
-                {/* Clear filters */}
-                {(categoryFilter || colorFilter) && (
+                {/* Clear filter */}
+                {(activeGroup.label !== "All" || activeColor) && (
                   <button
-                    onClick={resetFilters}
-                    className="px-3 py-2 text-[12px] uppercase tracking-wider text-black/30 underline underline-offset-2 hover:text-black/60 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setActiveGroup(PRODUCT_GROUPS[0]);
+                      setActiveColor(null);
+                    }}
+                    className="ml-2 text-[10px] uppercase tracking-wider text-black/30 hover:text-black/60 underline cursor-pointer"
                   >
                     Clear
                   </button>
                 )}
               </div>
-            </div>
 
-            {/* Product grid */}
-            {products.length > 0 ? (
-              <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-                {products.map((p) => (
+              {/* Count */}
+              <p className="mt-4 text-[11px] text-black/30">
+                {filtered.length} product
+                {filtered.length !== 1 ? "s" : ""} ·{" "}
+                {availableCount} available
+              </p>
+
+              {/* Product grid */}
+              <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6">
+                {filtered.map((p) => (
                   <ProductCard
                     key={p.slug}
                     product={p}
-                    onSelect={() => setDetailSlug(p.slug, "product")}
-                    onQuickAdd={p.stock > 0 ? () => addToCart() : undefined}
+                    onSelect={() => openProduct(p)}
+                    onQuickAdd={handleQuickAdd}
                   />
                 ))}
               </div>
-            ) : (
-              <div className="mt-20 flex flex-col items-center justify-center py-20 text-center">
-                <p className="text-[13px] uppercase tracking-widest text-black/20">
-                  No products found
-                </p>
-                <button
-                  onClick={resetFilters}
-                  className="mt-4 text-[12px] uppercase tracking-wider underline underline-offset-2 text-black/40 hover:text-black/60 cursor-pointer"
-                >
-                  Clear filters
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
 
-        {/* Newsletter footer */}
-        <footer className="border-t border-black/10 mt-8">
-          <div className="mx-auto max-w-[1400px] px-6 py-16 grid grid-cols-1 gap-10 md:grid-cols-3 md:py-20">
-            <div>
-              <h3 className="text-[12px] font-medium uppercase tracking-[0.2em]">
-                Subscribe
-              </h3>
-              <p className="mt-3 text-[13px] leading-relaxed text-black/40">
-                Receive email updates about launches, new product info,
-                exclusive access, and more.
+              {filtered.length === 0 && (
+                <div className="mt-20 text-center">
+                  <p className="text-sm text-black/30">
+                    No products match your filters.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {shopTab === "Collections" && (
+            <div className="mt-10">
+              <p className="text-[11px] text-black/30 mb-8">
+                {SHOP_ALBUMS.length} collections
               </p>
+              <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+                {SHOP_ALBUMS.map((album) => (
+                  <AlbumCard
+                    key={album.slug}
+                    album={album}
+                    onSelect={() => openAlbum(album)}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="flex flex-col gap-3">
-              <h3 className="text-[12px] font-medium uppercase tracking-[0.2em]">
-                Legal
-              </h3>
-              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
-                Terms &amp; Conditions
-              </a>
-              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
-                FAQs
-              </a>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h3 className="text-[12px] font-medium uppercase tracking-[0.2em]">
-                Social
-              </h3>
-              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
-                Instagram
-              </a>
-              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
-                Twitter
-              </a>
-              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
-                TikTok
-              </a>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </PageShell>
-  );
-}
-
-/* ── Action button in album header ── */
-function ActionButton({
-  icon,
-  label,
-  albumTitle,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  albumTitle?: string;
-}) {
-  const { addToCart } = useAppStore();
-  const [streamOpen, setStreamOpen] = useState(false);
-
-  if (label === "Stream" && albumTitle) {
-    return (
-      <>
-        <button
-          onClick={() => setStreamOpen(true)}
-          className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
-        >
-          <span className="text-black/30 group-hover:text-black/60 transition-colors">
-            {icon}
-          </span>
-          <span className="text-[13px] text-black/50 group-hover:text-black/80 transition-colors">
-            {label}
-          </span>
-        </button>
-        <StreamingOverlay
-          open={streamOpen}
-          onOpenChange={setStreamOpen}
-          title={albumTitle}
-        />
-      </>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => addToCart()}
-      className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
-    >
-      <span className="text-black/30 group-hover:text-black/60 transition-colors">
-        {icon}
-      </span>
-      <span className="text-[13px] text-black/50 group-hover:text-black/80 transition-colors">
-        {label}
-      </span>
-    </button>
+          )}
+        </div>
+      </section>
+    </>
   );
 }
 
 /* ═══════════════════════════════════════════════════
    ALBUM DETAIL PAGE
-   When clicking an album cover from the shop, show album + merch.
    ═══════════════════════════════════════════════════ */
 
 export function AlbumDetailPage() {
-  const { detailSlug, setDetailSlug, addToCart } = useAppStore();
+  const { detailSlug, setDetailSlug, addToCart, setActiveTab } =
+    useAppStore();
   const [streamOpen, setStreamOpen] = useState(false);
+  const [streamTitle, setStreamTitle] = useState("");
 
-  const album = SHOP_ALBUMS.find((a) => a.slug === detailSlug);
+  const album = useMemo(
+    () => SHOP_ALBUMS.find((a) => a.slug === detailSlug),
+    [detailSlug]
+  );
 
-  if (!album) return null;
+  const openProduct = useCallback(
+    (p: ShopProduct) => {
+      setDetailSlug(p.slug, "product");
+    },
+    [setDetailSlug]
+  );
+
+  const handleQuickAdd = useCallback(() => {
+    addToCart();
+  }, [addToCart]);
+
+  const openStream = useCallback((title: string) => {
+    setStreamTitle(title);
+    setStreamOpen(true);
+  }, []);
+
+  if (!album) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-sm text-black/40">Album not found.</p>
+      </div>
+    );
+  }
+
+  const digitalPrice = 12;
+  const vinylProduct = album.merch.find((m) => m.category === "Vinyl");
 
   return (
-    <PageShell>
-      <div className="min-h-screen bg-white text-black">
-        {/* Back link */}
-        <div className="border-b border-black/10">
-          <div className="mx-auto max-w-[1400px] px-6 py-4">
-            <button
-              onClick={() => setDetailSlug(null, null)}
-              className="group flex items-center gap-2 text-[12px] uppercase tracking-[0.15em] text-black/30 hover:text-black transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Back to Shop</span>
-            </button>
+    <>
+      {/* ── Dark hero ── */}
+      <section className="relative bg-ink px-6 pb-16 pt-36 md:px-12 md:pb-20 md:pt-48">
+        <div className="mx-auto max-w-[1400px]">
+          {/* Back button */}
+          <button
+            onClick={() => {
+              setDetailSlug(null, null);
+              setActiveTab("shop");
+            }}
+            className="mb-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-ash hover:text-bone transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Shop
+          </button>
+
+          {/* Two-column hero */}
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
+            {/* Left: album image */}
+            <div className="relative aspect-square overflow-hidden bg-white/5">
+              {album.cover ? (
+                <img
+                  src={album.cover}
+                  alt={album.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-ash/20">
+                  <ShoppingBag className="h-16 w-16" />
+                </div>
+              )}
+            </div>
+
+            {/* Right: album info */}
+            <div className="flex flex-col justify-center">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-ash">
+                Collection
+              </p>
+              <h1 className="mt-4 text-display text-[clamp(2.5rem,6vw,5.5rem)] leading-[0.9] text-bone">
+                {album.title}
+              </h1>
+              <p className="mt-3 text-[12px] uppercase tracking-[0.15em] text-ash">
+                {album.releaseDate} · {album.duration}
+              </p>
+              <p className="mt-6 max-w-md text-base leading-relaxed text-bone/70">
+                {album.description}
+              </p>
+              {album.quote && (
+                <p className="mt-4 text-sm italic text-ash">
+                  &ldquo;{album.quote}&rdquo;
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Album header */}
-        <section className="border-b border-black/10">
-          <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
-            <div className="grid grid-cols-1 gap-10 md:gap-16 md:grid-cols-2">
-              <ImageGallery total={2} label={album.title} />
-              <div className="flex flex-col justify-center">
-                <h1 className="text-3xl font-bold uppercase tracking-tight md:text-4xl">
-                  {album.title}
-                </h1>
-                <div className="mt-3 flex items-center gap-3 text-[13px] text-black/40">
-                  <span>{album.releaseDate}</span>
-                  <span>·</span>
-                  <span>{album.duration}</span>
-                </div>
-                <p className="mt-6 text-sm leading-relaxed text-black/50 max-w-md">
-                  {album.description}
+        {/* Gradient transition to white */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+      </section>
+
+      {/* ── Action rows ── */}
+      <section className="bg-white px-6 py-12 md:px-12 md:py-16">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {/* Stream Album */}
+            <button
+              onClick={() => openStream(album.title + " — Album")}
+              className="group flex items-center gap-4 border border-black/10 px-5 py-4 hover:border-black hover:bg-black hover:text-white transition-all cursor-pointer text-left"
+            >
+              <Play className="h-4 w-4 shrink-0" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] opacity-50">
+                  Stream
                 </p>
-                {album.quote && (
-                  <blockquote className="mt-4 border-l-2 border-black/10 pl-4 text-sm italic text-black/40">
-                    {album.quote}
-                  </blockquote>
-                )}
-                <div className="mt-8">
-                  <button
-                    onClick={() => setStreamOpen(true)}
-                    className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
-                  >
-                    <Play className="h-3.5 w-3.5 text-black/30 group-hover:text-black/60" />
-                    <span className="text-[13px] text-black/50 group-hover:text-black/80">Stream Album</span>
-                  </button>
-                  <button
-                    onClick={() => addToCart()}
-                    className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
-                  >
-                    <Plus className="h-3.5 w-3.5 text-black/30 group-hover:text-black/60" />
-                    <span className="text-[13px] text-black/50 group-hover:text-black/80">Add to Cart — Digital Album</span>
-                  </button>
-                  <button
-                    onClick={() => addToCart()}
-                    className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
-                  >
-                    <Plus className="h-3.5 w-3.5 text-black/30 group-hover:text-black/60" />
-                    <span className="text-[13px] text-black/50 group-hover:text-black/80">Add to Cart — Vinyl</span>
-                  </button>
+                <p className="text-[13px] font-medium">Album</p>
+              </div>
+            </button>
+
+            {/* Stream Single */}
+            {album.singleTitle && (
+              <button
+                onClick={() =>
+                  openStream(album.singleTitle! + " — Single")
+                }
+                className="group flex items-center gap-4 border border-black/10 px-5 py-4 hover:border-black hover:bg-black hover:text-white transition-all cursor-pointer text-left"
+              >
+                <Play className="h-4 w-4 shrink-0" />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-50">
+                    Stream Single
+                  </p>
+                  <p className="text-[13px] font-medium">
+                    {album.singleTitle}
+                  </p>
+                </div>
+              </button>
+            )}
+
+            {/* Add Digital */}
+            <button
+              onClick={() => addToCart()}
+              className="group flex items-center gap-4 border border-black/10 px-5 py-4 hover:border-black hover:bg-black hover:text-white transition-all cursor-pointer text-left"
+            >
+              <Plus className="h-4 w-4 shrink-0" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] opacity-50">
+                  Add to Cart
+                </p>
+                <p className="text-[13px] font-medium">
+                  Digital &mdash; ${digitalPrice}.00
+                </p>
+              </div>
+            </button>
+
+            {/* Add Vinyl */}
+            <button
+              onClick={() => addToCart()}
+              disabled={!vinylProduct || vinylProduct.stock === 0}
+              className={`group flex items-center gap-4 border border-black/10 px-5 py-4 transition-all cursor-pointer text-left ${
+                vinylProduct && vinylProduct.stock > 0
+                  ? "hover:border-black hover:bg-black hover:text-white"
+                  : "opacity-40 cursor-not-allowed"
+              }`}
+            >
+              <Plus className="h-4 w-4 shrink-0" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] opacity-50">
+                  Add to Cart
+                </p>
+                <p className="text-[13px] font-medium">
+                  Vinyl
+                  {vinylProduct
+                    ? ` — $${vinylProduct.price}.00`
+                    : " — Sold Out"}
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Associated Merch (4×2 grid) ── */}
+      <section className="bg-white px-6 pb-12 md:px-12 md:pb-16">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">
+                Merchandise
+              </p>
+              <p className="mt-1 text-[12px] text-black/50">
+                {album.merch.length} items ·{" "}
+                {album.merch.filter((m) => m.stock > 0).length} available
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6">
+            {album.merch.map((p) => (
+              <ProductCard
+                key={p.slug}
+                product={p}
+                onSelect={() => openProduct(p)}
+                onQuickAdd={handleQuickAdd}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Video grid (2×2) ── */}
+      <section className="bg-white px-6 pb-20 md:px-12 md:pb-28">
+        <div className="mx-auto max-w-[1400px]">
+          <p className="mb-8 text-[10px] uppercase tracking-[0.2em] text-black/30">
+            Visuals
+          </p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="relative aspect-video overflow-hidden bg-[#f0f0f0]"
+              >
+                <div className="flex h-full w-full items-center justify-center text-[11px] uppercase tracking-widest text-black/15">
+                  Video {i}
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Merch grid */}
-        <section className="px-6 py-12 md:py-16">
-          <div className="mx-auto max-w-[1400px]">
-            <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30">
-              {album.title} Merch
-            </h2>
-            <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-              {album.merch.map((p) => (
-                <ProductCard
-                  key={p.slug}
-                  product={p}
-                  onSelect={() => setDetailSlug(p.slug, "product")}
-                  onQuickAdd={p.stock > 0 ? () => addToCart() : undefined}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <StreamingOverlay
-          open={streamOpen}
-          onOpenChange={setStreamOpen}
-          title={album.title}
-        />
-      </div>
-    </PageShell>
+      <StreamingOverlay
+        open={streamOpen}
+        onOpenChange={setStreamOpen}
+        title={streamTitle}
+      />
+    </>
   );
 }
 
@@ -651,280 +684,240 @@ export function AlbumDetailPage() {
    ═══════════════════════════════════════════════════ */
 
 export function ProductDetailPage() {
-  const { detailSlug, setDetailSlug, addToCart } = useAppStore();
+  const { detailSlug, setDetailSlug, addToCart, setActiveTab } =
+    useAppStore();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [added, setAdded] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState("");
-  const [notified, setNotified] = useState(false);
+  const [notifySent, setNotifySent] = useState(false);
 
-  const product = ALL_PRODUCTS.find((p) => p.slug === detailSlug);
+  const product = useMemo(
+    () => ALL_PRODUCTS.find((p) => p.slug === detailSlug),
+    [detailSlug]
+  );
 
-  // Related: same album, different product, limit 4
+  const available = product ? product.stock > 0 : false;
+
+  /* Related products: same album, different product */
   const related = useMemo(() => {
     if (!product) return [];
     return ALL_PRODUCTS.filter(
-      (p) => p.slug !== product.slug && p.albumSlug === product.albumSlug
+      (p) =>
+        p.albumSlug === product.albumSlug && p.slug !== product.slug
     ).slice(0, 4);
   }, [product]);
 
-  // Reset state when product changes
-  useEffect(() => {
-    setSelectedSize(null);
-    setSelectedColor(null);
-    setAdded(false);
-    setNotifyEmail("");
-    setNotified(false);
-  }, [detailSlug]);
+  const openRelated = useCallback(
+    (p: ShopProduct) => {
+      setDetailSlug(p.slug, "product");
+      setSelectedSize(null);
+      setNotifySent(false);
+    },
+    [setDetailSlug]
+  );
 
-  if (!product) return null;
-
-  const available = product.stock > 0;
-  const hasSizes = product.sizes.length > 0;
-  const hasColors = product.colors.length > 0;
-
-  const handleAdd = () => {
-    setAdded(true);
-    addToCart();
-    setTimeout(() => setAdded(false), 1500);
-  };
-
-  const handleNotify = () => {
-    if (notifyEmail.trim()) {
-      setNotified(true);
-      setNotifyEmail("");
+  const handleAddToCart = useCallback(() => {
+    if (available) {
+      addToCart();
     }
-  };
+  }, [available, addToCart]);
+
+  const handleNotify = useCallback(() => {
+    if (notifyEmail) {
+      setNotifySent(true);
+    }
+  }, [notifyEmail]);
+
+  if (!product) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-sm text-black/40">Product not found.</p>
+      </div>
+    );
+  }
 
   return (
-    <PageShell>
-      <div className="min-h-screen bg-white text-black">
-        {/* Back link */}
-        <div className="border-b border-black/10">
-          <div className="mx-auto max-w-[1400px] px-6 py-4">
-            <button
-              onClick={() => setDetailSlug(null, null)}
-              className="group flex items-center gap-2 text-[12px] uppercase tracking-[0.15em] text-black/30 hover:text-black transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Back to Shop</span>
-            </button>
-          </div>
+    <>
+      {/* Dark header */}
+      <section className="relative bg-ink px-6 pb-16 pt-36 md:px-12 md:pb-20 md:pt-48">
+        <div className="mx-auto max-w-[1400px]">
+          <button
+            onClick={() => {
+              /* Go back to the album page if we came from one, otherwise shop */
+              const parentAlbum = SHOP_ALBUMS.find(
+                (a) => a.slug === product.albumSlug
+              );
+              if (parentAlbum) {
+                setDetailSlug(parentAlbum.slug, "album");
+              } else {
+                setDetailSlug(null, null);
+                setActiveTab("shop");
+              }
+            }}
+            className="mb-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-ash hover:text-bone transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-ash">
+            {product.category}
+          </p>
+          <h1 className="mt-4 text-display text-[clamp(2rem,5vw,4.5rem)] leading-[0.9] text-bone">
+            {product.name}
+          </h1>
         </div>
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+      </section>
 
-        {/* Product detail */}
-        <section>
-          <div className="mx-auto max-w-[1400px] px-6 py-10 md:py-16">
-            <div className="grid grid-cols-1 gap-10 md:gap-16 md:grid-cols-2">
-              {/* Image gallery */}
-              <ImageGallery total={3} label={product.name} />
-
-              {/* Product info */}
-              <div className="flex flex-col">
-                <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30">
-                  {product.category}
-                </p>
-                <h1 className="mt-3 text-3xl font-bold uppercase tracking-tight md:text-4xl">
-                  {product.name}
-                </h1>
-
-                <p className="mt-4 text-2xl">
-                  {available ? `$${product.price}.00` : "Sold Out"}
-                </p>
-
-                <p className="mt-6 text-[13px] leading-relaxed text-black/50 max-w-md">
-                  {product.description}
-                </p>
-
-                {/* Size guide link */}
-                {hasSizes && (
-                  <button className="mt-4 text-[12px] underline underline-offset-2 text-black/30 hover:text-black/60 transition-colors cursor-pointer text-left">
-                    Size Guide
-                  </button>
-                )}
-
-                {/* Divider */}
-                <div className="my-6 border-t border-black/10" />
-
-                {/* Size selector */}
-                {hasSizes && (
-                  <div>
-                    <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.15em] text-black/40">
-                      <span>Size</span>
-                      {selectedSize && (
-                        <span className="text-black">{selectedSize}</span>
-                      )}
-                    </div>
-                    <div className="mt-2">
-                      {product.sizes.map((size) => {
-                        const isSelected = selectedSize === size;
-                        return (
-                          <button
-                            key={size}
-                            onClick={() => available && setSelectedSize(size)}
-                            disabled={!available}
-                            className={`flex w-full items-center justify-between border-t border-black/10 py-3 text-[13px] cursor-pointer transition-colors ${
-                              !available
-                                ? "text-black/20 cursor-not-allowed"
-                                : isSelected
-                                  ? "text-black"
-                                  : "text-black/50 hover:text-black"
-                            }`}
-                          >
-                            <span>{size}</span>
-                            <span
-                              className={
-                                available
-                                  ? "text-black"
-                                  : "text-black/20"
-                              }
-                            >
-                              {isSelected && available ? "●" : "○"}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+      {/* White body */}
+      <section className="bg-white px-6 pb-20 md:px-12 md:pb-28">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+            {/* Left: Image gallery */}
+            <div>
+              <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <ShoppingBag className="h-12 w-12 text-black/10" />
                   </div>
                 )}
-
-                {/* Color selector */}
-                {hasColors && (
-                  <div className="mt-6">
-                    <div className="text-[12px] uppercase tracking-[0.15em] text-black/40">
-                      {selectedColor || "Color"}
-                    </div>
-                    <div className="mt-3 flex gap-2.5">
-                      {product.colors.map((c) => (
-                        <button
-                          key={c.hex}
-                          onClick={() =>
-                            available && setSelectedColor(c.name)
-                          }
-                          disabled={!available}
-                          className={`h-8 w-8 rounded-full border-2 transition-all cursor-pointer ${
-                            selectedColor === c.name
-                              ? "border-black scale-110"
-                              : "border-black/10 hover:border-black/30"
-                          } ${!available ? "opacity-30 cursor-not-allowed" : ""}`}
-                          style={{ backgroundColor: c.hex }}
-                          title={c.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Availability */}
-                <div className="mt-6 text-[12px] text-black/40">
-                  {available
-                    ? `${product.stock} in stock`
-                    : "Sold Out"}
-                </div>
-
-                {/* Add to Cart */}
-                <button
-                  onClick={handleAdd}
-                  disabled={!available}
-                  className={`mt-6 w-full py-4 text-[12px] font-medium uppercase tracking-[0.2em] transition-all duration-200 cursor-pointer ${
-                    added
-                      ? "bg-black text-white"
-                      : available
-                        ? "bg-black text-white hover:bg-black/80"
-                        : "bg-black/5 text-black/20 cursor-not-allowed"
-                  }`}
-                >
-                  {added
-                    ? "Added to Cart"
-                    : available
-                      ? "Add to Cart"
-                      : "Sold Out"}
-                </button>
-
-                {/* Notify Me for sold out */}
                 {!available && (
-                  <div className="mt-6">
-                    <p className="text-[12px] text-black/30 mb-3">
-                      This item is currently unavailable.
-                    </p>
-                    {notified ? (
-                      <p className="text-[12px] text-black/50">
-                        You&apos;ll be notified when back in stock.
-                      </p>
-                    ) : (
-                      <div className="flex gap-2">
-                        <input
-                          type="email"
-                          placeholder="Email address"
-                          value={notifyEmail}
-                          onChange={(e) => setNotifyEmail(e.target.value)}
-                          className="flex-1 border border-black/15 bg-white px-3 py-2.5 text-[13px] text-black placeholder:text-black/20 outline-none focus:border-black/40 transition-colors"
-                        />
-                        <button
-                          onClick={handleNotify}
-                          className="px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.15em] bg-black text-white hover:bg-black/80 transition-colors cursor-pointer"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+                    <span className="text-[11px] font-medium uppercase tracking-widest text-black/40">
+                      Sold Out
+                    </span>
                   </div>
                 )}
+              </div>
 
-                {/* Shipping info */}
-                <div className="mt-8 grid grid-cols-2 gap-6">
-                  <div className="border-t border-black/10 pt-3">
-                    <span className="text-[11px] uppercase tracking-[0.15em] text-black/30">
-                      Ships
-                    </span>
-                    <p className="mt-1 text-[13px] text-black/60">
-                      3–5 business days
-                    </p>
-                  </div>
-                  <div className="border-t border-black/10 pt-3">
-                    <span className="text-[11px] uppercase tracking-[0.15em] text-black/30">
-                      Returns
-                    </span>
-                    <p className="mt-1 text-[13px] text-black/60">
-                      30 days
-                    </p>
+              {/* Color swatches */}
+              {product.colors.length > 0 && (
+                <div className="mt-4 flex items-center gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-black/30">
+                    Color
+                  </span>
+                  {product.colors.map((c) => (
+                    <span
+                      key={c.hex}
+                      className="block h-5 w-5 rounded-full border-2 border-black/10 cursor-pointer hover:border-black/40 transition-colors"
+                      style={{ backgroundColor: c.hex }}
+                      title={c.name}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right: Info */}
+            <div className="flex flex-col">
+              <p className="text-2xl font-light">
+                {available ? `$${product.price}.00` : "Sold Out"}
+              </p>
+              {available && product.stock < 20 && (
+                <p className="mt-1 text-[11px] text-black/40">
+                  Only {product.stock} left
+                </p>
+              )}
+
+              <p className="mt-6 text-[12px] font-medium uppercase tracking-[0.2em] text-black/40">
+                {product.albumTitle} Collection
+              </p>
+
+              <p className="mt-4 text-sm leading-relaxed text-black/70">
+                {product.description}
+              </p>
+
+              {/* Size selector */}
+              {product.sizes.length > 0 && (
+                <div className="mt-8">
+                  <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-black/40">
+                    Size
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSize(s)}
+                        className={`h-10 min-w-[48px] px-4 text-[12px] uppercase tracking-wider border transition-all cursor-pointer ${
+                          selectedSize === s
+                            ? "bg-black text-white border-black"
+                            : "bg-white text-black/60 border-black/15 hover:border-black/40"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
                   </div>
                 </div>
+              )}
+
+              {/* Add to Cart / Notify Me */}
+              <div className="mt-8">
+                {available ? (
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-black py-4 text-[12px] uppercase tracking-[0.2em] text-white hover:bg-black/80 transition-colors cursor-pointer"
+                  >
+                    Add to Cart
+                  </button>
+                ) : notifySent ? (
+                  <div className="border border-black/10 py-4 text-center text-[12px] text-black/50">
+                    You&apos;ll be notified when available.
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="Email for notification"
+                      value={notifyEmail}
+                      onChange={(e) => setNotifyEmail(e.target.value)}
+                      className="flex-1 border border-black/15 px-4 py-3 text-[12px] placeholder:text-black/25 focus:outline-none focus:border-black/40"
+                    />
+                    <button
+                      onClick={handleNotify}
+                      className="bg-black px-6 py-3 text-[12px] uppercase tracking-[0.15em] text-white hover:bg-black/80 transition-colors cursor-pointer"
+                    >
+                      Notify Me
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Shipping info */}
+              <div className="mt-6 border-t border-black/5 pt-6">
+                <p className="text-[11px] text-black/30">
+                  Free shipping on orders over $100. Ships in 3–5 business
+                  days. 30-day returns.
+                </p>
               </div>
             </div>
           </div>
-        </section>
 
-        {/* Related Products */}
-        {related.length > 0 && (
-          <section className="border-t border-black/10">
-            <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
-              <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30 text-center">
-                Related Products
-              </h2>
-              <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
-                {related.map((r) => (
+          {/* Related products */}
+          {related.length > 0 && (
+            <div className="mt-20">
+              <p className="mb-8 text-[10px] uppercase tracking-[0.2em] text-black/30">
+                From the same collection
+              </p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6">
+                {related.map((p) => (
                   <ProductCard
-                    key={r.slug}
-                    product={r}
-                    onSelect={() => setDetailSlug(r.slug, "product")}
-                    onQuickAdd={
-                      r.stock > 0 ? () => addToCart() : undefined
-                    }
+                    key={p.slug}
+                    product={p}
+                    onSelect={() => openRelated(p)}
+                    onQuickAdd={() => addToCart()}
                   />
                 ))}
               </div>
             </div>
-          </section>
-        )}
-
-        {/* Footer */}
-        <footer className="border-t border-black/10">
-          <div className="mx-auto max-w-[1400px] px-6 py-12 text-center text-[11px] text-black/30 uppercase tracking-[0.15em]">
-            © {new Date().getFullYear()} Adea Lyric. All rights reserved.
-          </div>
-        </footer>
-      </div>
-    </PageShell>
+          )}
+        </div>
+      </section>
+    </>
   );
 }
