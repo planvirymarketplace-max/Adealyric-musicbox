@@ -436,3 +436,52 @@ Stage Summary:
 - Navigation links (Shop All, Collections) at top
 - No 180g vinyl text
 
+---
+Task ID: 7
+Agent: catalog-updater
+Task: Update catalog.ts with full product catalog from schema document
+
+Work Log:
+- Read existing /home/z/my-project/src/lib/catalog.ts (900 lines) to understand structure
+- Replaced ShopCategory union type with new 5-branch tree (Apparel, Women, Unisex, Accessories, Beauty)
+  - Added "Mugs" and "Cups" at end of union (commented as "Drinkware, keep for album merch") since existing album merch uses these categories and they were not in the spec's union but task #7 said to keep them
+- Replaced CATEGORY_SIZE_TYPE Record with new mapping for all new categories
+  - Added Mugs/Cups → "drinkware" entries at end for backward compat
+- Replaced CATEGORY_TREE constant with new 5-branch tree (Apparel/Women/Unisex/Accessories/Beauty)
+  - No Music branch in tree (Vinyl/Posters still in union for album merch)
+- Cleaned up 7 album merch descriptions to remove product spec text:
+  - cn-hoodie-blk: removed "400gsm"
+  - cn-tee-blk: removed "220gsm"
+  - cn-vinyl: removed "180g"
+  - cn-mug: removed "11oz"
+  - cn-poster: removed '18" x 24"' (was single-quoted due to inner quotes, changed to double-quoted)
+  - al-cup: removed ", 16oz"
+  - ml-poster: removed "24x36" (was single-quoted, changed to double-quoted)
+- Updated album merch categories via replace_all:
+  - "Sweaters" → "Sweatshirts" (5 instances: cn-sweater-navy, al-sweater, ml-sweater, sj-sweater, tl-sweater)
+  - "Joggers" → "Sweatpants" (3 instances: cn-jogger, al-jogger, sj-jogger)
+  - "Pants" → "Trousers" (3 instances: al-pants, ml-pants, tl-pants)
+  - "Accessories" → "Keychains" (2 instances: cn-bottle-opener, tl-bottle-opener)
+- Added CATALOG_PRODUCTS array (78 products spanning every leaf category) before ALL_PRODUCTS
+  - Defined 5 underscore-prefixed color swatches (_BLK, _WHT, _GRY, _NVY, _CRM) to avoid name conflicts with existing BLACK/WHITE/etc.
+  - All products have albumSlug: "" and albumTitle: "Shop All" to distinguish from album merch
+  - Categories include Apparel (Tops/Bottoms/Outerwear/One-Pieces), Women (Tops/Bottoms/Dresses/Activewear/Swimwear/Lingerie), Unisex (Apparel/Headwear/Bags), Accessories (3C/Caps/Face-Neck/Jewelry/Eyewear/Hand-Arm/Footwear/Bags), and Beauty
+- Updated ALL_PRODUCTS IIFE to merge album products with CATALOG_PRODUCTS:
+  ```
+  const albumProducts = SHOP_ALBUMS.flatMap((a) =>
+    a.merch.map((m) => ({ ...m, albumSlug: a.slug, albumTitle: a.title }))
+  );
+  return [...albumProducts, ...CATALOG_PRODUCTS].map(enrichProduct);
+  ```
+- Preserved all unchanged code: RELEASES, PRODUCTS (legacy), TOUR, SHOP_ALBUMS, ColorSwatch type, ShopProduct type, EnrichedProduct, enrichProduct, getLeafCategories, ALL_CATEGORIES, ALBUMS alias, etc.
+
+Stage Summary:
+- catalog.ts now reflects the full product catalog from the schema document
+- 5 top-level categories: Apparel, Women, Unisex, Accessories, Beauty
+- 78 catalog products + 60 album merch products = 138 total enriched products in ALL_PRODUCTS
+- All album merch descriptions cleaned of spec text (no more "180g", "gsm", "11oz", "16oz", "18\" x 24\"", "24x36")
+- All album merch categories now use the new tree's leaf categories
+- Lint passes with 0 errors (1 pre-existing warning in unrelated AdminLayout.tsx)
+- Dev server compiles and serves GET / successfully
+- Note: "Mugs" and "Cups" were added to ShopCategory union and CATEGORY_SIZE_TYPE (as "drinkware") beyond the exact spec to maintain backward compatibility with existing album merch items — task #7 explicitly said to keep these categories as-is
+
