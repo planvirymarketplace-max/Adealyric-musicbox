@@ -371,3 +371,30 @@ Stage Summary:
 - Album detail: all-white two-column with stream/cart actions, merch grid, video grid
 - Product detail: all-white with sizes, colors, add-to-cart, notify-me, related products
 - Footer logo now at 20% opacity — barely visible, adapts to footer without competing</arg_value>  
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix album detail button clarity, implement full category taxonomy, create Product_Attributes table
+
+Work Log:
+- Analyzed uploaded image (pasted_image_1785061932511.png) via VLM to understand button clarity issues
+- Identified 4 action buttons were tiny h-5 circles with ambiguous dots, split text, border-b separators making them look like accordion rows
+- Redesigned 4 action buttons: large h-12 icon containers (black filled circles for Stream, black rounded-lg for Cart), consolidated labels ("Stream Album" not "Stream"/"Album"), prominent prices, arrow hover effects
+- Implemented full 3-level category taxonomy in catalog.ts: Clothing (Men's/Women's/Unisex with Tops/Activewear/Outerwear/Bottoms/Dresses/Swimwear/Lingerie), Accessories (Headwear/Bags & Luggage/Tech/Fashion/Footwear), Home & Lifestyle (Drinkware/Barware), Music
+- Expanded ShopCategory union type from 13 to 90+ leaf categories
+- Expanded CATEGORY_SIZE_TYPE mappings for all categories with contextual size types (clothing/waist/shoe/hat/drinkware/one-size/none)
+- Built full CATEGORY_TREE with 3-4 levels of nesting matching user's blueprint
+- Created Product_Attributes Prisma model with type-specific sizing, availability, related products, color swatches
+- Pushed schema to SQLite database successfully
+- Updated SizeFilter labels to be contextual ("Clothing Size", "Waist Size", "Shoe Size", "Hat Size")
+- Verified all 3 entry paths (Albums, Collections, Shop All) working
+- Verified streaming overlay with 8 platforms
+- Verified nested category sidebar expansion (Clothing > Men's > Tops/Activewear/Outerwear/Bottoms)
+- Verified contextual size selectors on product detail pages
+- Zero runtime errors in dev log
+
+Stage Summary:
+- Album detail buttons now use large (h-12) black icon containers with clear labels, prices, and hover effects
+- Full category taxonomy: 4 top-level nodes, 15+ second-level nodes, 40+ third-level leaf nodes
+- Product_Attributes table in Prisma with indexes on productId, category, sizeType, availability
+- All changes browser-verified and lint-clean

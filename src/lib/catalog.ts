@@ -240,83 +240,435 @@ export const SIZE_OPTIONS: Record<SizeType, string[]> = {
   none: [],
 };
 
-/* Map each category to its size type for contextual filters */
-export const CATEGORY_SIZE_TYPE: Record<string, SizeType> = {
-  "T-Shirts": "clothing",
-  Hoodies: "clothing",
-  Sweaters: "clothing",
-  Sweatpants: "waist",
-  Joggers: "waist",
-  Pants: "waist",
-  Socks: "one-size",
-  Hats: "hat",
-  Cups: "drinkware",
-  Mugs: "drinkware",
-  Vinyl: "none",
-  Posters: "none",
-  Accessories: "none",
-};
+/* ═══════════════════════════════════════════════════════════════
+   FULL CATEGORY TAXONOMY
+   Level 1 — Clothing (Men's / Women's / Unisex)
+   Level 2 — Accessories (Headwear / Bags / Tech / Fashion / Footwear)
+   Level 3 — Home & Lifestyle (Drinkware / Barware)
+   ═══════════════════════════════════════════════════════════════ */
 
 export type ShopCategory =
+  /* ── Clothing > Men's > Tops ── */
   | "T-Shirts"
+  | "Long Sleeve Shirts"
+  | "Tank Tops"
+  | "Crop Tops"
+  /* ── Clothing > Men's > Activewear ── */
+  | "Athletic Tops"
+  | "Sports Sets"
+  /* ── Clothing > Men's > Outerwear ── */
   | "Hoodies"
+  | "Sweatshirts"
+  | "Coats"
+  | "Jackets"
   | "Sweaters"
+  /* ── Clothing > Men's > Bottoms ── */
   | "Sweatpants"
+  | "Shorts"
+  | "Trousers"
   | "Joggers"
   | "Pants"
-  | "Socks"
+  /* ── Clothing > Women's > Tops ── */
+  | "T-Shirts & Shirts"
+  | "Tanks"
+  /* ── Clothing > Women's > Outerwear ── (shared with Men's) */
+  /* ── Clothing > Women's > Bottoms ── */
+  | "Skirts"
+  | "Mini Skirts"
+  | "Midi Skirts"
+  | "Maxi Skirts"
+  /* ── Clothing > Women's > Dresses ── */
+  | "Dresses"
+  | "Sleeveless Dresses"
+  | "Short Sleeve Dresses"
+  | "Long Sleeve Dresses"
+  | "One-Pieces"
+  /* ── Clothing > Women's > Bodysuits & Jumpsuits ── */
+  | "Bodysuits"
+  | "Jumpsuits"
+  /* ── Clothing > Women's > Activewear ── */
+  | "Sports Bras"
+  | "Yoga Pants"
+  | "Yoga Shorts"
+  | "Yoga Sets"
+  /* ── Clothing > Women's > Swimwear ── */
+  | "Bikinis"
+  | "Tankinis"
+  | "Swimwear"
+  | "Plus Size Swimwear"
+  | "Cover Ups"
+  | "Swimwear Accessories"
+  /* ── Clothing > Women's > Lingerie & Sleep ── */
+  | "Underwear"
+  | "Lingerie"
+  | "Loungewear"
+  | "Sleepwear"
+  /* ── Accessories > Headwear ── */
+  | "Baseball Caps"
+  | "Bucket Hats"
+  | "Beanies"
+  | "Unisex Hats"
   | "Hats"
+  /* ── Accessories > Bags & Luggage ── */
+  | "Backpacks"
+  | "Schoolbags"
+  | "Travel Backpacks"
+  | "Bucket Bags"
+  | "Tote Bags"
+  | "Crossbody Bags"
+  | "Clutches"
+  | "Fanny Packs"
+  | "Wallets"
+  | "Phone Bags"
+  | "Cosmetic Bags"
+  | "Luggage"
+  | "Travel Bags"
+  | "Lunch Bags"
+  /* ── Accessories > Tech (3C) ── */
+  | "Phone Cases"
+  | "Tablet Cases"
+  | "Laptop Cases"
+  | "AirPods Cases"
+  | "Watches"
+  | "Watch Bands"
+  | "Gaming Accessories"
+  | "Photo Accessories"
+  /* ── Accessories > Fashion ── */
+  | "Sunglasses"
+  | "Prescription Glasses"
+  | "Eyewear Accessories"
+  | "Necklaces"
+  | "Badges"
+  | "Keychains"
+  | "Key Holders"
+  | "Face Covers"
+  | "Scarfs"
+  | "Wraps"
+  | "Stoles"
+  | "Ties"
+  | "Arm Coolers"
+  | "Arm Warmers"
+  /* ── Accessories > Footwear ── */
+  | "Sports Shoes"
+  | "Boots"
+  | "Slippers"
+  | "Socks"
+  /* ── Home & Lifestyle > Drinkware ── */
   | "Cups"
   | "Mugs"
+  | "Travel Tumblers"
+  /* ── Home & Lifestyle > Barware ── */
+  | "Bottle Openers"
+  | "Coasters"
+  /* ── Music (physical media & memorabilia) ── */
   | "Vinyl"
   | "Posters"
   | "Accessories";
 
-/* ─── Category Taxonomy Tree ─── */
+/* Map each leaf category to its size type for contextual filters */
+export const CATEGORY_SIZE_TYPE: Record<string, SizeType> = {
+  /* Clothing > Tops */
+  "T-Shirts": "clothing",
+  "Long Sleeve Shirts": "clothing",
+  "Tank Tops": "clothing",
+  "Crop Tops": "clothing",
+  "T-Shirts & Shirts": "clothing",
+  Tanks: "clothing",
+  "Athletic Tops": "clothing",
+  "Sports Bras": "clothing",
+  /* Clothing > Activewear */
+  "Sports Sets": "clothing",
+  "Yoga Pants": "clothing",
+  "Yoga Shorts": "clothing",
+  "Yoga Sets": "clothing",
+  /* Clothing > Outerwear */
+  Hoodies: "clothing",
+  Sweatshirts: "clothing",
+  Coats: "clothing",
+  Jackets: "clothing",
+  Sweaters: "clothing",
+  /* Clothing > Bottoms */
+  Sweatpants: "waist",
+  Joggers: "waist",
+  Pants: "waist",
+  Shorts: "waist",
+  Trousers: "waist",
+  Skirts: "one-size",
+  "Mini Skirts": "one-size",
+  "Midi Skirts": "one-size",
+  "Maxi Skirts": "one-size",
+  /* Clothing > Dresses */
+  Dresses: "clothing",
+  "Sleeveless Dresses": "clothing",
+  "Short Sleeve Dresses": "clothing",
+  "Long Sleeve Dresses": "clothing",
+  "One-Pieces": "one-size",
+  /* Clothing > Bodysuits & Jumpsuits */
+  Bodysuits: "clothing",
+  Jumpsuits: "clothing",
+  /* Clothing > Swimwear */
+  Bikinis: "clothing",
+  Tankinis: "clothing",
+  Swimwear: "clothing",
+  "Plus Size Swimwear": "clothing",
+  "Cover Ups": "one-size",
+  "Swimwear Accessories": "one-size",
+  /* Clothing > Lingerie & Sleep */
+  Underwear: "clothing",
+  Lingerie: "clothing",
+  Loungewear: "clothing",
+  Sleepwear: "clothing",
+  /* Accessories > Headwear */
+  "Baseball Caps": "hat",
+  "Bucket Hats": "hat",
+  Beanies: "hat",
+  "Unisex Hats": "hat",
+  Hats: "hat",
+  /* Accessories > Bags — all one-size */
+  Backpacks: "one-size",
+  Schoolbags: "one-size",
+  "Travel Backpacks": "one-size",
+  "Bucket Bags": "one-size",
+  "Tote Bags": "one-size",
+  "Crossbody Bags": "one-size",
+  Clutches: "one-size",
+  "Fanny Packs": "one-size",
+  Wallets: "one-size",
+  "Phone Bags": "one-size",
+  "Cosmetic Bags": "one-size",
+  Luggage: "one-size",
+  "Travel Bags": "one-size",
+  "Lunch Bags": "one-size",
+  /* Accessories > Tech — all one-size */
+  "Phone Cases": "one-size",
+  "Tablet Cases": "one-size",
+  "Laptop Cases": "one-size",
+  "AirPods Cases": "one-size",
+  Watches: "one-size",
+  "Watch Bands": "one-size",
+  "Gaming Accessories": "one-size",
+  "Photo Accessories": "one-size",
+  /* Accessories > Fashion — all one-size */
+  Sunglasses: "one-size",
+  "Prescription Glasses": "one-size",
+  "Eyewear Accessories": "one-size",
+  Necklaces: "one-size",
+  Badges: "one-size",
+  Keychains: "one-size",
+  "Key Holders": "one-size",
+  "Face Covers": "one-size",
+  Scarfs: "one-size",
+  Wraps: "one-size",
+  Stoles: "one-size",
+  Ties: "one-size",
+  "Arm Coolers": "one-size",
+  "Arm Warmers": "one-size",
+  /* Accessories > Footwear */
+  "Sports Shoes": "shoe",
+  Boots: "shoe",
+  Slippers: "shoe",
+  Socks: "one-size",
+  /* Home & Lifestyle > Drinkware */
+  Cups: "drinkware",
+  Mugs: "drinkware",
+  "Travel Tumblers": "drinkware",
+  /* Home & Lifestyle > Barware */
+  "Bottle Openers": "one-size",
+  Coasters: "one-size",
+  /* Music */
+  Vinyl: "none",
+  Posters: "none",
+  Accessories: "one-size",
+};
+
+/* ─── Category Taxonomy Tree (3 levels) ─── */
 export type CategoryNode = {
   label: string;
   slug: string;
   categories?: ShopCategory[];
-  children?: CategoryNode[];
+   children?: CategoryNode[];
 };
 
 export const CATEGORY_TREE: CategoryNode[] = [
+  /* ═══════ LEVEL 1: CLOTHING ═══════ */
   {
     label: "Clothing",
     slug: "clothing",
     children: [
+      /* ── Men's Clothing ── */
       {
         label: "Men's",
         slug: "mens",
         children: [
-          { label: "Tops", slug: "mens-tops", categories: ["T-Shirts", "Hoodies", "Sweaters"] },
-          { label: "Bottoms", slug: "mens-bottoms", categories: ["Sweatpants", "Joggers", "Pants"] },
+          {
+            label: "Tops",
+            slug: "mens-tops",
+            categories: ["T-Shirts", "Long Sleeve Shirts", "Tank Tops", "Crop Tops"],
+          },
+          {
+            label: "Activewear",
+            slug: "mens-activewear",
+            categories: ["Athletic Tops", "Sports Sets"],
+          },
+          {
+            label: "Outerwear",
+            slug: "mens-outerwear",
+            categories: ["Hoodies", "Sweatshirts", "Coats", "Jackets"],
+          },
+          {
+            label: "Bottoms",
+            slug: "mens-bottoms",
+            categories: ["Sweatpants", "Shorts", "Trousers"],
+          },
         ],
       },
+      /* ── Women's Clothing ── */
       {
         label: "Women's",
         slug: "womens",
         children: [
-          { label: "Tops", slug: "womens-tops", categories: ["T-Shirts", "Hoodies", "Sweaters"] },
-          { label: "Bottoms", slug: "womens-bottoms", categories: ["Sweatpants", "Joggers", "Pants"] },
+          {
+            label: "Tops",
+            slug: "womens-tops",
+            categories: ["T-Shirts & Shirts", "Tanks", "Crop Tops", "Long Sleeve Shirts"],
+          },
+          {
+            label: "Outerwear",
+            slug: "womens-outerwear",
+            categories: ["Hoodies", "Sweatshirts", "Coats", "Jackets"],
+          },
+          {
+            label: "Bottoms",
+            slug: "womens-bottoms",
+            categories: ["Trousers", "Shorts", "Mini Skirts", "Midi Skirts", "Maxi Skirts"],
+          },
+          {
+            label: "Dresses",
+            slug: "womens-dresses",
+            categories: ["Sleeveless Dresses", "Short Sleeve Dresses", "Long Sleeve Dresses", "One-Pieces"],
+          },
+          {
+            label: "Bodysuits & Jumpsuits",
+            slug: "womens-bodysuits",
+            categories: ["Bodysuits", "Jumpsuits"],
+          },
+          {
+            label: "Activewear",
+            slug: "womens-activewear",
+            categories: ["Sports Bras", "Athletic Tops", "Yoga Pants", "Yoga Shorts", "Yoga Sets", "Sports Sets"],
+          },
+          {
+            label: "Swimwear",
+            slug: "womens-swimwear",
+            categories: ["Bikinis", "Tankinis", "Swimwear", "Plus Size Swimwear", "Cover Ups", "Swimwear Accessories"],
+          },
+          {
+            label: "Lingerie & Sleep",
+            slug: "womens-lingerie",
+            categories: ["Underwear", "Lingerie", "Loungewear", "Sleepwear"],
+          },
         ],
       },
-      { label: "Unisex", slug: "unisex", categories: ["T-Shirts", "Hoodies", "Sweaters", "Sweatpants", "Joggers", "Pants", "Socks"] },
+      /* ── Unisex / Gender-Neutral ── */
+      {
+        label: "Unisex",
+        slug: "unisex",
+        categories: ["Hoodies", "Sweatshirts", "Jackets", "Athletic Tops", "Sports Sets"],
+      },
     ],
   },
+  /* ═══════ LEVEL 2: ACCESSORIES ═══════ */
   {
     label: "Accessories",
     slug: "accessories",
-    categories: ["Hats"],
+    children: [
+      {
+        label: "Headwear",
+        slug: "headwear",
+        categories: ["Baseball Caps", "Bucket Hats", "Beanies", "Unisex Hats"],
+      },
+      {
+        label: "Bags & Luggage",
+        slug: "bags-luggage",
+        children: [
+          {
+            label: "Backpacks",
+            slug: "backpacks",
+            categories: ["Schoolbags", "Travel Backpacks", "Bucket Bags"],
+          },
+          {
+            label: "Handbags",
+            slug: "handbags",
+            categories: ["Tote Bags", "Crossbody Bags", "Clutches"],
+          },
+          {
+            label: "Small Bags",
+            slug: "small-bags",
+            categories: ["Fanny Packs", "Wallets", "Phone Bags", "Cosmetic Bags"],
+          },
+          {
+            label: "Travel",
+            slug: "travel",
+            categories: ["Luggage", "Travel Bags", "Lunch Bags"],
+          },
+        ],
+      },
+      {
+        label: "Tech Accessories",
+        slug: "tech-accessories",
+        categories: ["Phone Cases", "Tablet Cases", "Laptop Cases", "AirPods Cases", "Watches", "Watch Bands", "Gaming Accessories", "Photo Accessories"],
+      },
+      {
+        label: "Fashion Accessories",
+        slug: "fashion-accessories",
+        children: [
+          {
+            label: "Eyewear",
+            slug: "eyewear",
+            categories: ["Sunglasses", "Prescription Glasses", "Eyewear Accessories"],
+          },
+          {
+            label: "Jewelry",
+            slug: "jewelry",
+            categories: ["Necklaces", "Badges", "Keychains", "Key Holders"],
+          },
+          {
+            label: "Face & Neck",
+            slug: "face-neck",
+            categories: ["Face Covers", "Scarfs", "Wraps", "Stoles", "Ties"],
+          },
+          {
+            label: "Hand & Arm",
+            slug: "hand-arm",
+            categories: ["Arm Coolers", "Arm Warmers"],
+          },
+        ],
+      },
+      {
+        label: "Footwear",
+        slug: "footwear",
+        categories: ["Sports Shoes", "Boots", "Slippers", "Socks"],
+      },
+    ],
   },
+  /* ═══════ LEVEL 3: HOME & LIFESTYLE ═══════ */
   {
     label: "Home & Lifestyle",
     slug: "home-lifestyle",
     children: [
-      { label: "Drinkware", slug: "drinkware", categories: ["Cups", "Mugs"] },
-      { label: "Barware", slug: "barware", categories: ["Accessories"] },
+      {
+        label: "Drinkware",
+        slug: "drinkware",
+        categories: ["Cups", "Mugs", "Travel Tumblers"],
+      },
+      {
+        label: "Barware",
+        slug: "barware",
+        categories: ["Bottle Openers", "Coasters"],
+      },
     ],
   },
+  /* ═══════ MUSIC (physical media) ═══════ */
   {
     label: "Music",
     slug: "music",

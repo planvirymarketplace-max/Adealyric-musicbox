@@ -44,3 +44,49 @@ model Banner {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Product_Attributes — type-specific attributes for every product
+   Size options are contextual per product type:
+     Clothing:  XS / S / M / L / XL / XXL
+     Waist:     28 / 30 / 32 / 34 / 36
+     Shoe:      5 / 6 / 7 / 8 / 9 / 10
+     Hat:       S/M / L/XL / Adjustable
+     Drinkware: 11oz / 15oz
+     One Size:  One Size
+     None:      (no size filter)
+   ═══════════════════════════════════════════════════════════════ */
+
+model Product_Attributes {
+  id              String   @id @default(cuid())
+  productId       String   @map("product_id")
+  // Leaf category from the taxonomy (e.g. "T-Shirts", "Hoodies", "Baseball Caps")
+  category        String
+  // Size type determines which size filter to show
+  // clothing | waist | shoe | hat | drinkware | one-size | none
+  sizeType        String   @default("none") @map("size_type")
+  // JSON array of available sizes for this specific product
+  // e.g. ["S","M","L","XL"] or ["11oz","15oz"] or ["One Size"]
+  sizes           String   @default("[]")
+  // Availability status: In Stock | Low Stock | Out of Stock | Pre-Order
+  availability    String   @default("In Stock") @map("availability")
+  // Product description
+  description     String   @default("")
+  // URL to product photo
+  imageUrl        String?  @map("image_url")
+  // Slug of related product (for cross-linking)
+  relatedProduct  String?  @map("related_product")
+  // Price in dollars (integer)
+  price           Int      @default(0)
+  // Stock count
+  stock           Int      @default(0)
+  // Color swatches stored as JSON array of {name, hex}
+  colors          String   @default("[]")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@index([category])
+  @@index([sizeType])
+  @@index([availability])
+}

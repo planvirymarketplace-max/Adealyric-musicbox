@@ -22,6 +22,7 @@ import {
   Plus,
   X,
   ArrowLeft,
+  ArrowRight,
   ShoppingBag,
   ChevronDown,
   ChevronRight,
@@ -312,6 +313,16 @@ function CategorySidebar({
 }
 
 /* ─── Size Filter (contextual) ─── */
+const SIZE_LABELS: Record<string, string> = {
+  clothing: "Clothing Size",
+  waist: "Waist Size",
+  shoe: "Shoe Size",
+  hat: "Hat Size",
+  drinkware: "Size",
+  "one-size": "",
+  none: "",
+};
+
 function SizeFilter({
   categories,
   selected,
@@ -334,11 +345,12 @@ function SizeFilter({
   }
 
   const options = SIZE_OPTIONS[activeSizeType];
-  if (options.length === 0) return null;
+  const label = SIZE_LABELS[activeSizeType];
+  if (!options || options.length === 0 || !label) return null;
 
   return (
     <div className="mt-6">
-      <p className="text-[10px] uppercase tracking-[0.2em] text-black/30 mb-3">Size</p>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-black/30 mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((s) => (
           <button
@@ -523,87 +535,89 @@ export function AlbumDetailPage() {
             </div>
           </div>
 
-          {/* ── Stacked action rows (OVO style) ── */}
-          <div className="mt-12 max-w-2xl">
-            {/* Stream */}
+          {/* ── Action Buttons ── */}
+          <div className="mt-12 max-w-2xl space-y-3">
+            {/* Stream Album */}
             <button
               onClick={() => openStream(album.title + " — Album")}
-              className="w-full flex items-center justify-between border-b border-black/10 py-5 cursor-pointer hover:bg-black/[0.02] transition-colors group"
+              className="w-full flex items-center gap-5 border border-black/12 px-6 py-5 bg-white hover:bg-black/[0.03] hover:border-black/25 transition-all cursor-pointer group"
             >
-              <div className="flex items-center gap-4">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-black/20 group-hover:border-black/60 transition-colors">
-                  <Play className="h-2.5 w-2.5 ml-0.5 text-black/40" />
-                </span>
-                <div className="text-left">
-                  <p className="text-[13px] font-medium">Stream</p>
-                  <p className="text-[11px] text-black/30">Album</p>
-                </div>
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-white group-hover:scale-105 transition-transform">
+                <Play className="h-5 w-5 ml-0.5" />
+              </span>
+              <div className="flex-1 text-left">
+                <p className="text-[15px] font-semibold tracking-wide">Stream Album</p>
+                <p className="mt-0.5 text-[12px] text-black/40">All platforms</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-black/20" />
+              <ArrowRight className="h-5 w-5 text-black/20 group-hover:text-black/60 group-hover:translate-x-1 transition-all" />
             </button>
 
             {/* Stream Single */}
             {album.singleTitle && (
               <button
                 onClick={() => openStream(album.singleTitle! + " — Single")}
-                className="w-full flex items-center justify-between border-b border-black/10 py-5 cursor-pointer hover:bg-black/[0.02] transition-colors group"
+                className="w-full flex items-center gap-5 border border-black/12 px-6 py-5 bg-white hover:bg-black/[0.03] hover:border-black/25 transition-all cursor-pointer group"
               >
-                <div className="flex items-center gap-4">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-black/20 group-hover:border-black/60 transition-colors">
-                    <Play className="h-2.5 w-2.5 ml-0.5 text-black/40" />
-                  </span>
-                  <div className="text-left">
-                    <p className="text-[13px] font-medium">Stream</p>
-                    <p className="text-[11px] text-black/30">{album.singleTitle}</p>
-                  </div>
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-white group-hover:scale-105 transition-transform">
+                  <Play className="h-5 w-5 ml-0.5" />
+                </span>
+                <div className="flex-1 text-left">
+                  <p className="text-[15px] font-semibold tracking-wide">Stream Single</p>
+                  <p className="mt-0.5 text-[12px] text-black/40">{album.singleTitle}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-black/20" />
+                <ArrowRight className="h-5 w-5 text-black/20 group-hover:text-black/60 group-hover:translate-x-1 transition-all" />
               </button>
             )}
 
             {/* Add to Cart — Digital */}
             <button
               onClick={() => addToCart()}
-              className="w-full flex items-center justify-between border-b border-black/10 py-5 cursor-pointer hover:bg-black/[0.02] transition-colors group"
+              className="w-full flex items-center gap-5 border border-black/12 px-6 py-5 bg-white hover:bg-black/[0.03] hover:border-black/25 transition-all cursor-pointer group"
             >
-              <div className="flex items-center gap-4">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-black/20 group-hover:border-black/60 transition-colors">
-                  <Plus className="h-3 w-3 text-black/40" />
-                </span>
-                <div className="text-left">
-                  <p className="text-[13px] font-medium">Add to Cart (Digital)</p>
-                  <p className="text-[11px] text-black/30">${digitalPrice}.00</p>
-                </div>
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-black text-white group-hover:scale-105 transition-transform">
+                <Plus className="h-6 w-6" />
+              </span>
+              <div className="flex-1 text-left">
+                <p className="text-[15px] font-semibold tracking-wide">Add to Cart — Digital</p>
+                <p className="mt-0.5 text-[12px] text-black/40">Digital download</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-black/20" />
+              <span className="text-[16px] font-semibold tabular-nums">${digitalPrice}.00</span>
             </button>
 
             {/* Add to Cart — Vinyl */}
             <button
               onClick={() => addToCart()}
               disabled={!vinylProduct || vinylProduct.stock === 0}
-              className={`w-full flex items-center justify-between border-b border-black/10 py-5 transition-colors group ${
+              className={`w-full flex items-center gap-5 border px-6 py-5 transition-all group ${
                 vinylProduct && vinylProduct.stock > 0
-                  ? "cursor-pointer hover:bg-black/[0.02]"
-                  : "opacity-40 cursor-not-allowed"
+                  ? "border-black/12 bg-white hover:bg-black/[0.03] hover:border-black/25 cursor-pointer"
+                  : "border-black/5 bg-black/[0.02] opacity-50 cursor-not-allowed"
               }`}
             >
-              <div className="flex items-center gap-4">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-black/20 group-hover:border-black/60 transition-colors">
-                  <Plus className="h-3 w-3 text-black/40" />
-                </span>
-                <div className="text-left">
-                  <p className="text-[13px] font-medium">Add to Cart (Vinyl)</p>
-                  <p className="text-[11px] text-black/30">
-                    {vinylProduct ? `$${vinylProduct.price}.00` : "Sold Out"}
-                  </p>
-                </div>
+              <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg transition-transform ${
+                vinylProduct && vinylProduct.stock > 0
+                  ? "bg-black text-white group-hover:scale-105"
+                  : "bg-black/10 text-black/30"
+              }`}>
+                <Plus className="h-6 w-6" />
+              </span>
+              <div className="flex-1 text-left">
+                <p className={`text-[15px] font-semibold tracking-wide ${vinylProduct && vinylProduct.stock > 0 ? "" : "text-black/40"}`}>
+                  Add to Cart — Vinyl
+                </p>
+                <p className={`mt-0.5 text-[12px] ${vinylProduct && vinylProduct.stock > 0 ? "text-black/40" : "text-black/25"}`}>
+                  {vinylProduct && vinylProduct.stock > 0 ? "180g heavyweight vinyl" : "Currently unavailable"}
+                </p>
               </div>
-              <ChevronRight className="h-4 w-4 text-black/20" />
+              {vinylProduct && vinylProduct.stock > 0 ? (
+                <span className="text-[16px] font-semibold tabular-nums">${vinylProduct.price}.00</span>
+              ) : (
+                <span className="text-[12px] uppercase tracking-widest text-black/30">Sold Out</span>
+              )}
             </button>
 
             {/* Availability */}
-            <p className="mt-4 text-[11px] text-black/30">
+            <p className="pt-2 text-[11px] text-black/30">
               {availableCount} of {album.merch.length} items available
             </p>
           </div>
