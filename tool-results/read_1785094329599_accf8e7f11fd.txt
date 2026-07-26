@@ -1,0 +1,754 @@
+     1→const fkboiAsset = "/fkboi.jpg";
+     2→const cantnobodyAsset = "/cantnobody.webp";
+     3→const philly1 = "/philly-1.jpg";
+     4→const philly2 = "/philly-2.jpg";
+     5→const philly3 = "/philly-3.jpg";
+     6→
+     7→export type ReleaseType = "Album" | "EP" | "Single" | "Mixtape";
+     8→
+     9→export type Release = {
+    10→  slug: string;
+    11→  title: string;
+    12→  year: number;
+    13→  type: ReleaseType;
+    14→  cover: string;
+    15→  runtime: string;
+    16→  tracks: { n: number; title: string; length: string; feat?: string }[];
+    17→  color: string;
+    18→  credits: string;
+    19→  story: string;
+    20→  bgImage: string;
+    21→};
+    22→
+    23→export const RELEASES: Release[] = [
+    24→  {
+    25→    slug: "fk-boi",
+    26→    title: "F**K Boi",
+    27→    year: 2024,
+    28→    type: "Single",
+    29→    cover: fkboiAsset,
+    30→    runtime: "3:42",
+    31→    color: "oklch(0.6 0.02 0)",
+    32→    credits: "Written by Adea Lyric. Produced in West Philly.",
+    33→    story: "A confrontation, a mirror, a warning. Unapologetic to the last bar.",
+    34→    bgImage: philly2,
+    35→    tracks: [{ n: 1, title: "F**K Boi", length: "3:42" }],
+    36→  },
+    37→  {
+    38→    slug: "the-lyric-ep",
+    39→    title: "The Lyric",
+    40→    year: 2023,
+    41→    type: "EP",
+    42→    cover: philly3,
+    43→    runtime: "22:14",
+    44→    color: "oklch(0.55 0.02 0)",
+    45→    credits: "Six tracks. Zero compromises.",
+    46→    story: "The refusal record. Made without a table she wasn't invited to.",
+    47→    bgImage: philly1,
+    48→    tracks: [
+    49→      { n: 1, title: "Prelude / West", length: "2:11" },
+    50→      { n: 2, title: "Signal", length: "3:48", feat: "K. Rue" },
+    51→      { n: 3, title: "Rachi", length: "4:02" },
+    52→      { n: 4, title: "No Chase", length: "3:29" },
+    53→      { n: 5, title: "Streetlight", length: "4:17" },
+    54→      { n: 6, title: "Lyric", length: "4:27" },
+    55→    ],
+    56→  },
+    57→  {
+    58→    slug: "cant-nobody",
+    59→    title: "Can't Nobody",
+    60→    year: 2022,
+    61→    type: "Single",
+    62→    cover: cantnobodyAsset,
+    63→    runtime: "3:58",
+    64→    color: "oklch(0.5 0.02 0)",
+    65→    credits: "Rachi Lyfe.",
+    66→    story: "A statement of arrival, tuned to a Philly frequency.",
+    67→    bgImage: philly3,
+    68→    tracks: [{ n: 1, title: "Can't Nobody", length: "3:58" }],
+    69→  },
+    70→  {
+    71→    slug: "west-philly",
+    72→    title: "West Philly",
+    73→    year: 2021,
+    74→    type: "Mixtape",
+    75→    cover: philly2,
+    76→    runtime: "38:20",
+    77→    color: "oklch(0.45 0.02 0)",
+    78→    credits: "Ten tracks. One block.",
+    79→    story: "The mixtape that turned a neighborhood into a language.",
+    80→    bgImage: philly2,
+    81→    tracks: [
+    82→      { n: 1, title: "52nd", length: "3:20" },
+    83→      { n: 2, title: "Row House", length: "4:05" },
+    84→      { n: 3, title: "Cornerstore", length: "3:44" },
+    85→      { n: 4, title: "Market Frankford", length: "4:12" },
+    86→      { n: 5, title: "Overbrook", length: "3:33" },
+    87→      { n: 6, title: "Cobbs Creek", length: "4:01" },
+    88→      { n: 7, title: "Belmont", length: "3:48" },
+    89→      { n: 8, title: "Fairmount", length: "3:56" },
+    90→      { n: 9, title: "Malcolm X", length: "3:41" },
+    91→      { n: 10, title: "Home", length: "4:00" },
+    92→    ],
+    93→  },
+    94→  {
+    95→    slug: "debut-2017",
+    96→    title: "First Light",
+    97→    year: 2017,
+    98→    type: "EP",
+    99→    cover: philly1,
+   100→    runtime: "18:02",
+   101→    color: "oklch(0.4 0.02 0)",
+   102→    credits: "The introduction.",
+   103→    story: "Where it started. A voice deciding to be heard.",
+   104→    bgImage: philly1,
+   105→    tracks: [
+   106→      { n: 1, title: "Introduction", length: "2:44" },
+   107→      { n: 2, title: "Grown", length: "3:52" },
+   108→      { n: 3, title: "Say My Name", length: "4:08" },
+   109→      { n: 4, title: "Philly Blues", length: "3:31" },
+   110→      { n: 5, title: "Light", length: "3:47" },
+   111→    ],
+   112→  },
+   113→];
+   114→
+   115→export type Product = {
+   116→  slug: string;
+   117→  name: string;
+   118→  price: number;
+   119→  type: "Vinyl" | "CD" | "Apparel" | "Print";
+   120→  category: string;
+   121→  image: string;
+   122→  color: string;
+   123→  sizes?: string[];
+   124→  edition?: string;
+   125→  description: string;
+   126→};
+   127→
+   128→export const PRODUCTS: Product[] = [
+   129→  {
+   130→    slug: "fkboi-vinyl",
+   131→    name: 'F**K Boi 12" Vinyl',
+   132→    price: 34,
+   133→    type: "Vinyl",
+   134→    category: "Music",
+   135→    image: fkboiAsset,
+   136→    color: "oklch(0.2 0 0)",
+   137→    edition: "Limited / 500",
+   138→    description: "Heavyweight 180g black vinyl. Screen-printed sleeve. Signed insert.",
+   139→  },
+   140→  {
+   141→    slug: "west-philly-cassette",
+   142→    name: "West Philly Cassette",
+   143→    price: 18,
+   144→    type: "CD",
+   145→    category: "Music",
+   146→    image: cantnobodyAsset,
+   147→    color: "oklch(0.25 0 0)",
+   148→    edition: "Numbered / 250",
+   149→    description: "Chrome tape. Fold-out J-card with lyrics.",
+   150→  },
+   151→  {
+   152→    slug: "lyric-hoodie-black",
+   153→    name: "Lyric Hoodie — Black",
+   154→    price: 88,
+   155→    type: "Apparel",
+   156→    category: "Wear",
+   157→    image: fkboiAsset,
+   158→    color: "oklch(0.1 0 0)",
+   159→    sizes: ["S", "M", "L", "XL", "XXL"],
+   160→    description: "Heavyweight 500gsm cotton. Embroidered chain-stitch lyric on the back.",
+   161→  },
+   162→  {
+   163→    slug: "lyric-tee-bone",
+   164→    name: "Lyric Tee — Bone",
+   165→    price: 42,
+   166→    type: "Apparel",
+   167→    category: "Wear",
+   168→    image: cantnobodyAsset,
+   169→    color: "oklch(0.9 0 0)",
+   170→    sizes: ["S", "M", "L", "XL"],
+   171→    description: "Boxy fit. 260gsm ring-spun cotton. Puff-print logo.",
+   172→  },
+   173→  {
+   174→    slug: "west-print",
+   175→    name: 'West Philly Print 18"',
+   176→    price: 65,
+   177→    type: "Print",
+   178→    category: "Object",
+   179→    image: philly2,
+   180→    color: "oklch(0.15 0 0)",
+   181→    edition: "Signed / 100",
+   182→    description: "Giclée on cotton rag. Signed and numbered by Adea.",
+   183→  },
+   184→  {
+   185→    slug: "row-print",
+   186→    name: 'Row House Print 24"',
+   187→    price: 95,
+   188→    type: "Print",
+   189→    category: "Object",
+   190→    image: philly1,
+   191→    color: "oklch(0.18 0 0)",
+   192→    edition: "Signed / 100",
+   193→    description: "Large-format giclée. Museum-grade paper. Numbered.",
+   194→  },
+   195→  {
+   196→    slug: "el-print",
+   197→    name: 'The El Print 18"',
+   198→    price: 65,
+   199→    type: "Print",
+   200→    category: "Object",
+   201→    image: philly3,
+   202→    color: "oklch(0.16 0 0)",
+   203→    edition: "Signed / 100",
+   204→    description: "Giclée on cotton rag. Signed and numbered.",
+   205→  },
+   206→  {
+   207→    slug: "lyric-cap",
+   208→    name: "Lyric Cap — Black",
+   209→    price: 38,
+   210→    type: "Apparel",
+   211→    category: "Wear",
+   212→    image: fkboiAsset,
+   213→    color: "oklch(0.08 0 0)",
+   214→    sizes: ["One Size"],
+   215→    description: "Unstructured 6-panel. Waxed cotton. Metal clasp back.",
+   216→  },
+   217→];
+   218→
+   219→/* ═══════════════════════════════════════════════════
+   220→   SHOP CATALOG — Albums + Merch with full e-commerce data
+   221→   ═══════════════════════════════════════════════════ */
+   222→
+   223→/* ─── Product_Attributes: Size System ─── */
+   224→export type SizeType =
+   225→  | "clothing"
+   226→  | "waist"
+   227→  | "shoe"
+   228→  | "hat"
+   229→  | "drinkware"
+   230→  | "one-size"
+   231→  | "none";
+   232→
+   233→export const SIZE_OPTIONS: Record<SizeType, string[]> = {
+   234→  clothing: ["XS", "S", "M", "L", "XL", "XXL"],
+   235→  waist: ["28", "30", "32", "34", "36"],
+   236→  shoe: ["5", "6", "7", "8", "9", "10"],
+   237→  hat: ["S/M", "L/XL", "Adjustable"],
+   238→  drinkware: ["11oz", "15oz"],
+   239→  "one-size": ["One Size"],
+   240→  none: [],
+   241→};
+   242→
+   243→/* ═══════════════════════════════════════════════════════════════
+   244→   FULL CATEGORY TAXONOMY
+   245→   Level 1 — Clothing (Men's / Women's / Unisex)
+   246→   Level 2 — Accessories (Headwear / Bags / Tech / Fashion / Footwear)
+   247→   Level 3 — Home & Lifestyle (Drinkware / Barware)
+   248→   ═══════════════════════════════════════════════════════════════ */
+   249→
+   250→export type ShopCategory =
+   251→  /* Apparel > Tops */
+   252→  | "T-Shirts" | "Tank Tops" | "Crop Tops" | "Hoodies" | "Sweatshirts" | "Long Sleeve Shirts" | "Polo Shirts"
+   253→  /* Apparel > Bottoms */
+   254→  | "Leggings" | "Sweatpants" | "Skirts" | "Shorts" | "Trousers"
+   255→  /* Apparel > Outerwear */
+   256→  | "Coats & Jackets"
+   257→  /* Apparel > One-Pieces */
+   258→  | "Bodysuits" | "Jumpsuits" | "Rompers"
+   259→  /* Women's Tops */
+   260→  | "Women's T-Shirts" | "Women's Tanks" | "Women's Hoodies" | "Women's Sweatshirts" | "Women's Coats"
+   261→  /* Women's Bottoms */
+   262→  | "Women's Trousers" | "Women's Shorts"
+   263→  /* Women's Dresses */
+   264→  | "Sleeveless Dresses" | "Short Sleeve Dresses" | "Long Sleeve Dresses" | "Short Skirts"
+   265→  /* Women's Bodysuits & Jumpsuits */
+   266→  | "Bodysuits" | "Jumpsuits"
+   267→  /* Women's Outfits */
+   268→  | "Casual Suits"
+   269→  /* Women's Activewear */
+   270→  | "Sports Bras" | "Sports Sets" | "Athletic Tops" | "Yoga Pants" | "Yoga Shorts" | "Yoga Sets"
+   271→  /* Women's Swimwear */
+   272→  | "Bikinis" | "Tankinis" | "One-Piece Swimwear" | "Plus Size Swimwear" | "Cover Ups" | "Swimwear Accessories"
+   273→  /* Women's Lingerie & Sleep */
+   274→  | "Women's Underwear" | "Women's Lingerie" | "Women's Loungewear" | "Women's Sleepwear"
+   275→  /* Unisex */
+   276→  | "Unisex T-Shirts" | "Unisex Crop Tops" | "Unisex Leggings" | "Unisex Hoodies" | "Unisex Sweatshirts" | "Unisex Jackets"
+   277→  | "Hats" | "Beanies" | "Unisex Totes"
+   278→  /* Accessories > 3C & Tech */
+   279→  | "AirPods Cases" | "Laptop Cases" | "Gaming Accessories" | "Watches & Bands" | "Phone Cases"
+   280→  /* Accessories > Caps & Hats */
+   281→  | "Baseball Caps" | "Bucket Hats"
+   282→  /* Accessories > Face & Neck */
+   283→  | "Face Covers" | "Scarves" | "Ties"
+   284→  /* Accessories > Jewelry */
+   285→  | "Badges" | "Necklaces" | "Keychains"
+   286→  /* Accessories > Eyewear */
+   287→  | "Eyewear Accessories"
+   288→  /* Accessories > Hand & Arm */
+   289→  | "Arm Coolers"
+   290→  /* Accessories > Footwear */
+   291→  | "Sports Shoes" | "Slippers" | "Boots" | "Socks"
+   292→  /* Accessories > Bags */
+   293→  | "Backpacks" | "Tote Bags" | "Crossbody Bags" | "Fanny Packs" | "Wallets" | "Cosmetic Bags" | "Luggage" | "Clutches" | "Bucket Bags"
+   294→  /* Beauty */
+   295→  | "Face Care" | "Body Care" | "Hair Care" | "Makeup" | "Collection Boxes"
+   296→  /* Music (keep for album merch) */
+   297→  | "Vinyl" | "Posters"
+   298→  /* Drinkware (keep for album merch) */
+   299→  | "Mugs" | "Cups";
+   300→
+   301→/* Map each leaf category to its size type for contextual filters */
+   302→export const CATEGORY_SIZE_TYPE: Record<string, SizeType> = {
+   303→  /* Apparel > Tops */
+   304→  "T-Shirts": "clothing", "Tank Tops": "clothing", "Crop Tops": "clothing", Hoodies: "clothing", Sweatshirts: "clothing", "Long Sleeve Shirts": "clothing", "Polo Shirts": "clothing",
+   305→  /* Apparel > Bottoms */
+   306→  Leggings: "clothing", Sweatpants: "waist", Skirts: "one-size", Shorts: "waist", Trousers: "waist",
+   307→  /* Apparel > Outerwear */
+   308→  "Coats & Jackets": "clothing",
+   309→  /* Apparel > One-Pieces */
+   310→  Bodysuits: "clothing", Jumpsuits: "clothing", Rompers: "clothing",
+   311→  /* Women's Tops */
+   312→  "Women's T-Shirts": "clothing", "Women's Tanks": "clothing", "Women's Hoodies": "clothing", "Women's Sweatshirts": "clothing", "Women's Coats": "clothing",
+   313→  /* Women's Bottoms */
+   314→  "Women's Trousers": "waist", "Women's Shorts": "waist",
+   315→  /* Women's Dresses */
+   316→  "Sleeveless Dresses": "clothing", "Short Sleeve Dresses": "clothing", "Long Sleeve Dresses": "clothing", "Short Skirts": "one-size",
+   317→  /* Women's Bodysuits & Jumpsuits */
+   318→  "Casual Suits": "clothing",
+   319→  /* Women's Activewear */
+   320→  "Sports Bras": "clothing", "Sports Sets": "clothing", "Athletic Tops": "clothing", "Yoga Pants": "clothing", "Yoga Shorts": "clothing", "Yoga Sets": "clothing",
+   321→  /* Women's Swimwear */
+   322→  Bikinis: "clothing", Tankinis: "clothing", "One-Piece Swimwear": "clothing", "Plus Size Swimwear": "clothing", "Cover Ups": "one-size", "Swimwear Accessories": "one-size",
+   323→  /* Women's Lingerie & Sleep */
+   324→  "Women's Underwear": "clothing", "Women's Lingerie": "clothing", "Women's Loungewear": "clothing", "Women's Sleepwear": "clothing",
+   325→  /* Unisex Apparel */
+   326→  "Unisex T-Shirts": "clothing", "Unisex Crop Tops": "clothing", "Unisex Leggings": "clothing", "Unisex Hoodies": "clothing", "Unisex Sweatshirts": "clothing", "Unisex Jackets": "clothing",
+   327→  /* Unisex Headwear */
+   328→  Hats: "hat", Beanies: "hat", "Unisex Totes": "one-size",
+   329→  /* Accessories > 3C & Tech */
+   330→  "AirPods Cases": "one-size", "Laptop Cases": "one-size", "Gaming Accessories": "one-size", "Watches & Bands": "one-size", "Phone Cases": "one-size",
+   331→  /* Accessories > Caps & Hats */
+   332→  "Baseball Caps": "hat", "Bucket Hats": "hat",
+   333→  /* Accessories > Face & Neck */
+   334→  "Face Covers": "one-size", Scarves: "one-size", Ties: "one-size",
+   335→  /* Accessories > Jewelry */
+   336→  Badges: "one-size", Necklaces: "one-size", Keychains: "one-size",
+   337→  /* Accessories > Eyewear */
+   338→  "Eyewear Accessories": "one-size",
+   339→  /* Accessories > Hand & Arm */
+   340→  "Arm Coolers": "one-size",
+   341→  /* Accessories > Footwear */
+   342→  "Sports Shoes": "shoe", Slippers: "shoe", Boots: "shoe", Socks: "one-size",
+   343→  /* Accessories > Bags */
+   344→  Backpacks: "one-size", "Tote Bags": "one-size", "Crossbody Bags": "one-size", "Fanny Packs": "one-size", Wallets: "one-size", "Cosmetic Bags": "one-size", Luggage: "one-size", Clutches: "one-size", "Bucket Bags": "one-size",
+   345→  /* Beauty */
+   346→  "Face Care": "one-size", "Body Care": "one-size", "Hair Care": "one-size", Makeup: "one-size", "Collection Boxes": "one-size",
+   347→  /* Music */
+   348→  Vinyl: "none", Posters: "none",
+   349→  /* Drinkware (album merch) */
+   350→  Mugs: "drinkware", Cups: "drinkware",
+   351→};
+   352→
+   353→/* ─── Category Taxonomy Tree (3 levels) ─── */
+   354→export type CategoryNode = {
+   355→  label: string;
+   356→  slug: string;
+   357→  categories?: ShopCategory[];
+   358→   children?: CategoryNode[];
+   359→};
+   360→
+   361→export const CATEGORY_TREE: CategoryNode[] = [
+   362→  {
+   363→    label: "Apparel",
+   364→    slug: "apparel",
+   365→    children: [
+   366→      { label: "Tops", slug: "apparel-tops", categories: ["T-Shirts", "Tank Tops", "Crop Tops", "Hoodies", "Sweatshirts", "Long Sleeve Shirts", "Polo Shirts"] },
+   367→      { label: "Bottoms", slug: "apparel-bottoms", categories: ["Leggings", "Sweatpants", "Skirts", "Shorts", "Trousers"] },
+   368→      { label: "Outerwear", slug: "apparel-outerwear", categories: ["Coats & Jackets"] },
+   369→      { label: "One-Pieces", slug: "apparel-one-pieces", categories: ["Bodysuits", "Jumpsuits", "Rompers"] },
+   370→    ],
+   371→  },
+   372→  {
+   373→    label: "Women",
+   374→    slug: "women",
+   375→    children: [
+   376→      { label: "Women's Tops", slug: "women-tops", categories: ["Women's T-Shirts", "Women's Tanks", "Women's Hoodies", "Women's Sweatshirts", "Women's Coats"] },
+   377→      { label: "Women's Bottoms", slug: "women-bottoms", categories: ["Women's Trousers", "Women's Shorts"] },
+   378→      { label: "Women's Dresses", slug: "women-dresses", categories: ["Sleeveless Dresses", "Short Sleeve Dresses", "Long Sleeve Dresses", "Short Skirts"] },
+   379→      { label: "Bodysuits & Jumpsuits", slug: "women-bodysuits", categories: ["Bodysuits", "Jumpsuits"] },
+   380→      { label: "Women's Outfits", slug: "women-outfits", categories: ["Casual Suits"] },
+   381→      { label: "Activewear", slug: "women-activewear", categories: ["Sports Bras", "Sports Sets", "Athletic Tops", "Yoga Pants", "Yoga Shorts", "Yoga Sets"] },
+   382→      { label: "Swimwear", slug: "women-swimwear", categories: ["Bikinis", "Tankinis", "One-Piece Swimwear", "Plus Size Swimwear", "Cover Ups", "Swimwear Accessories"] },
+   383→      { label: "Lingerie & Sleep", slug: "women-lingerie", categories: ["Women's Underwear", "Women's Lingerie", "Women's Loungewear", "Women's Sleepwear"] },
+   384→    ],
+   385→  },
+   386→  {
+   387→    label: "Unisex",
+   388→    slug: "unisex",
+   389→    children: [
+   390→      { label: "Apparel", slug: "unisex-apparel", categories: ["Unisex T-Shirts", "Unisex Crop Tops", "Unisex Leggings", "Unisex Hoodies", "Unisex Sweatshirts", "Unisex Jackets"] },
+   391→      { label: "Headwear", slug: "unisex-headwear", categories: ["Hats", "Beanies"] },
+   392→      { label: "Bags", slug: "unisex-bags", categories: ["Unisex Totes"] },
+   393→    ],
+   394→  },
+   395→  {
+   396→    label: "Accessories",
+   397→    slug: "accessories",
+   398→    children: [
+   399→      { label: "3C & Tech", slug: "accessories-tech", categories: ["AirPods Cases", "Laptop Cases", "Gaming Accessories", "Watches & Bands", "Phone Cases"] },
+   400→      { label: "Caps & Hats", slug: "accessories-caps", categories: ["Baseball Caps", "Bucket Hats"] },
+   401→      { label: "Face & Neck", slug: "accessories-face", categories: ["Face Covers", "Scarves", "Ties"] },
+   402→      { label: "Jewelry & Ornaments", slug: "accessories-jewelry", categories: ["Badges", "Necklaces", "Keychains"] },
+   403→      { label: "Eyewear", slug: "accessories-eyewear", categories: ["Eyewear Accessories"] },
+   404→      { label: "Hand & Arm", slug: "accessories-hand", categories: ["Arm Coolers"] },
+   405→      { label: "Footwear", slug: "accessories-footwear", categories: ["Sports Shoes", "Slippers", "Boots", "Socks"] },
+   406→      { label: "Bags", slug: "accessories-bags", categories: ["Backpacks", "Tote Bags", "Crossbody Bags", "Fanny Packs", "Wallets", "Cosmetic Bags", "Luggage", "Clutches", "Bucket Bags"] },
+   407→    ],
+   408→  },
+   409→  {
+   410→    label: "Beauty",
+   411→    slug: "beauty",
+   412→    categories: ["Face Care", "Body Care", "Hair Care", "Makeup", "Collection Boxes"],
+   413→  },
+   414→];
+   415→
+   416→/* Collect all leaf category names from the tree */
+   417→export function getLeafCategories(node: CategoryNode): ShopCategory[] {
+   418→  if (node.categories) return node.categories;
+   419→  if (node.children) return node.children.flatMap(getLeafCategories);
+   420→  return [];
+   421→}
+   422→
+   423→export type ColorSwatch = {
+   424→  name: string;
+   425→  hex: string;
+   426→};
+   427→
+   428→export type AvailabilityStatus = "In Stock" | "Low Stock" | "Out of Stock" | "Pre-Order";
+   429→
+   430→function getAvailability(stock: number): AvailabilityStatus {
+   431→  if (stock === 0) return "Out of Stock";
+   432→  if (stock <= 10) return "Low Stock";
+   433→  return "In Stock";
+   434→}
+   435→
+   436→export type ShopProduct = {
+   437→  slug: string;
+   438→  name: string;
+   439→  price: number;
+   440→  category: ShopCategory;
+   441→  sizes: string[];
+   442→  colors: ColorSwatch[];
+   443→  image: string;
+   444→  description: string;
+   445→  stock: number;
+   446→  albumSlug: string;
+   447→  albumTitle: string;
+   448→};
+   449→
+   450→export type EnrichedProduct = ShopProduct & {
+   451→  sizeType: SizeType;
+   452→  availability: AvailabilityStatus;
+   453→};
+   454→
+   455→export function enrichProduct(p: ShopProduct): EnrichedProduct {
+   456→  return {
+   457→    ...p,
+   458→    sizeType: CATEGORY_SIZE_TYPE[p.category] ?? "none",
+   459→    availability: getAvailability(p.stock),
+   460→  };
+   461→}
+   462→
+   463→export type ShopAlbum = {
+   464→  slug: string;
+   465→  title: string;
+   466→  releaseDate: string;
+   467→  duration: string;
+   468→  description: string;
+   469→  quote: string;
+   470→  singleTitle?: string;
+   471→  cover: string;
+   472→  merch: ShopProduct[];
+   473→};
+   474→
+   475→/* ---- Color Swatches ---- */
+   476→const BLACK: ColorSwatch = { name: "Black", hex: "#111111" };
+   477→const WHITE: ColorSwatch = { name: "White", hex: "#F5F5F5" };
+   478→const GRAY: ColorSwatch = { name: "Gray", hex: "#6B6B6B" };
+   479→const NAVY: ColorSwatch = { name: "Navy", hex: "#1B2A4A" };
+   480→const CREAM: ColorSwatch = { name: "Cream", hex: "#E8DFD0" };
+   481→const BURGUNDY: ColorSwatch = { name: "Burgundy", hex: "#5C1A1B" };
+   482→const FOREST: ColorSwatch = { name: "Forest", hex: "#2D4A3E" };
+   483→const CHARCOAL: ColorSwatch = { name: "Charcoal", hex: "#36454F" };
+   484→const SAND: ColorSwatch = { name: "Sand", hex: "#C2B280" };
+   485→const OLIVE: ColorSwatch = { name: "Olive", hex: "#556B2F" };
+   486→const WINE: ColorSwatch = { name: "Wine", hex: "#722F37" };
+   487→const SLATE: ColorSwatch = { name: "Slate", hex: "#708090" };
+   488→
+   489→export const SHOP_ALBUMS: ShopAlbum[] = [
+   490→  {
+   491→    slug: "cant-nobody-album",
+   492→    title: "Can't Nobody",
+   493→    releaseDate: "March 2022",
+   494→    duration: "42:18",
+   495→    description:
+   496→      "The debut album that introduced Adea Lyric to the world. Raw, unfiltered, and deeply rooted in West Philadelphia.",
+   497→    quote: "Every word is a weapon, every note is a prayer.",
+   498→    cover: cantnobodyAsset,
+   499→    merch: [
+   500→      { slug: "cn-hoodie-blk", name: "Can't Nobody Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, GRAY, CREAM], image: "", description: "Heavyweight fleece hoodie with embroidered album logo on chest.", stock: 24, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   501→      { slug: "cn-tee-blk", name: "Can't Nobody Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, WHITE, CREAM], image: "", description: "Premium cotton tee with puff-print album artwork.", stock: 48, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   502→      { slug: "cn-sweater-navy", name: "Can't Nobody Crewneck", price: 78, category: "Sweatshirts", sizes: ["S", "M", "L", "XL"], colors: [NAVY, BURGUNDY, CHARCOAL], image: "", description: "Heavy-knit crewneck sweater with woven label on hem.", stock: 16, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   503→      { slug: "cn-sweatpant", name: "Can't Nobody Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, CHARCOAL, NAVY], image: "", description: "Relaxed-fit French terry sweatpant with embroidered detail.", stock: 20, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   504→      { slug: "cn-jogger", name: "Can't Nobody Jogger", price: 72, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, OLIVE], image: "", description: "Tapered jogger with zip pockets and ribbed cuffs.", stock: 12, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   505→      { slug: "cn-socks", name: "Can't Nobody Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [BLACK, WHITE], image: "", description: "Ribbed cotton-blend socks with album logo.", stock: 60, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   506→      { slug: "cn-vinyl", name: "Can't Nobody Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Heavyweight vinyl with printed inner sleeve.", stock: 8, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   507→      { slug: "cn-mug", name: "Can't Nobody Mug", price: 18, category: "Mugs", sizes: [], colors: [BLACK, WHITE], image: "", description: "Ceramic mug with wrap-around album artwork.", stock: 35, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   508→      { slug: "cn-cup", name: "Can't Nobody Cup", price: 12, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Double-wall insulated tumbler with lid.", stock: 40, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   509→      { slug: "cn-hat", name: "Can't Nobody Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [BLACK, CREAM, OLIVE], image: "", description: "Unstructured 6-panel dad hat with embroidered script.", stock: 0, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   510→      { slug: "cn-poster", name: "Can't Nobody Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Gig poster on premium stock.", stock: 30, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   511→      { slug: "cn-bottle-opener", name: "Can't Nobody Bottle Opener", price: 12, category: "Keychains", sizes: [], colors: [BLACK], image: "", description: "Flat stainless steel bottle opener with laser engraving.", stock: 50, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   512→    ],
+   513→  },
+   514→  {
+   515→    slug: "after-lyric",
+   516→    title: "After Lyric",
+   517→    releaseDate: "January 2023",
+   518→    duration: "48:35",
+   519→    description:
+   520→      "The sophomore record. A deeper cut into the psyche — love, loss, and everything that comes after the bars fade.",
+   521→    quote: "After the lyric, the silence speaks louder.",
+   522→    singleTitle: "Fuck Boi",
+   523→    cover: philly2,
+   524→    merch: [
+   525→      { slug: "al-hoodie", name: "After Lyric Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, NAVY, FOREST], image: "", description: "Oversized heavyweight hoodie with back graphic.", stock: 18, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   526→      { slug: "al-tee", name: "After Lyric Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WHITE, SAND, CHARCOAL], image: "", description: "Relaxed-fit tee with tonal album graphic.", stock: 55, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   527→      { slug: "al-sweater", name: "After Lyric Sweater", price: 78, category: "Sweatshirts", sizes: ["S", "M", "L", "XL"], colors: [CREAM, SLATE], image: "", description: "Cozy lambswool blend crewneck.", stock: 10, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   528→      { slug: "al-sweatpant", name: "After Lyric Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [CHARCOAL, NAVY], image: "", description: "French terry sweatpant with tonal embroidery.", stock: 14, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   529→      { slug: "al-jogger", name: "After Lyric Jogger", price: 72, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK], image: "", description: "Tech-fabric jogger with reflective details.", stock: 8, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   530→      { slug: "al-pants", name: "After Lyric Cargo Pant", price: 85, category: "Trousers", sizes: ["S", "M", "L", "XL"], colors: [BLACK, OLIVE], image: "", description: "Relaxed cargo pant with utility pockets.", stock: 11, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   531→      { slug: "al-socks", name: "After Lyric Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [BLACK, CHARCOAL], image: "", description: "Cushioned athletic socks with lyric detail.", stock: 45, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   532→      { slug: "al-vinyl", name: "After Lyric Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Colored vinyl with gatefold sleeve.", stock: 5, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   533→      { slug: "al-mug", name: "After Lyric Mug", price: 18, category: "Mugs", sizes: [], colors: [WHITE, CREAM], image: "", description: "Stoneware mug with debossed logo.", stock: 28, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   534→      { slug: "al-cup", name: "After Lyric Tumbler", price: 15, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Insulated travel tumbler.", stock: 32, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   535→      { slug: "al-hat", name: "After Lyric Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [BLACK, CREAM], image: "", description: "Washed cotton dad hat.", stock: 20, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   536→      { slug: "al-poster", name: "After Lyric Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Art print on archival paper.", stock: 0, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   537→    ],
+   538→  },
+   539→  {
+   540→    slug: "man-in-my-life",
+   541→    title: "Man in My Life",
+   542→    releaseDate: "July 2023",
+   543→    duration: "45:52",
+   544→    description:
+   545→      "An exploration of relationships, loyalty, and the men who shaped the narrative. Honest and unapologetic.",
+   546→    quote: "You do not choose who changes you — they just do.",
+   547→    singleTitle: "Side N****a",
+   548→    cover: philly3,
+   549→    merch: [
+   550→      { slug: "ml-hoodie", name: "Man in My Life Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WINE, BLACK, GRAY], image: "", description: "Faded wash hoodie with oversized back print.", stock: 22, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   551→      { slug: "ml-tee", name: "Man in My Life Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL"], colors: [WHITE, CREAM, SLATE], image: "", description: "Vintage-wash tee with front graphic.", stock: 0, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   552→      { slug: "ml-sweater", name: "Man in My Life Cardigan", price: 95, category: "Sweatshirts", sizes: ["S", "M", "L", "XL"], colors: [CREAM, CHARCOAL], image: "", description: "Open-front knit cardigan with button closure.", stock: 7, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   553→      { slug: "ml-sweatpant", name: "Man in My Life Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, GRAY, WINE], image: "", description: "Matching set sweatpant with tonal drawstring.", stock: 15, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   554→      { slug: "ml-pants", name: "Man in My Life Pant", price: 82, category: "Trousers", sizes: ["S", "M", "L", "XL"], colors: [BLACK, NAVY], image: "", description: "Wide-leg trouser in premium twill.", stock: 9, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   555→      { slug: "ml-socks", name: "Man in My Life Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [WINE, BLACK, CREAM], image: "", description: "Cotton-blend dress socks.", stock: 38, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   556→      { slug: "ml-vinyl", name: "Man in My Life Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Standard weight vinyl in printed sleeve.", stock: 12, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   557→      { slug: "ml-mug", name: "Man in My Life Mug", price: 18, category: "Mugs", sizes: [], colors: [BLACK, CREAM], image: "", description: "Matte black ceramic mug.", stock: 22, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   558→      { slug: "ml-cup", name: "Man in My Life Cup", price: 12, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Ceramic cup with hand-drawn lettering.", stock: 0, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   559→      { slug: "ml-hat", name: "Man in My Life Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [WINE, BLACK, SAND], image: "", description: "Distressed cotton twill hat.", stock: 17, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   560→      { slug: "ml-poster", name: "Man in My Life Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Lithograph poster.", stock: 20, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   561→    ],
+   562→  },
+   563→  {
+   564→    slug: "story-of-my-journey",
+   565→    title: "Story of My Journey",
+   566→    releaseDate: "November 2023",
+   567→    duration: "51:07",
+   568→    description:
+   569→      "A sonic autobiography. From the corners of West Philly to stages worldwide — every chapter told in verse.",
+   570→    quote: "The journey does not end — it just finds new streets.",
+   571→    singleTitle: "Drink on the Beach",
+   572→    cover: philly1,
+   573→    merch: [
+   574→      { slug: "sj-hoodie", name: "Story of My Journey Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [FOREST, BLACK, SAND], image: "", description: "Earth-toned hoodie with journey-inspired back art.", stock: 19, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   575→      { slug: "sj-tee", name: "Story of My Journey Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WHITE, OLIVE, NAVY], image: "", description: "Oversized tee with map-print graphic.", stock: 40, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   576→      { slug: "sj-sweater", name: "Story of My Journey Pullover", price: 78, category: "Sweatshirts", sizes: ["S", "M", "L", "XL"], colors: [FOREST, CREAM], image: "", description: "Half-zip fleece pullover with embroidered patch.", stock: 13, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   577→      { slug: "sj-sweatpant", name: "Story of My Journey Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [OLIVE, CHARCOAL, BLACK], image: "", description: "Relaxed-fit sweatpant with embroidered knee.", stock: 16, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   578→      { slug: "sj-jogger", name: "Story of My Journey Jogger", price: 72, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [FOREST, BLACK], image: "", description: "Lightweight jogger with map lining.", stock: 10, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   579→      { slug: "sj-socks", name: "Story of My Journey Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [FOREST, CREAM, BLACK], image: "", description: "Merino wool blend socks.", stock: 50, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   580→      { slug: "sj-vinyl", name: "Story of My Journey Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Double LP with booklet.", stock: 6, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   581→      { slug: "sj-mug", name: "Story of My Journey Mug", price: 18, category: "Mugs", sizes: [], colors: [CREAM, FOREST], image: "", description: "Speckled stoneware mug.", stock: 25, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   582→      { slug: "sj-cup", name: "Story of My Journey Cup", price: 15, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Stainless steel camp cup.", stock: 0, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   583→      { slug: "sj-hat", name: "Story of My Journey Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [OLIVE, SAND, BLACK], image: "", description: "Washed canvas bucket hat.", stock: 15, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   584→      { slug: "sj-poster", name: "Story of My Journey Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Illustrated journey map poster.", stock: 18, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   585→    ],
+   586→  },
+   587→  {
+   588→    slug: "tainted-love",
+   589→    title: "Tainted Love",
+   590→    releaseDate: "May 2024",
+   591→    duration: "39:44",
+   592→    description:
+   593→      "The aftermath of devotion. A darker, more vulnerable record that strips away the armor.",
+   594→    quote: "Love is the wound that keeps teaching you how to heal.",
+   595→    cover: fkboiAsset,
+   596→    merch: [
+   597→      { slug: "tl-hoodie", name: "Tainted Love Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BURGUNDY, BLACK, CHARCOAL], image: "", description: "Distressed hoodie with cracked-print heart graphic.", stock: 21, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   598→      { slug: "tl-tee", name: "Tainted Love Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WHITE, BURGUNDY, SLATE], image: "", description: "Bleach-wash tee with heart-break graphic.", stock: 37, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   599→      { slug: "tl-sweater", name: "Tainted Love Sweater", price: 78, category: "Sweatshirts", sizes: ["S", "M", "L", "XL"], colors: [BURGUNDY, BLACK], image: "", description: "Turtleneck sweater in dark rose.", stock: 9, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   600→      { slug: "tl-sweatpant", name: "Tainted Love Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, CHARCOAL, BURGUNDY], image: "", description: "Matching set sweatpant with tonal details.", stock: 18, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   601→      { slug: "tl-pants", name: "Tainted Love Pant", price: 82, category: "Trousers", sizes: ["S", "M", "L", "XL"], colors: [BLACK, CHARCOAL], image: "", description: "Straight-leg pant with hidden pocket.", stock: 7, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   602→      { slug: "tl-socks", name: "Tainted Love Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [BURGUNDY, BLACK], image: "", description: "Ribbed ankle socks with heart detail.", stock: 42, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   603→      { slug: "tl-vinyl", name: "Tainted Love Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BURGUNDY], image: "", description: "Colored vinyl in red/burgundy.", stock: 4, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   604→      { slug: "tl-mug", name: "Tainted Love Mug", price: 18, category: "Mugs", sizes: [], colors: [BLACK, WHITE], image: "", description: "Matte black mug with red accent.", stock: 20, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   605→      { slug: "tl-cup", name: "Tainted Love Cup", price: 15, category: "Cups", sizes: [], colors: [BURGUNDY, BLACK], image: "", description: "Ceramic cup with gold foil detail.", stock: 30, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   606→      { slug: "tl-hat", name: "Tainted Love Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [BLACK, BURGUNDY], image: "", description: "Washed twill hat with embroidered rose.", stock: 0, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   607→      { slug: "tl-poster", name: "Tainted Love Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Dark art print on heavyweight stock.", stock: 15, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   608→      { slug: "tl-bottle-opener", name: "Tainted Love Keychain", price: 12, category: "Keychains", sizes: [], colors: [BLACK, BURGUNDY], image: "", description: "Bottle opener keychain with laser-cut heart.", stock: 0, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   609→    ],
+   610→  },
+   611→];
+   612→
+   613→/* ═══════════════════════════════════════════════════
+   614→   FULL CATALOG PRODUCTS — non-album merchandise
+   615→   Representative items spanning every leaf category.
+   616→   ═══════════════════════════════════════════════════ */
+   617→const _BLK: ColorSwatch = { name: "Black", hex: "#111" };
+   618→const _WHT: ColorSwatch = { name: "White", hex: "#F5F5F5" };
+   619→const _GRY: ColorSwatch = { name: "Gray", hex: "#6B6B6B" };
+   620→const _NVY: ColorSwatch = { name: "Navy", hex: "#1B2A4A" };
+   621→const _CRM: ColorSwatch = { name: "Cream", hex: "#E8DFD0" };
+   622→
+   623→export const CATALOG_PRODUCTS: ShopProduct[] = [
+   624→  // Apparel > Tops - T-Shirts
+   625→  { slug: "wt0216", name: "Women's Regular Fit Crewneck T-Shirt", price: 6.99, category: "T-Shirts", sizes: ["S","M","L","XL","2XL"], colors: [_BLK, _WHT, _GRY], image: "", description: "Classic crewneck in soft cotton.", stock: 50, albumSlug: "", albumTitle: "Shop All" },
+   626→  { slug: "wt0050", name: "Essential Bodycon Crewneck T-Shirt", price: 6.99, category: "T-Shirts", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT, _CRM], image: "", description: "Fitted bodycon silhouette.", stock: 45, albumSlug: "", albumTitle: "Shop All" },
+   627→  // Apparel > Tops - Tank Tops
+   628→  { slug: "wt0082", name: "Women's Tight Crewneck Crop Tank", price: 4.99, category: "Tank Tops", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Fitted crop tank in soft cotton.", stock: 60, albumSlug: "", albumTitle: "Shop All" },
+   629→  // Apparel > Tops - Hoodies
+   630→  { slug: "ww0003", name: "Essential Cropped Hoodie", price: 18.99, category: "Hoodies", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY, _CRM], image: "", description: "Relaxed cropped hoodie in fleece.", stock: 25, albumSlug: "", albumTitle: "Shop All" },
+   631→  // Apparel > Tops - Sweatshirts
+   632→  { slug: "ww0004", name: "Essential Fleece Mock-Neck Crew", price: 16.99, category: "Sweatshirts", sizes: ["S","M","L"], colors: [_BLK, _GRY, _NVY], image: "", description: "Heavyweight fleece crewneck.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   633→  // Apparel > Bottoms - Leggings
+   634→  { slug: "wb0013", name: "High-Waisted Yoga Leggings", price: 12.99, category: "Leggings", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "High-waisted performance leggings.", stock: 35, albumSlug: "", albumTitle: "Shop All" },
+   635→  // Apparel > Bottoms - Sweatpants
+   636→  { slug: "wk0009", name: "Essential Straight-Leg Sweatpants", price: 12.99, category: "Sweatpants", sizes: ["XS","S","M","L"], colors: [_BLK, _GRY], image: "", description: "Classic straight-leg sweatpant.", stock: 30, albumSlug: "", albumTitle: "Shop All" },
+   637→  // Apparel > Bottoms - Skirts
+   638→  { slug: "wb0081", name: "Women's High Rise A-Line Skirt", price: 16.99, category: "Skirts", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Flattering A-line silhouette.", stock: 22, albumSlug: "", albumTitle: "Shop All" },
+   639→  // Apparel > Bottoms - Shorts
+   640→  { slug: "wb0014", name: "Women's Contrast Stripe Track Shorts", price: 12.99, category: "Shorts", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "Athletic track shorts with stripe detail.", stock: 28, albumSlug: "", albumTitle: "Shop All" },
+   641→  // Apparel > Bottoms - Trousers
+   642→  { slug: "wb0089", name: "Women's Wide Leg Denim Jeans", price: 24.99, category: "Trousers", sizes: ["S","M","L","XL"], colors: [_BLK], image: "", description: "Wide-leg denim with high rise.", stock: 15, albumSlug: "", albumTitle: "Shop All" },
+   643→  // Apparel > Outerwear
+   644→  { slug: "wt0187", name: "Women's Mock-Neck Quarter-Zip", price: 22.99, category: "Coats & Jackets", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "Quarter-zip outerwear layer.", stock: 12, albumSlug: "", albumTitle: "Shop All" },
+   645→  // Apparel > One-Pieces
+   646→  { slug: "wo0014", name: "Women's A-Line Sleeveless Dress", price: 22.99, category: "Bodysuits", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Clean A-line sleeveless design.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   647→  { slug: "wo0018", name: "Women's U-Neck Yoga Romper", price: 19.99, category: "Rompers", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "One-piece yoga romper.", stock: 14, albumSlug: "", albumTitle: "Shop All" },
+   648→  // Women's Tops
+   649→  { slug: "wt0218", name: "Women's Leopard Print Crop T-Shirt", price: 9.99, category: "Women's T-Shirts", sizes: ["S","M","L","XL"], colors: [_BLK, _CRM], image: "", description: "Bold leopard print crop tee.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   650→  { slug: "wt0200", name: "Women's Boatneck Raglan T-Shirt", price: 5.99, category: "Women's T-Shirts", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Boatneck raglan sleeve tee.", stock: 40, albumSlug: "", albumTitle: "Shop All" },
+   651→  // Women's Tanks
+   652→  { slug: "wt0196", name: "Women's Crewneck Tank Top", price: 5.99, category: "Women's Tanks", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT, _GRY], image: "", description: "Essential crewneck tank.", stock: 55, albumSlug: "", albumTitle: "Shop All" },
+   653→  // Women's Hoodies
+   654→  { slug: "wt0192", name: "Women's Mineral Washed Crop Hoodie", price: 24.99, category: "Women's Hoodies", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "Mineral washed cropped hoodie.", stock: 10, albumSlug: "", albumTitle: "Shop All" },
+   655→  // Women's Sweatshirts
+   656→  { slug: "wt0212", name: "Women's Crop Collared Sweatshirt", price: 22.99, category: "Women's Sweatshirts", sizes: ["S","M","L","XL"], colors: [_BLK, _CRM], image: "", description: "Collared crop sweatshirt.", stock: 16, albumSlug: "", albumTitle: "Shop All" },
+   657→  // Women's Coats
+   658→  { slug: "wt0187b", name: "Women's Quarter-Zip Outerwear", price: 22.99, category: "Women's Coats", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "Lightweight quarter-zip layer.", stock: 8, albumSlug: "", albumTitle: "Shop All" },
+   659→  // Women's Trousers
+   660→  { slug: "wb0011", name: "Women's High-Rise Flared Jeans", price: 24.99, category: "Women's Trousers", sizes: ["S","M","L","XL"], colors: [_BLK], image: "", description: "High-rise flared denim.", stock: 12, albumSlug: "", albumTitle: "Shop All" },
+   661→  // Women's Shorts
+   662→  { slug: "wb0073", name: "Women's Drawstring Bermuda Shorts", price: 12.99, category: "Women's Shorts", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Relaxed drawstring bermuda.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   663→  // Women's Dresses
+   664→  { slug: "wo0008", name: "Women's Collared Halter A-Line Tennis Dress", price: 12.99, category: "Sleeveless Dresses", sizes: ["S","M","L","XL"], colors: [_WHT, _BLK], image: "", description: "Halter A-line tennis dress.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   665→  { slug: "wo0015", name: "Women's Ruched Sleeveless Full-Zip Dress", price: 26.99, category: "Sleeveless Dresses", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "Full-zip ruched sleeveless dress.", stock: 10, albumSlug: "", albumTitle: "Shop All" },
+   666→  { slug: "ws0004", name: "High-Waist Pocketed A-Line Skirt", price: 14.99, category: "Short Skirts", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "Mini skirt with pockets.", stock: 22, albumSlug: "", albumTitle: "Shop All" },
+   667→  // Women's Activewear
+   668→  { slug: "wt0125", name: "Women's V-Neck Yoga Sports Bra", price: 12.99, category: "Sports Bras", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT, _GRY], image: "", description: "V-neck yoga sports bra.", stock: 30, albumSlug: "", albumTitle: "Shop All" },
+   669→  { slug: "wb0040", name: "Women's High Rise Topstitching Leggings", price: 14.99, category: "Yoga Pants", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "Topstitching detail yoga leggings.", stock: 25, albumSlug: "", albumTitle: "Shop All" },
+   670→  { slug: "wb0038", name: "Women's High Rise Yoga Shorts", price: 9.99, category: "Yoga Shorts", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "High-rise yoga shorts.", stock: 28, albumSlug: "", albumTitle: "Shop All" },
+   671→  { slug: "wt0074", name: "Strappy Criss-Cross Sports Bra", price: 9.99, category: "Sports Bras", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Strappy criss-cross design.", stock: 22, albumSlug: "", albumTitle: "Shop All" },
+   672→  { slug: "wb0076", name: "Women's Quarter-Zip Yoga Romper", price: 16.99, category: "Sports Sets", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "Quarter-zip yoga romper set.", stock: 10, albumSlug: "", albumTitle: "Shop All" },
+   673→  { slug: "wt0181", name: "Women's Performance Crop T-Shirt", price: 6.99, category: "Athletic Tops", sizes: ["XS","S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Performance crop athletic top.", stock: 35, albumSlug: "", albumTitle: "Shop All" },
+   674→  // Women's Swimwear
+   675→  { slug: "sw-bikini-1", name: "Classic Triangle Bikini Set", price: 19.99, category: "Bikinis", sizes: ["S","M","L"], colors: [_BLK, _WHT], image: "", description: "Triangle bikini two-piece set.", stock: 15, albumSlug: "", albumTitle: "Shop All" },
+   676→  { slug: "sw-tankini-1", name: "Ruched Tankini Set", price: 24.99, category: "Tankinis", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "Ruched tankini swim set.", stock: 12, albumSlug: "", albumTitle: "Shop All" },
+   677→  { slug: "sw-coverup-1", name: "Mesh Fringed Cover Up", price: 16.99, category: "Cover Ups", sizes: ["S/M","L/XL"], colors: [_WHT, _BLK], image: "", description: "Mesh cover up with fringe.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   678→  // Women's Lingerie & Sleep
+   679→  { slug: "ln-underwear-1", name: "Women's Cotton Brief 3-Pack", price: 12.99, category: "Women's Underwear", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT, _GRY], image: "", description: "Cotton brief underwear 3-pack.", stock: 40, albumSlug: "", albumTitle: "Shop All" },
+   680→  { slug: "ln-loungewear-1", name: "Women's Ribbed Knit Loungewear Set", price: 29.99, category: "Women's Loungewear", sizes: ["S","M","L","XL"], colors: [_BLK, _CRM, _GRY], image: "", description: "Ribbed knit matching loungewear set.", stock: 14, albumSlug: "", albumTitle: "Shop All" },
+   681→  // Unisex
+   682→  { slug: "ux-tee-1", name: "Unisex Heavyweight Tee", price: 14.99, category: "Unisex T-Shirts", sizes: ["S","M","L","XL","2XL"], colors: [_BLK, _WHT, _GRY], image: "", description: "Heavyweight unisex tee.", stock: 50, albumSlug: "", albumTitle: "Shop All" },
+   683→  { slug: "ux-crop-1", name: "Unisex Boxie Crop Top", price: 12.99, category: "Unisex Crop Tops", sizes: ["S","M","L","XL"], colors: [_BLK, _WHT], image: "", description: "Boxy unisex crop top.", stock: 30, albumSlug: "", albumTitle: "Shop All" },
+   684→  { slug: "ux-hoodie-1", name: "Unisex Oversized Hoodie", price: 34.99, category: "Unisex Hoodies", sizes: ["S","M","L","XL","2XL"], colors: [_BLK, _GRY, _NVY], image: "", description: "Oversized unisex hoodie.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   685→  { slug: "ux-sweat-1", name: "Unisex Crewneck Sweatshirt", price: 28.99, category: "Unisex Sweatshirts", sizes: ["S","M","L","XL"], colors: [_BLK, _GRY], image: "", description: "Classic unisex crewneck.", stock: 25, albumSlug: "", albumTitle: "Shop All" },
+   686→  { slug: "ux-jacket-1", name: "Unisex Windbreaker Jacket", price: 39.99, category: "Unisex Jackets", sizes: ["S","M","L","XL"], colors: [_BLK, _NVY], image: "", description: "Lightweight windbreaker.", stock: 15, albumSlug: "", albumTitle: "Shop All" },
+   687→  { slug: "ux-hat-1", name: "Unisex Classic Baseball Cap", price: 18.99, category: "Hats", sizes: ["One Size"], colors: [_BLK, _WHT, _CRM], image: "", description: "Adjustable baseball cap.", stock: 35, albumSlug: "", albumTitle: "Shop All" },
+   688→  { slug: "ux-beanie-1", name: "Unisex Ribbed Knit Beanie", price: 14.99, category: "Beanies", sizes: ["One Size"], colors: [_BLK, _GRY, _CRM], image: "", description: "Ribbed knit beanie.", stock: 40, albumSlug: "", albumTitle: "Shop All" },
+   689→  { slug: "ux-tote-1", name: "Unisex Canvas Tote Bag", price: 16.99, category: "Unisex Totes", sizes: [], colors: [_BLK, _WHT, _CRM], image: "", description: "Heavyweight canvas tote.", stock: 45, albumSlug: "", albumTitle: "Shop All" },
+   690→  // Accessories > 3C & Tech
+   691→  { slug: "tc-airpods-1", name: "Silicone AirPods Case", price: 8.99, category: "AirPods Cases", sizes: [], colors: [_BLK, _WHT, _CRM], image: "", description: "Protective silicone AirPods case.", stock: 60, albumSlug: "", albumTitle: "Shop All" },
+   692→  { slug: "tc-laptop-1", name: "Padded Laptop Sleeve", price: 19.99, category: "Laptop Cases", sizes: [], colors: [_BLK, _GRY], image: "", description: "Padded laptop sleeve case.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   693→  { slug: "tc-phone-1", name: "Clear Phone Case", price: 6.99, category: "Phone Cases", sizes: [], colors: [_BLK, _WHT], image: "", description: "Clear protective phone case.", stock: 80, albumSlug: "", albumTitle: "Shop All" },
+   694→  { slug: "tc-gaming-1", name: "Gaming Controller Grip", price: 12.99, category: "Gaming Accessories", sizes: [], colors: [_BLK, _GRY], image: "", description: "Controller grip accessory.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   695→  { slug: "tc-watch-1", name: "Minimalist Watch Band", price: 9.99, category: "Watches & Bands", sizes: [], colors: [_BLK, _CRM, _NVY], image: "", description: "Minimalist watch band.", stock: 25, albumSlug: "", albumTitle: "Shop All" },
+   696→  // Accessories > Caps & Hats
+   697→  { slug: "ac-baseball-1", name: "Washed Cotton Baseball Cap", price: 14.99, category: "Baseball Caps", sizes: ["One Size"], colors: [_BLK, _CRM, _NVY], image: "", description: "Washed cotton baseball cap.", stock: 30, albumSlug: "", albumTitle: "Shop All" },
+   698→  { slug: "ac-bucket-1", name: "Reversible Bucket Hat", price: 16.99, category: "Bucket Hats", sizes: ["S/M","L/XL"], colors: [_BLK, _WHT, _GRY], image: "", description: "Reversible bucket hat.", stock: 22, albumSlug: "", albumTitle: "Shop All" },
+   699→  // Accessories > Face & Neck
+   700→  { slug: "fn-scarf-1", name: "Oversized Cashmere-Blend Scarf", price: 24.99, category: "Scarves", sizes: [], colors: [_BLK, _CRM, _GRY], image: "", description: "Oversized cashmere-blend scarf.", stock: 15, albumSlug: "", albumTitle: "Shop All" },
+   701→  { slug: "fn-face-1", name: "Patterned Face Cover 3-Pack", price: 8.99, category: "Face Covers", sizes: [], colors: [_BLK, _WHT], image: "", description: "Patterned reusable face covers.", stock: 50, albumSlug: "", albumTitle: "Shop All" },
+   702→  // Accessories > Jewelry
+   703→  { slug: "jw-badge-1", name: "Enamel Pin Badge", price: 6.99, category: "Badges", sizes: [], colors: [_BLK, _WHT], image: "", description: "Enamel pin badge.", stock: 40, albumSlug: "", albumTitle: "Shop All" },
+   704→  { slug: "jw-necklace-1", name: "Minimal Chain Necklace", price: 18.99, category: "Necklaces", sizes: [], colors: [_BLK, _GRY, _CRM], image: "", description: "Minimal chain necklace.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   705→  { slug: "jw-keychain-1", name: "Metal Keychain", price: 7.99, category: "Keychains", sizes: [], colors: [_BLK, _GRY, _CRM], image: "", description: "Durable metal keychain.", stock: 55, albumSlug: "", albumTitle: "Shop All" },
+   706→  // Accessories > Footwear
+   707→  { slug: "fw-sport-1", name: "Lightweight Athletic Sneaker", price: 34.99, category: "Sports Shoes", sizes: ["5","6","7","8","9","10"], colors: [_BLK, _WHT, _GRY], image: "", description: "Lightweight athletic sneaker.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   708→  { slug: "fw-boot-1", name: "Platform Chelsea Boot", price: 49.99, category: "Boots", sizes: ["5","6","7","8","9","10"], colors: [_BLK], image: "", description: "Platform Chelsea boot.", stock: 8, albumSlug: "", albumTitle: "Shop All" },
+   709→  { slug: "fw-slipper-1", name: "Faux Fur Slide Slipper", price: 14.99, category: "Slippers", sizes: ["5","6","7","8","9"], colors: [_BLK, _CRM], image: "", description: "Faux fur slide slipper.", stock: 25, albumSlug: "", albumTitle: "Shop All" },
+   710→  { slug: "fw-sock-1", name: "Performance Athletic Socks 3-Pack", price: 9.99, category: "Socks", sizes: ["One Size"], colors: [_BLK, _WHT], image: "", description: "Cushioned athletic socks.", stock: 60, albumSlug: "", albumTitle: "Shop All" },
+   711→  // Accessories > Bags
+   712→  { slug: "bg-backpack-1", name: "Classic Quilted Backpack", price: 29.99, category: "Backpacks", sizes: [], colors: [_BLK, _GRY], image: "", description: "Quilted backpack with padded straps.", stock: 15, albumSlug: "", albumTitle: "Shop All" },
+   713→  { slug: "bg-tote-1", name: "Structured Leather Tote", price: 39.99, category: "Tote Bags", sizes: [], colors: [_BLK, _CRM, _NVY], image: "", description: "Structured leather tote bag.", stock: 12, albumSlug: "", albumTitle: "Shop All" },
+   714→  { slug: "bg-crossbody-1", name: "Chain Strap Crossbody Bag", price: 24.99, category: "Crossbody Bags", sizes: [], colors: [_BLK, _CRM], image: "", description: "Chain strap crossbody bag.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   715→  { slug: "bg-fanny-1", name: "Nylon Fanny Pack", price: 14.99, category: "Fanny Packs", sizes: [], colors: [_BLK, _GRY], image: "", description: "Lightweight nylon fanny pack.", stock: 30, albumSlug: "", albumTitle: "Shop All" },
+   716→  { slug: "bg-wallet-1", name: "Slim Bifold Wallet", price: 16.99, category: "Wallets", sizes: [], colors: [_BLK, _CRM], image: "", description: "Slim bifold leather wallet.", stock: 22, albumSlug: "", albumTitle: "Shop All" },
+   717→  { slug: "bg-cosmetic-1", name: "Zip Cosmetic Pouch", price: 9.99, category: "Cosmetic Bags", sizes: [], colors: [_BLK, _CRM, _WHT], image: "", description: "Zip-close cosmetic pouch.", stock: 35, albumSlug: "", albumTitle: "Shop All" },
+   718→  { slug: "bg-luggage-1", name: "Hardshell Carry-On Suitcase", price: 69.99, category: "Luggage", sizes: [], colors: [_BLK, _GRY], image: "", description: "Hardshell carry-on suitcase.", stock: 6, albumSlug: "", albumTitle: "Shop All" },
+   719→  { slug: "bg-clutch-1", name: "Minimalist Clutch", price: 19.99, category: "Clutches", sizes: [], colors: [_BLK, _CRM, _NVY], image: "", description: "Minimalist evening clutch.", stock: 14, albumSlug: "", albumTitle: "Shop All" },
+   720→  { slug: "bg-bucket-1", name: "Structured Bucket Bag", price: 28.99, category: "Bucket Bags", sizes: [], colors: [_BLK, _CRM], image: "", description: "Structured bucket bag.", stock: 10, albumSlug: "", albumTitle: "Shop All" },
+   721→  // Beauty
+   722→  { slug: "by-face-1", name: "Peptide Ageless AM/PM Cream", price: 12.50, category: "Face Care", sizes: [], colors: [], image: "", description: "Anti-age peptide cream.", stock: 25, albumSlug: "", albumTitle: "Shop All" },
+   723→  { slug: "by-face-2", name: "Anti-Age Hydrogel Eye Patches", price: 16.35, category: "Face Care", sizes: [], colors: [], image: "", description: "Niacinamide hydrogel eye patches.", stock: 20, albumSlug: "", albumTitle: "Shop All" },
+   724→  { slug: "by-body-1", name: "5% Urea + 2% Panthenol Body Cream", price: 16.40, category: "Body Care", sizes: [], colors: [], image: "", description: "Hydrating body cream.", stock: 18, albumSlug: "", albumTitle: "Shop All" },
+   725→  { slug: "by-hair-1", name: "Argan Oil Hair Treatment", price: 14.99, category: "Hair Care", sizes: [], colors: [], image: "", description: "Nourishing argan oil treatment.", stock: 22, albumSlug: "", albumTitle: "Shop All" },
+   726→  { slug: "by-makeup-1", name: "Matte Lipstick Collection", price: 11.99, category: "Makeup", sizes: [], colors: [], image: "", description: "Long-wear matte lipsticks.", stock: 30, albumSlug: "", albumTitle: "Shop All" },
+   727→  { slug: "by-box-1", name: "Anti-Age Peptide Collection Box", price: 48.30, category: "Collection Boxes", sizes: [], colors: [], image: "", description: "3-product anti-age collection.", stock: 8, albumSlug: "", albumTitle: "Shop All" },
+   728→];
+   729→
+   730→/* Flat list of all products — enriched with sizeType and availability */
+   731→export const ALL_PRODUCTS: EnrichedProduct[] = (() => {
+   732→  const albumProducts = SHOP_ALBUMS.flatMap((a) =>
+   733→    a.merch.map((m) => ({ ...m, albumSlug: a.slug, albumTitle: a.title }))
+   734→  );
+   735→  return [...albumProducts, ...CATALOG_PRODUCTS].map(enrichProduct);
+   736→})();
+   737→
+   738→/* All unique categories */
+   739→export const ALL_CATEGORIES: ShopCategory[] = Object.keys(CATEGORY_SIZE_TYPE) as ShopCategory[];
+   740→
+   741→/* Backward compat aliases */
+   742→export type AlbumMerchProduct = ShopProduct;
+   743→export const ALBUMS = SHOP_ALBUMS;
+   744→
+   745→export const TOUR = [
+   746→  { date: "OCT 12", city: "Philadelphia, PA", venue: "The Fillmore", status: "On Sale" },
+   747→  { date: "OCT 19", city: "New York, NY", venue: "Bowery Ballroom", status: "On Sale" },
+   748→  { date: "OCT 26", city: "Washington, DC", venue: "9:30 Club", status: "Low" },
+   749→  { date: "NOV 02", city: "Boston, MA", venue: "Royale", status: "On Sale" },
+   750→  { date: "NOV 09", city: "Atlanta, GA", venue: "Terminal West", status: "On Sale" },
+   751→  { date: "NOV 16", city: "Chicago, IL", venue: "Thalia Hall", status: "Sold Out" },
+   752→  { date: "NOV 23", city: "Los Angeles, CA", venue: "The Novo", status: "On Sale" },
+   753→];
+   754→

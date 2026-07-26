@@ -9,39 +9,39 @@ const philly3 = "/philly-3.jpg";
 export function BioPage() {
   return (
     <>
-      <PageIntro eyebrow="The Artist" title="Adea Lyric," italic="in her own key." />
-      <section className="px-6 pb-24 md:px-12">
+      <PageIntro eyebrow="The Artist" title="Adea Lyric," italic="in her own key." dark />
+      <section className="bg-white px-6 pb-24 md:px-12">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
-          <div className="space-y-8 text-xl leading-relaxed text-bone/80 md:col-span-7">
+          <div className="space-y-8 text-xl leading-relaxed text-black/70 md:col-span-7">
             <p>
               Since stepping into the public spotlight in 2017, Adea has remained true to her
               artistry, refusing to compromise her sound or vision.
             </p>
             <p>
-              She isn&apos;t following trends — she&apos;s <span className="italic text-bone">defining</span>{" "}
+              She isn&apos;t following trends — she&apos;s <span className="italic text-black">defining</span>{" "}
               them. Her music is raw, soulful, unapologetic, and rooted in the culture that raised
               her.
             </p>
-            <p className="text-display text-4xl leading-tight text-bone md:text-6xl">
+            <p className="text-display text-4xl leading-tight text-black md:text-6xl">
               Adea Lyric isn&apos;t chasing a sound.{" "}
-              <span className="italic text-ash">She is the sound of West Philly.</span>
+              <span className="italic text-black/40">She is the sound of West Philly.</span>
             </p>
           </div>
           <aside className="md:col-span-4 md:col-start-9">
             <div className="grid grid-cols-2 gap-4">
               {[["Since", "2017"], ["Home", "W. Philly"], ["Releases", "5+"], ["Label", "Indie"]].map(([k, v]) => (
-                <div key={k} className="border border-border p-6">
-                  <div className="text-eyebrow text-ash">{k}</div>
-                  <div className="mt-2 text-display text-3xl text-bone">{v}</div>
+                <div key={k} className="border border-black/10 p-6">
+                  <div className="text-eyebrow text-black/30">{k}</div>
+                  <div className="mt-2 text-display text-3xl text-black">{v}</div>
                 </div>
               ))}
             </div>
           </aside>
         </div>
       </section>
-      <section className="grid grid-cols-1 gap-1 bg-border md:grid-cols-3">
+      <section className="grid grid-cols-1 gap-1 bg-black/5 md:grid-cols-3">
         {[philly1, philly2, philly3].map((src, i) => (
-          <div key={i} className="relative aspect-[4/5] overflow-hidden bg-ink">
+          <div key={i} className="relative aspect-[4/5] overflow-hidden">
             <img src={src} alt="" className="h-full w-full object-cover grayscale" />
           </div>
         ))}

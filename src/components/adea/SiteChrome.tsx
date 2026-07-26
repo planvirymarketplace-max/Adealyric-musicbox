@@ -7,13 +7,11 @@ const NAV: { label: string; id: TabId }[] = [
   { label: "Home", id: "home" },
   { label: "Discography", id: "discography" },
   { label: "Tour", id: "tour" },
-  { label: "Booking", id: "booking" },
   { label: "Shop", id: "shop" },
   { label: "Bio", id: "bio" },
-  { label: "Account", id: "account" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ light = false }: { light?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const { activeTab, setActiveTab, cartCount } = useAppStore();
@@ -38,44 +36,56 @@ export function SiteHeader() {
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
           scrolled || activeTab !== "home"
-            ? "border-b border-border bg-ink/80 backdrop-blur-xl"
-            : "bg-transparent"
+            ? light
+              ? "border-b border-black/10 bg-white/80 backdrop-blur-xl"
+              : "border-b border-border bg-ink/80 backdrop-blur-xl"
+            : light
+              ? "bg-white/60 backdrop-blur-sm"
+              : "bg-transparent"
         }`}
       >
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-5 md:px-12">
-          <button onClick={() => setActiveTab("home")} className="text-eyebrow text-bone cursor-pointer">
-            Adea<span className="mx-2 text-ash">/</span>Lyric
+          <button onClick={() => setActiveTab("home")} className={`text-eyebrow cursor-pointer ${light ? "text-black" : "text-bone"}`}>
+            Adea<span className={"mx-2 " + (light ? "text-black/40" : "text-ash")}>/</span>Lyric
           </button>
           <nav className="hidden items-center gap-10 md:flex">
             {NAV.map((n) => {
               const active = activeTab === n.id;
               return (
-                <button key={n.id} onClick={() => setActiveTab(n.id)} className={`group relative text-eyebrow text-bone/70 transition-colors hover:text-bone cursor-pointer`}>
+                <button key={n.id} onClick={() => setActiveTab(n.id)} className={`group relative text-eyebrow transition-colors cursor-pointer ${light ? (active ? "text-black" : "text-black/50 hover:text-black") : (active ? "text-bone" : "text-bone/70 hover:text-bone")}`}>
                   {n.label}
-                  <span className={`absolute -bottom-1 left-0 h-px bg-bone transition-all duration-500 ${active ? "w-full" : "w-0 group-hover:w-full"}`} />
+                  <span className={`absolute -bottom-1 left-0 h-px transition-all duration-500 ${light ? (active ? "w-full bg-black" : "w-0 group-hover:w-full bg-black/30") : (active ? "w-full bg-bone" : "w-0 group-hover:w-full bg-bone")}`} />
                 </button>
               );
             })}
           </nav>
           <div className="flex items-center gap-6">
-            <button onClick={() => setActiveTab("account")} className="hidden text-eyebrow text-bone md:inline-flex cursor-pointer">
+            <button onClick={() => setActiveTab("login")} className={`hidden text-eyebrow md:inline-flex cursor-pointer ${light ? "text-black/50 hover:text-black" : "text-bone/70 hover:text-bone"}`}>
+              Log In
+            </button>
+            <button onClick={() => setActiveTab("off")} className={`hidden text-eyebrow md:inline-flex cursor-pointer ${light ? "text-black/50 hover:text-black" : "text-bone/70 hover:text-bone"}`}>
+              Sign Up
+            </button>
+            <button onClick={() => setActiveTab("shop")} className={`hidden text-eyebrow md:inline-flex cursor-pointer ${light ? "text-black/50 hover:text-black" : "text-bone/70 hover:text-bone"}`}>
               Cart / {cartCount}
             </button>
-            <button className="grid h-10 w-10 place-items-center border border-border md:hidden cursor-pointer" onClick={() => setMenu((v) => !v)} aria-label="Menu">
+            <button className={`grid h-10 w-10 place-items-center border md:hidden cursor-pointer ${light ? "border-black/15" : "border-border"}`} onClick={() => setMenu((v) => !v)} aria-label="Menu">
               <div className="flex flex-col gap-1.5">
-                <span className={`block h-px w-5 bg-bone transition-transform ${menu ? "translate-y-1 rotate-45" : ""}`} />
-                <span className={`block h-px w-5 bg-bone transition-transform ${menu ? "-translate-y-1 -rotate-45" : ""}`} />
+                <span className={`block h-px w-5 transition-transform ${light ? "bg-black" : "bg-bone"} ${menu ? "translate-y-1 rotate-45" : ""}`} />
+                <span className={`block h-px w-5 transition-transform ${light ? "bg-black" : "bg-bone"} ${menu ? "-translate-y-1 -rotate-45" : ""}`} />
               </div>
             </button>
           </div>
         </div>
       </header>
 
-      <div className={`fixed inset-0 z-30 bg-ink transition-all duration-500 md:hidden ${menu ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+      <div className={`fixed inset-0 z-30 transition-all duration-500 md:hidden ${menu ? (light ? "bg-white opacity-100 pointer-events-auto" : "bg-ink opacity-100 pointer-events-auto") : (light ? "bg-white opacity-0 pointer-events-none" : "bg-ink opacity-0 pointer-events-none")}`}>
         <nav className="flex h-full flex-col justify-center gap-8 px-8">
           {NAV.map((n, i) => (
-            <button key={n.id} onClick={() => { setActiveTab(n.id); setMenu(false); }} className="text-display text-6xl text-bone cursor-pointer text-left" style={{ transitionDelay: `${i * 50}ms` }}>{n.label}</button>
+            <button key={n.id} onClick={() => { setActiveTab(n.id); setMenu(false); }} className={`text-display text-6xl cursor-pointer text-left ${light ? "text-black" : "text-bone"}`} style={{ transitionDelay: `${i * 50}ms` }}>{n.label}</button>
           ))}
+          <button onClick={() => { setActiveTab("booking"); setMenu(false); }} className={`text-display text-6xl cursor-pointer text-left ${light ? "text-black/50" : "text-bone/50"}`}>Booking</button>
+          <button onClick={() => { setActiveTab("login"); setMenu(false); }} className={`text-display text-6xl cursor-pointer text-left ${light ? "text-black/50" : "text-bone/50"}`}>Log In</button>
         </nav>
       </div>
     </>
@@ -99,8 +109,9 @@ export function PlatformIcon({ name, className = "h-5 w-5" }: { name: string; cl
 
 const FOOTER_LINKS = [
   { heading: "Music", links: [{ label: "Discography", action: "discography" as TabId }, { label: "Latest Release", action: "discography" as TabId }, { label: "Streaming", external: true }] },
-  { heading: "Shop", links: [{ label: "Merchandise", action: "shop" as TabId }, { label: "Vinyl & CDs", action: "shop" as TabId }, { label: "Checkout", action: "account" as TabId }] },
-  { heading: "Connect", links: [{ label: "Tour Dates", action: "tour" as TabId }, { label: "Fan Portal", action: "account" as TabId }, { label: "Newsletter", action: "home" as TabId }] },
+  { heading: "Shop", links: [{ label: "Merchandise", action: "shop" as TabId }, { label: "Vinyl & CDs", action: "shop" as TabId }] },
+  { heading: "Connect", links: [{ label: "Tour Dates", action: "tour" as TabId }, { label: "Booking", action: "booking" as TabId }, { label: "Newsletter", action: "home" as TabId }] },
+  { heading: "Account", links: [{ label: "Log In", action: "login" as TabId }, { label: "Sign Up", action: "off" as TabId }] },
   { heading: "Industry", links: [{ label: "Sync Agents", external: true }, { label: "Writers Room", external: true }] },
 ];
 
@@ -173,23 +184,23 @@ export function SiteFooter() {
   );
 }
 
-export function PageShell({ children }: { children: React.ReactNode }) {
+export function PageShell({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
-    <div className="relative min-h-screen w-full bg-ink text-bone">
-      <SiteHeader />
+    <div className={`relative min-h-screen w-full text-bone ${light ? "bg-white text-black" : "bg-ink text-bone"}`}>
+      <SiteHeader light={light} />
       <main>{children}</main>
       <SiteFooter />
     </div>
   );
 }
 
-export function PageIntro({ eyebrow, title, italic, sub }: { eyebrow: string; title: string; italic?: string; sub?: string }) {
+export function PageIntro({ eyebrow, title, italic, sub, dark = false }: { eyebrow: string; title: string; italic?: string; sub?: string; dark?: boolean }) {
   return (
-    <section className="relative px-6 pb-16 pt-40 md:px-12 md:pb-24 md:pt-56">
+    <section className={`relative px-6 pb-16 pt-40 md:px-12 md:pb-24 md:pt-56 ${dark ? "bg-ink text-bone" : "bg-white text-black"}`}>
       <div className="mx-auto max-w-[1600px]">
-        <div className="text-eyebrow text-ash">{eyebrow}</div>
-        <h1 className="mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] text-bone">{title}{italic && <span className="block italic text-ash">{italic}</span>}</h1>
-        {sub && <p className="mt-8 max-w-xl text-lg text-bone/70">{sub}</p>}
+        <div className={`text-eyebrow ${dark ? "text-ash" : "text-black/30"}`}>{eyebrow}</div>
+        <h1 className={`mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] ${dark ? "text-bone" : "text-black"}`}>{title}{italic && <span className={`block italic ${dark ? "text-ash" : "text-black/40"}`}>{italic}</span>}</h1>
+        {sub && <p className={`mt-8 max-w-xl text-lg ${dark ? "text-bone/70" : "text-black/50"}`}>{sub}</p>}
       </div>
     </section>
   );

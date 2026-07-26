@@ -1,0 +1,402 @@
+   701→| Women's Solid Tight Sleeveless Dress | WO0002 | XS–L | 3 | 260gsm/7.7oz | $8.99 | — |
+   702→| Women's Mineral Wash Crewneck Bodysuit | WT0091 | S–2XL | 1 | 275gsm/8.1oz | $12.99 | — |
+   703→| Women's Tight Flared Leg Quarter-Zip Jumpsuit | WO0009 | S–XL | 5 | 230gsm/6.8oz | $19.99 | NEW |
+   704→| Women's Halter Flared Jumpsuit | WO0013 | S–2XL | 4 | 220gsm/6.5oz | $16.99 | NEW |
+   705→| Women's Color Block Mini Dress | WO0004 | S–XL | 3 | 260gsm/7.7oz | $9.99 | — |
+   706→| Women's Quarter-Zip Short Sleeve Romper | WO0012 | S–XL | 5 | 230gsm/6.8oz | $14.99 | BESTSELLER, NEW |
+   707→| Women's Collared Halter A-Line Tennis Dress | WO0008 | S–2XL | 5 | 210gsm/6.2oz | $12.99 | BESTSELLER |
+   708→| Women's V-Neck Short Sleeve Maxi Dress | WO0001 | S–XL | 3 | 260gsm/7.7oz | $12.99 | — |
+   709→| Women's Binding Tight Halter Dress | WO0005 | S–XL | 3 | 210gsm/6.2oz | $9.99 | — |
+   710→| Women's Paneled A-Line Dress | WO0010 | S–2XL | 5 | 210gsm/6.2oz | $16.99 | NEW |
+   711→| Women's Dual-Function Cape Tie-Waist Romper | WO0006 | S–2XL | 5 | 250gsm/7.4oz | $16.99 | — |
+   712→| Women's Color Block A-Line Sleeveless Dress | WO0011 | 2XS–XL | 3 | 220gsm/6.5oz | $16.99 | NEW |
+   713→| Women's Full-Zip Ruched Bodysuit | WT0176 | S–XL | 3 | 315gsm/9.3oz | $14.99 | NEW |
+   714→| Women's Ruched Sleeveless Full-Zip Dress | WO0015 | S–XL | 8 | 220gsm/6.5oz | $26.99 | NEW |
+   715→
+   716→### A11. Coats & Jackets (4 SKUs)
+   717→
+   718→| Name | SKU | Sizes | Colors | Fabric | Price | Badge |
+   719→|---|---|---|---|---|---|---|
+   720→| Women's Mock Neck Zip Up Cardigan | — | S–XL | 4 | 420gsm/12.4oz | — | NEW |
+   721→| Women's Crop Denim Jacket | WT0186 | S–XL | 2 | 420gsm/12.4oz | $29.99 | NEW |
+   722→| Women's Full-Zip Sports Jacket | WT0162 | S–XL | 3 | 230gsm/6.8oz | $16.99 | NEW |
+   723→| Contrast Side Stripe Fleece Cropped Track Jacket | WQ0004 | S–XL | 4 | 420gsm/12.4oz | $26.99 | — |
+   724→
+   725→### A12. Polo Shirts (4 SKUs)
+   726→
+   727→| Name | SKU | Sizes | Colors | Fabric | Price | Badge |
+   728→|---|---|---|---|---|---|---|
+   729→| Women's Slim Fit Quarter-Zip Polo Shirt | WT0163 | 2XS–XL | 5 | 160gsm/4.7oz | $12.99 | NEW |
+   730→| Essential Cropped Polo Shirt | PL0007 | S–XL | 3 | 200gsm/5.9oz | $9.99 | — |
+   731→| Bodycon Short Sleeve Polo Shirt | PL0008 | S–XL | 3 | 260gsm/7.7oz | $9.99 | — |
+   732→| Women's Knit Cotton Polo Shirt | WT0172 | S–XL | 4 | 180gsm/5.3oz | $14.99 | NEW |
+   733→
+   734→**Blank Apparel total: 284 rows extracted** (source stated 281 items across pagination; a handful of near-duplicate name/SKU pairs from overlapping page loads were kept as-is rather than guessed away — flag these for dedup during import: `Snow Washed Crop Top` ×3 SKUs, `Women's Drawstring Shorts` ×2 SKUs, `Women's Vintage Wash Wide Leg Jeans` ×4 SKUs, `Essential Cropped Hoodie/Zip-Up Hoodie` ×2 each, `Women's High Rise Color Block Yoga Shorts` ×2, `Women's Cropped Sports Bra` ×2 — these look like genuine colorway/wash variants of the same style, not errors.)
+   735→
+   736→---
+   737→
+   738→## PART B — Print-on-Demand Apparel (no fixed color count; price = base print cost)
+   739→
+   740→| Name | Sizes | Price | Tier |
+   741→|---|---|---|---|
+   742→| Custom Printed Women's shirts (All-Over Printing) | S–3XL | From $9.28 | — |
+   743→| 280gsm Custom Best Hoodies-Double-Layer Cap Women's Hoodies | S–6XL | From $9.92 | — |
+   744→| Loose High Waisted Shorts (All-Over Printing) | S–3XL | From $7.46 | — |
+   745→| 180gsm Custom Women Top T-Shirts (All-Over Printing) | S–6XL | From $5.74 | — |
+   746→| DTG 150gsm Custom Personalized T-Shirts-Dual-Sided Printing | S–3XL | From $5.91 | — |
+   747→| Custom Printed Honeycomb Textured Yoga Pants for Women | S–2XL | From $10.14 | — |
+   748→| Custom Crewneck T-Shirts (All-Over Printing) | S–5XL | From $5.76 | — |
+   749→| Custom Printed Mom Shirts (All-Over Printing) | XS–5XL | From $6.39 | — |
+   750→| Swimsuit Cover-up (All-Over Printing) | One size | From $13.63 | — |
+   751→| Baggy Pants for Women (All-Over Printing) | S–2XL | From $7.03 | — |
+   752→| Sleeveless Ankle-length Dress (All-Over Printing) | S–5XL | From $10.24 | — |
+   753→| V-Neck Baggy Dress with Pocket | S–5XL | From $8.31 | — |
+   754→| Summer Sweet Bowknot Dress (All-Over Printing) | 2XS–6XL | From $12.77 | — |
+   755→| DTF 190gsm Designer T-Shirts for Women-Front Prints | S–2XL | From $6.98 | — |
+   756→| DTF 255gsm Custom Designed Women's Hoodies Front Prints | S–3XL | From $10.03 | — |
+   757→| DTF 255gsm Custom Hoodies for Women Dual-Sided Prints | S–3XL | From $12.17 | — |
+   758→| DTG 150gsm T-Shirts for Women-Printed Tees (Front Printing) | L–3XL | From $4.91 | — |
+   759→| Custom Printed Patterned Ribbed Yoga Sets (All-Over Printing) | S–2XL | From $8.53 | — |
+   760→| DTF 190gsm Custom Designed Women's T-Shirts-Dual-Sided Printing | S–2XL | From $8.14 | — |
+   761→| 180gsm Women's Tank Top (All-Over Printing) | S–2XL | From $5.10 | — |
+   762→| Custom Printed Yoga Pants with 2 Pockets (All-Over Printing) | S–2XL | From $11.31 | — |
+   763→| Custom Printed Yoga Tank Tops (All-Over Printing) | S–2XL | From $7.24 | — |
+   764→| Custom Printed Yoga Workout Outfits (All-Over Printing) | XS–2XL | From $10.69 | — |
+   765→| Custom Women's Long Sleeve U-Neck T-Shirts (All-Over Printing) | S–5XL | From $6.34 | — |
+   766→| Round Neck Sleeveless Dress Styles | XS–5XL | From $7.03 | — |
+   767→| Cover-up Dress for Swimwear (All-Over Printing) | S–2XL | From $12.45 | — |
+   768→| Women's Halter One-Piece Swimsuits (All-Over Printing) | S–2XL | From $11.31 | — |
+   769→| Sleeveless Dress | S–5XL | From $6.39 | — |
+   770→| Ankle-length Slip Dress (All-Over Printing) | S–5XL | From $10.24 | — |
+   771→| Beach Wrap Skirt (All-Over Printing) | S–2XL | From $4.03 | — |
+   772→| Halter Tie Front Bikini Top (All-Over Printing) | S–2XL | From $5.76 | — |
+   773→| Halter Tie Front Bikini Set (All-Over Printing) | S–2XL | From $8.53 | — |
+   774→| Two Piece Halter Swimsuit (All-Over Printing) | XS–2XL | From $8.53 | — |
+   775→| Halter Triangle Bikini (All-Over Printing) | XS–2XL | From $9.39 | — |
+   776→| 2-Piece Women's Halter Tankini (All-Over Printing) | XS–XL | From $11.96 | — |
+   777→| Tankini Two Piece Swimsuit (Top Printed) | S–3XL | From $12.60 | — |
+   778→| 280gsm Custom Sweatshirt Designs Raglan Style | S–3XL | From $7.84 | — |
+   779→| Custom Sports Bra Designs-Yoga Support Bras | S–2XL | From $7.14 | — |
+   780→| Custom Printed Patterned Yoga Sports Bra | S–2XL | From $7.14 | — |
+   781→| DTG 190gsm Customized Dual-Sided Printed T-Shirts for Women | S–2XL | From $9.43 | — |
+   782→| DTF 150gsm Print Crew Neck T-Shirts for Women (Front Printing) | S–3XL | From $4.31 | — |
+   783→| DTG 150gsm St Patricks Day Shirts-Short Sleeve Raglan Tees | S–3XL | From $6.60 | — |
+   784→| 180gsm Custom Long Sleeve T-Shirts with Pocket | 2XS–6XL | From $7.24 | — |
+   785→| DTG 190gsm Custom Printed Women's T-Shirts Front Prints | S–2XL | From $7.50 | — |
+   786→| Spaghetti Strap Jumpsuit (All-Over Printing) | S–3XL | From $11.49 | — |
+   787→| Tank Top Bodysuit (All-Over Printing) | S–2XL | From $8.08 | — |
+   788→| Women's 2-Piece Pajama Set (All-Over Printing) | XS–6XL | From $11.74 | — |
+   789→| DTG 255gsm Women's Pocket Hoodie Back Printed | S–3XL | From $10.24 | — |
+   790→| Women Long Sleeve Turtleneck Sweater (All-Over Printing) | S–2XL | From $11.91 | — |
+   791→| Workout Yoga Set | S–2XL | From $8.70 | — |
+   792→| Suspender Jumpsuit (All-Over Printing) | S–3XL | From $11.10 | — |
+   793→| Women's Home Pajamas Pants (All-Over Printing) | S–5XL | From $7.56 | — |
+   794→| V-Neck Women Night Wear Suit (All-Over Printing) | S–XL | From $13.20 | — |
+   795→| 310gsm Wearable Sweater Blanket Oversize | One size | From $12.81 | — |
+   796→| Long Sleeve Nightdress (All-Over Printing) | S–XL | From $7.41 | — |
+   797→| Ruffle V-Neck T-Shirt (All-Over Printing) | S–5XL | From $5.91 | — |
+   798→| Long Sleeve Drop Shoulder Open Shirt (All-Over Printing) | S–2XL | From $9.75 | — |
+   799→| Tanga for Women (All-Over Printing) | S–2XL | From $3.77 | — |
+   800→| 2-Piece Ruffle Tankini Swimsuit (All-Over Printing) | S–2XL | From $12.56 | — |
+   801→| Custom Print Patterned Yoga Pants with 2 Pockets | S–2XL | From $8.70 | — |
+   802→| Short Sleeve Loungewear Set (All-Over Printing) | S–5XL | From $9.77 | — |
+   803→| Spaghetti Dress (All-Over Printing) | S–2XL | From $9.60 | — |
+   804→| Personalized Drawstring Yoga Pants (Straight Baggy) | S–3XL | From $6.34 | — |
+   805→| Women's Bikini Bottom (All-Over Printing) | S–2XL | From $5.12 | — |
+   806→| DTG 150gsm Raglan Women's 3/4 Sleeve T-shirt | S–3XL | From $6.81 | — |
+   807→| DTG 150gsm Raglan Women's Long Sleeve T-shirt | S–3XL | From $7.24 | — |
+   808→| DTG 260gsm Women's Printed Sweatshirt (Front Printing) | S–3XL | From $8.96 | — |
+   809→| 230gsm Drop shoulder Hoodie (All-Over Printing) | S–4XL | From $7.24 | — |
+   810→| 1/4 Zipper Long Sleeve Zip Gym Top (All-Over Printing) | S–3XL | From $9.92 | — |
+   811→| DTG 255gsm Cotton Women's Back Print Hoodie | S–3XL | From $10.03 | — |
+   812→| Printed V-neck Cami Top (All-Over Printing) | S–2XL | From $7.61 | — |
+   813→| Short Tank Top (All-Over Printing) | S–2XL | From $5.96 | — |
+   814→| Floral Camisole | S–2XL | From $4.89 | — |
+   815→| Sleeveless Crop Top (All-Over Printing) | S–2XL | From $6.19 | — |
+   816→| Women's Zipper Jacket (All-Over Printing) | XS–XL | From $8.31 | — |
+   817→| Ladies Swim Shorts | S–2XL | From $4.91 | — |
+   818→| Sports Yoga Bra (All-Over Printing) | S–2XL | From $6.69 | — |
+   819→| Bell Bottoms (All-Over Printing) | XS–XL | From $5.12 | — |
+   820→| Women's Jogger Sweatpants (All-Over Printing) | S–3XL | From $7.26 | — |
+   821→| Diagonal Shoulder Two Piece Set (All-Over Printing) | S–5XL | From $10.03 | — |
+   822→| Hot Yoga Pants for Women (All-Over Printing) | S–2XL | From $10.03 | — |
+   823→| Women Yoga Shorts (All-Over Printing) | S–2XL | From $6.60 | — |
+   824→| Women's Two Piece Swimsuit High Neck Halter Top | S–2XL | From $9.62 | — |
+   825→| High-collar Long-sleeve Bodysuit (All-Over Printing) | S–2XL | From $10.20 | — |
+   826→| V-neck 3/4 Sleeve Dress with Pockets | S–5XL | From $8.06 | — |
+   827→| One Shoulder Split Dress (All-Over Printing) | XS–L | From $8.96 | — |
+   828→| 230gsm Long Sleeve Hoodie Dress (All-Over Printing) | S–5XL | From $11.31 | — |
+   829→| Short Sleeve V Neck Lovely Dress (All-Over Printing) | 2XS–6XL | From $10.03 | — |
+   830→| Round Neck Short Sleeve Dress (All-Over Printing) | 2XS–8XL | From $11.06 | — |
+   831→| Thong Panties (All-Over Printing) | XS–XL | From $4.41 | — |
+   832→| Cutout Bodycon Slim Fit Dress (All-Over Printing) | S–5XL | From $10.03 | — |
+   833→| Sleeveless Ladies Tank Dress (All-Over Printing) | S–2XL | From $8.08 | — |
+   834→| 180gsm Women's Off the Shoulder Half-Sleeve T-shirt | S–5XL | From $5.96 | — |
+   835→| V Neck Sleeveless Dress (All-Over Printing) | S–2XL | From $8.06 | — |
+   836→| 140gsm Women Short Sleeve Shirt (All-Over Printing) | S–4XL | From $3.60 | — |
+   837→| V-neck Short Sleeve T-Shirt (All-Over Printing) | S–5XL | From $5.91 | — |
+   838→| V-neck Loose Long Sleeve T-shirt (All-Over Printing) | S–5XL | From $8.06 | — |
+   839→| Women's Flower Blouse Long Sleeve (All-Over Printing) | S–5XL | From $8.74 | — |
+   840→| Short Sleeve Navel Shirt Baby Tee (All-Over Printing) | S–3XL | From $2.57 | — |
+   841→| Women's Irregular Shirt (All-Over Printing) | S–8XL | From $10.41 | — |
+   842→| Drop Shoulder Women's Open Shirt (Irregular Hem) | S–2XL | From $11.70 | — |
+   843→| Casual Long Sleeve Vintage Tour Shirt (All-Over Printing) | S–3XL | From $8.10 | — |
+   844→| Women's Straight POLO Shirt (All-Over Printing) | S–5XL | From $8.74 | — |
+   845→| DTG 150gsm Women Custom Tees (Dual-sided Printing) | L–3XL | From $7.05 | — |
+   846→| Plus Size V-neck Long Sleeve Dress (All-Over Printing) | S–8XL | From $8.49 | — |
+   847→| V-neck Women Top with Quarter Sleeve (All-Over Printing) | S–5XL | From $8.53 | — |
+   848→| One-Piece Swimsuit (All-Over Printing) | S–2XL | From $10.46 | — |
+   849→| Spaghetti Strap Dress for Women (All-Over Printing) | S–5XL | From $11.06 | — |
+   850→| 110gsm Yoga Knickerbockers (All-Over Printing) | S–2XL | From $7.35 | — |
+   851→| DTG 255gsm Cotton Printed Hoodie for Women (Front Printing) | S–3XL | From $10.03 | — |
+   852→| Custom Zipper T-Shirts | S–3XL | From $7.61 | — |
+   853→| 230gsm Women's Graphic Hoodie (All-Over Printing) | S–3XL | From $6.84 | — |
+   854→| DTG 255gsm Cotton Women's Customize Hoodie with Pocket | S–3XL | From $10.24 | — |
+   855→| 230gsm Full Zipper Long Sleeve Hoodie (All-Over Printing) | S–5XL | From $13.63 | — |
+   856→| 230gsm Hooded Pullover (All-Over Printing) | S–5XL | From $11.10 | — |
+   857→| 230gsm Poncho-style Long Sleeve Hoodie (Irregular Hem) | S–5XL | From $12.77 | — |
+   858→| DTG 255gsm Cotton Women's Hoodie with Pocket (Dual-sided) | S–3XL | From $12.17 | — |
+   859→| 230gsm Lady Hoodie with Double-layer Cap | S–5XL | From $7.05 | — |
+   860→| 230gsm Hoodie for Women with Double-layer Cap | S–6XL | From $7.63 | — |
+   861→| 160gsm Lightweight Women's Hoodie (All-Over Printing) | S–5XL | From $4.84 | — |
+   862→| Turtle Neck Long Dress for Women (All-Over Printing) | XS–XL | From $11.91 | — |
+   863→| Loose Long-sleeve Dress with Pockets | S–5XL | From $8.06 | — |
+   864→| Sleeveless High Waist Dress (All-Over Printing) | S–2XL | From $13.80 | — |
+   865→| Long Dress Set (All-Over Printing) | S–5XL | From $9.81 | — |
+   866→| Plus Size Halter Tie Front Bikini Set | XL–4XL | From $9.17 | — |
+   867→| Plus Size Two Piece Swimsuit High Neck Halter Top | XL–4XL | From $10.26 | — |
+   868→| Multi-Strap Lace Briefs (All-Over Printing) | S–2XL | From $5.31 | — |
+   869→| Sexy One Piece Women Lingerie Bodysuit Deep V Teddy | S–3XL | From $6.34 | — |
+   870→| 170gsm Faux Cotton Women Zip up Jumpsuit Pajama | S–4XL | From $13.67 | — |
+   871→| 250gsm Women Flannel Zip up Jumpsuit Pajama | S–4XL | From $14.31 | — |
+   872→| DTG 150gsm Women's T-shirt with Short Sleeves | S–3XL | From $4.20 | — |
+   873→| 160gsm Sexy G String Thong for Women | S–3XL | From $4.63 | — |
+   874→| Sexy G String Thong for Women | S–3XL | From $6.39 | — |
+   875→| Anti-peep Skort with Pocket | S–4XL | From $5.49 | — |
+   876→| Women Slim Fit Slip Dress | S–2XL | From $7.67 | — |
+   877→| 170gsm Faux Cotton Drawstring Wide Leg Pajama Pants | S–5XL | From $6.99 | — |
+   878→| DTF 190gsm Women Washed Vintage T-Shirt (Front Printing) | S–2XL | From $6.53 | — |
+   879→| DTG 190gsm Women Washed Vintage T-Shirt (Front Printing) | S–2XL | From $8.33 | Premium |
+   880→| Round Neck Long Sleeve Dress with Pocket | S–2XL | From $9.81 | — |
+   881→| Sleeveless Vest (Dual-sided Printing) | S–2XL | From $11.12 | — |
+   882→| Long Sleeve Dress (All-Over Printing) | S–2XL | From $7.41 | — |
+   883→| Workout Yoga Set (All-over Printing) | S–2XL | From $11.31 | — |
+   884→| Workout Sports Bra for Women | S–2XL | From $4.97 | — |
+   885→| 250gsm Knee-Length Yoga Shorts (All-over Printing) | S–2XL | From $9.17 | — |
+   886→| 180gsm Faux Cotton Custom Short Sleeve T-Shirt | S–5XL | From $5.23 | — |
+   887→| Women Workout Yoga Pants with Lines | S–2XL | From $8.74 | — |
+   888→| Spaghetti Strap Dress (All-Over Printing) | S–2XL | From $12.45 | — |
+   889→| 2-Piece Women's Tankini Swimsuit (Top Printed) | S–6XL | From $13.46 | — |
+   890→| Women's Long Sleeve Sun Protection Shirt-UPF 40 UV Rash Guard | S–2XL | From $6.99 | — |
+   891→| 2-Piece Women's Tankini Set High Neck Halter Top | XS–2XL | From $9.81 | — |
+   892→| Plus Size Women's Halter Bikini Set | XL–4XL | From $9.17 | — |
+   893→| Women's One Piece Tummy Control V Neck Swimwear | S–2XL | From $10.69 | — |
+   894→| Plus Size Women Tankini 2-Piece Swimsuit (Top Printed) | XL–5XL | From $12.60 | — |
+   895→| 120gsm Worn-effect Fabric Women Satin Pajama Set | XS–5XL | From $11.96 | — |
+   896→| UPF50+ 180gsm Cooling Polyester Ruffle V-Neck T-Shirt | S–5XL | From $6.24 | Premium |
+   897→| UPF50+ 180gsm Cooling Short Sleeve Loungewear Set | S–5XL | From $10.84 | Premium |
+   898→| 160gsm Ice Silk V Neck Short-Sleeve Women Shirt | S–5XL | From $5.10 | — |
+   899→| Ice Silk Women Underwear Thongs | S–2XL | From $4.03 | — |
+   900→| 2-Piece Bikini Swimwear (All-Over Printing) | S–2XL | From $6.39 | — |
+   901→| 2-Piece Thong Triangle Bikini Set | XS–2XL | From $7.46 | — |
+   902→| Strapless Women Tube Top Y2K Bandeau | S–2XL | From $4.03 | — |
+   903→| Swimming Cap for Women and Men | One size | From $3.17 | — |
+   904→| Plus Size Two Piece Swimsuit with Tankini | XL–4XL | From $15.60 | — |
+   905→| 180gsm Plus Size Round-neck Short Sleeve Dress | L–4XL | From $8.27 | — |
+   906→| Asymmetrical Hem Shirt (All-Over Printing) | S–8XL | From $11.27 | Premium |
+   907→| Polar Fleece Double-Zip Jacket (All-Over Printing) | S–6XL | From $22.67 | Premium |
+   908→| Long-Sleeve Raglan T-Shirt for Women | S–6XL | From $9.84 | Premium |
+   909→| Loose-Fit 3/4 Sleeve Boat Neck T-Shirt | S–5XL | From $7.67 | Premium |
+   910→| Round Neck 3/4 Sleeve Long Dress | S–8XL | From $10.46 | Premium |
+   911→| 230gsm Wide Round Neck 3/4 Sleeve Long Dress | S–8XL | From $13.46 | Premium |
+   912→| Sleeveless Ankle-length Dress | S–5XL | From $10.67 | Premium |
+   913→| Short Sleeve V Neck Lovely Dress | 2XS–6XL | From $10.78 | Premium |
+   914→| 250gsm Tank Top Pocket Dress | 2XS–5XL | From $6.77 | — |
+   915→| Slim Fit Spaghetti Strap Dress for Women | XS–6XL | From $5.31 | — |
+   916→| 180gsm Sleeveless Dress for Women | S–3XL | From $5.10 | — |
+   917→| Cheerleader Set for Women | S–4XL | From $8.27 | — |
+   918→| Cheerleader Dress for Women | XS–2XL | From $5.74 | — |
+   919→| Women Baseball Jersey | S–4XL | From $7.67 | — |
+   920→| DTG 190gsm Cotton Summer Short Sleeve T-Shirts for Women | 2XS–4XL | From $9.99 | — |
+   921→| DTG 190gsm Cotton Pajama Pants for Women | S–5XL | From $11.27 | — |
+   922→| DTG 190gsm Cotton Thong Underwear for Women | S–2XL | From $5.49 | — |
+   923→| 233gsm Button-Down Polo Shirt for Women | S–3XL | From $6.71 | — |
+   924→| Workout Crop Yoga Tank Top | S–2XL | From $8.53 | — |
+   925→| 180gsm Slit Fitted Camisole Cheongsam | S–4XL | From $7.78 | — |
+   926→| 160gsm One Size Ice Silk Nightdress | XL | From $6.39 | — |
+   927→| 180gsm Women's Raglan T-shirt | S–5XL | From $5.27 | Premium |
+   928→| 180gsm Women's Baseball Jacket | XS–5XL | From $9.34 | — |
+   929→| 180gsm Women's Ice Silk Top with Half-Sleeve | S–6XL | From $6.17 | Premium |
+   930→| 180gsm Women's Cool Touch Fitted Quick Dry Top | S–6XL | From $10.89 | Premium |
+   931→| 180gsm Women's Long Sleeve Quick Dry Top | S–6XL | From $8.31 | Premium |
+   932→| 300gsm Women's Long Sleeve Sweater Dress | S–2XL | From $8.91 | — |
+   933→| 180gsm V-neck Dress for Women | S–3XL | From $7.41 | — |
+   934→| 140gsm Women's Sleeveless Polo Shirt | XS–4XL | From $5.53 | — |
+   935→| 300gsm Women's Drop Shoulder Cardigan | S–3XL | From $8.96 | — |
+   936→| Women's Stand-Up Collar Fleece Jacket | S–4XL | From $9.56 | — |
+   937→| 180gsm Women's Boxer Briefs | S–3XL | From $4.20 | — |
+   938→| Stand-up Collar Fleece Casual Jacket | S–6XL | From $27.39 | Premium |
+   939→| Winter Quilted Long-Sleeve Hooded Outerwear | S–6XL | From $37.24 | Premium |
+   940→| Fleece Sweatshirt Short Jacket for Women | S–6XL | From $13.46 | Premium |
+   941→| Double-Layer Hooded Top | S–6XL | From $23.31 | Premium |
+   942→| Full-Edge Binding Slim-Fit Jacket | S–6XL | From $16.46 | Premium |
+   943→| Double-Layered Hoodie with Pockets | S–6XL | From $16.99 | Premium |
+   944→| 310gsm Adult Hooded Blanket Sweatshirt | One size | From $11.53 | — |
+   945→| DTG 260gsm Women's Cute Sweatshirt (Back Printing) | S–3XL | From $8.96 | — |
+   946→| 180gsm Collarless Dress | XS–5XL | From $7.84 | — |
+   947→| 180gsm Women's V Neck Long Sleeved Top | S–5XL | From $6.60 | — |
+   948→| Bikini Swimsuit (All-Over Printing) | XS–2XL | From $8.64 | — |
+   949→| 180gsm Women's High-Rise Panties | S–2XL | From $3.60 | — |
+   950→| 180gsm Straight-Leg Drawstring Yoga Pants | S–2XL | From $7.20 | — |
+   951→| 170gsm Women's Ruffled Sweatshirt | S–5XL | From $6.34 | — |
+   952→| 180gsm Women's Low-Rise Panties | S–2XL | From $3.24 | — |
+   953→| 180gsm Women's Wide Leg Pant | XS–3XL | From $7.20 | — |
+   954→| 180gsm Women's Drop Shoulder Shirt | S–3XL | From $8.06 | — |
+   955→| 180gsm Women's V Neck Ruffled Sleeve Top | S–3XL | From $6.34 | — |
+   956→| 180gsm Lace Thong | XS–3XL | From $3.81 | — |
+   957→| 120gsm Mediterranean Style V Neck Mid-Sleeve Robe | S–5XL | From $10.20 | — |
+   958→| 120gsm Mediterranean Style V-Neck Suit | XS–5XL | From $11.10 | — |
+   959→| 120gsm Women's Mediterranean Style Set | XS–5XL | From $15.13 | — |
+   960→| 180gsm Midi Spaghetti Strap Dress | XS–5XL | From $6.60 | — |
+   961→| 180gsm Lace-Trimmed Camisole Nightgown | S–4XL | From $6.28 | — |
+   962→| 160gsm Ice Silk Camisole Pajama Set | XS–4XL | From $10.89 | — |
+   963→| 180gsm Ruffled Short-Sleeve Pajama Set | S–5XL | From $9.60 | — |
+   964→| 180gsm Women's V-Neck Pajama Set | S–5XL | From $11.96 | — |
+   965→| 180gsm V-Neck Short Sleeve Pajama Set | S–5XL | From $9.99 | — |
+   966→| 200gsm Women's 3/4 Sleeve Top | S–3XL | From $7.67 | — |
+   967→| 200gsm Side Slit Dress | S–5XL | From $9.39 | — |
+   968→| 180gsm V-Neck Short Sleeve Top | 2XS–5XL | From $5.31 | — |
+   969→| 250gsm Women's Yoga Sports Tank | S–6XL | From $9.60 | Premium |
+   970→| Short Sleeve Collared Shirt Dress | XS–6XL | From $9.77 | — |
+   971→| One Piece Swimsuit for Women | S–2XL | From $10.89 | — |
+   972→| Women's Loose Fit Casual Pants | S–5XL | From $8.91 | — |
+   973→| Off the Shoulder Top | S–2XL | From $4.63 | — |
+   974→| 180gsm Women's Lace Panties | XS–3XL | From $3.81 | — |
+   975→| 180gsm Women's V Neck Short Sleeve T-Shirt | S–2XL | From $4.41 | — |
+   976→| 180gsm Women's Backless Top | XS–L | From $4.67 | — |
+   977→| 200gsm Women's Loungewear Pajama Set | S–5XL | From $12.77 | — |
+   978→| 300gsm Button-Up Cardigan | S–5XL | From $11.96 | — |
+   979→| 100gsm Long Sleeve Mesh T-Shirt | S–5XL | From $5.42 | — |
+   980→| 200gsm Lace Trim V-Neck 3/4 Sleeve T-Shirt | S–5XL | From $7.48 | — |
+   981→| Chic Strapless Bandana Style Bikini | XS–2XL | From $8.10 | — |
+   982→| 170gsm Women's V Neck Long Sleeve Hoodie | S–3XL | From $7.20 | — |
+   983→| 300gsm Sleeveless Cardigan Vest | S–2XL | From $7.63 | — |
+   984→| 180gsm Cropped T-Shirt | S–3XL | From $5.70 | Premium |
+   985→| 170gsm Women's Casual Blazer | S–7XL | From $9.77 | — |
+   986→| 250gsm Flannel Women's Sleep Pants | S–5XL | From $7.89 | — |
+   987→| Sheer Mesh One-Piece Swimsuit | S–2XL | From $11.31 | — |
+   988→| 210gsm One Size Flannel Nightdress | XL | From $7.63 | — |
+   989→| 210gsm V Neck Tank Top | S–3XL | From $5.06 | — |
+   990→| 180gsm Puff Short Sleeve Top | 2XS–3XL | From $6.99 | — |
+   991→| 170gsm Women's Lightweight Cardigan | S–6XL | From $8.42 | — |
+   992→| Women's Ruffle T-shirt | XS–5XL | From $6.99 | — |
+   993→| Men's POLO Shirt | S–5XL | From $10.03 | Premium |
+   994→| Women's POLO Shirt | S–5XL | From $10.03 | Premium |
+   995→| 200gsm Double Layer V-Neck Top | S–5XL | From $8.27 | Premium |
+   996→| 180gsm Short Sleeve Nightdress | S–3XL | From $5.53 | — |
+   997→| 300gsm Sleeveless Knit Sweater | S–3XL | From $5.10 | — |
+   998→| 200gsm Ruffle Sleeve Dress | S–5XL | From $7.41 | — |
+   999→| 250gsm Women's 2-Button POLO Shirt | S–6XL | From $8.96 | Premium |
+  1000→| 180gsm Short Cami Dress | XS–5XL | From $6.17 | — |
+  1001→| 200gsm Women's Lace Trim Pajama Shorts | S–5XL | From $7.20 | — |
+  1002→| 135gsm Button Down Collar Dress | S–6XL | From $12.41 | Premium |
+  1003→| 180gsm Women's Flare Sleeve Tee | XS–5XL | From $5.10 | — |
+  1004→| 180gsm Lace Trimmed Short Sleeve Nightgown | S–5XL | From $9.81 | — |
+  1005→| 200gsm Women's Ruffled Sleep Pants | S–5XL | From $8.06 | — |
+  1006→| Women's Ruffled Cover Up Dress | S–2XL | From $6.49 | — |
+  1007→| 180gsm Women's V Neck Rugby Jersey | XS–5XL | From $4.89 | — |
+  1008→| 180gsm Ruffled Yoga Skort with Pockets | XS–3XL | From $6.13 | — |
+  1009→| 195gsm Square Neck One Piece Swimsuit | S–2XL | From $8.96 | — |
+  1010→| Women's Ruffled Sleeve One Piece Swimsuit | S–2XL | From $9.17 | — |
+  1011→| 180gsm Women's Halter Tie Vest | XS–5XL | From $3.49 | — |
+  1012→| 100gsm Mesh High Stretch Dress Cover Up | S–5XL | From $7.74 | — |
+  1013→| Button Down Shirts for Women | XS–5XL | From $7.89 | — |
+  1014→| 180gsm Yoga Jogger Pants | S–2XL | From $9.13 | Premium |
+  1015→| 200gsm Square Neck Tank Top | S–5XL | From $6.49 | — |
+  1016→| Women's POLO Tank Top | XS–4XL | From $7.29 | Premium |
+  1017→| 180gsm Ruffled V Neck Dress | XS–2XL | From $9.56 | — |
+  1018→| Mesh One-Piece Swimsuit | S–2XL | From $9.13 | — |
+  1019→| 200gsm V Neck Camisole | XS–4XL | From $5.10 | — |
+  1020→| 200gsm Flared Sleeve T-shirt | S–5XL | From $5.91 | — |
+  1021→| Two-Piece Swimsuit Set | S–2XL | From $11.31 | — |
+  1022→| High Waisted Quick Drying Shorts | S–3XL | From $8.64 | Premium |
+  1023→| 170gsm Women's Cuban Collar Pajama Set | S–2XL | From $13.20 | — |
+  1024→| 180gsm Women's Short Sleeve Pajama Set | S–4XL | From $10.41 | — |
+  1025→| High Neck Tank Top | S–5XL | From $6.73 | Premium |
+  1026→| 200gsm Women's Casual V Neck Dress | S–5XL | From $6.81 | — |
+  1027→| 180gsm Flared Slit Dress | S–5XL | From $8.10 | — |
+  1028→| 200gsm V Neck Sleeveless Dress | XS–5XL | From $8.10 | Premium |
+  1029→| 120gsm Women's Ruffle Long Sleeve Robe | S–5XL | From $9.34 | — |
+  1030→| 150gsm Short Sleeved Wide Leg Pants Set | S–5XL | From $8.74 | — |
+  1031→| 120gsm Sleeveless Top and Wide Leg Pants Set | S–5XL | From $9.71 | — |
+  1032→| 150gsm Strap Top Wide Leg Pants Set | S–5XL | From $8.74 | — |
+  1033→| 200gsm Lace Trim Pajama Set | XS–2XL | From $7.41 | — |
+  1034→| 200gsm Ruffled Pajama Set | S–5XL | From $10.84 | — |
+  1035→| 200gsm Women's Button Up Vest | S–3XL | From $4.89 | — |
+  1036→| 100gsm High Neck Mesh Top For Women | S–5XL | From $5.53 | — |
+  1037→| 200gsm Casual V Neck Dress For Women | S–3XL | From $9.99 | — |
+  1038→| 180gsm Irregular Hemmed Skirt | S–3XL | From $6.13 | — |
+  1039→| 200gsm Women's High Waisted Pants | S–5XL | From $9.56 | — |
+  1040→| 200gsm Flared Sleeve Dress For Women | S–5XL | From $6.99 | — |
+  1041→| 190gsm Mesh One Piece Swimsuit For Women | S–2XL | From $12.81 | — |
+  1042→| 190gsm Strap One Piece Swimsuit For Women | S–2XL | From $12.81 | — |
+  1043→| 190gsm Women's V Neck One Piece Swimsuit | S–2XL | From $12.81 | — |
+  1044→| 180gsm Bat Sleeve Dress For Women | S–5XL | From $6.99 | — |
+  1045→| 180gsm Women's Bubble Sleeve T-Shirt | S–5XL | From $6.34 | — |
+  1046→| Women's Square Neck Long Sleeved Shirt | XS–5XL | From $6.34 | — |
+  1047→| 230gsm Off Shoulder Hoodie | S–5XL | From $6.39 | — |
+  1048→| Square Collar Long Sleeved Jumpsuit | XS–5XL | From $6.99 | — |
+  1049→| 170gsm Women's Button Up Hoodie | S–5XL | From $7.46 | — |
+  1050→| 200gsm V-Neck Pajama Set | S–3XL | From $9.34 | — |
+  1051→| 190gsm Netted Swimsuit Set For Women | S–2XL | From $13.67 | — |
+  1052→| 190gsm Sporty Bikini Swimwear Set | S–2XL | From $9.39 | — |
+  1053→| 190gsm Mesh Splicing One-Piece Swimsuit | S–2XL | From $10.03 | — |
+  1054→| 190gsm Backless One-Piece Swimsuit | S–2XL | From $11.96 | — |
+  1055→| 170gsm Casual Long Sleeve V-Neck Sweatshirt | S–5XL | From $6.81 | — |
+  1056→| 200gsm Women's Square Neckline Ruffle Dress | S–5XL | From $8.98 | Premium |
+  1057→| Women's Suit Vest | S–5XL | From $5.96 | — |
+  1058→| DTG 100gsm Cotton Women's Short Sleeved Shirt | XS–5XL | From $11.10 | — |
+  1059→| 100gsm Irregular Shirt For Women | S–3XL | From $13.46 | — |
+  1060→| DTG 110gsm Button Down Shirt For Men | XS–4XL | From $11.31 | — |
+  1061→| 200gsm Women's Straight Wide Leg Pants | S–5XL | From $8.91 | — |
+  1062→| 120gsm Lantern Long Sleeve Shirt | S–5XL | From $8.96 | — |
+  1063→| 180gsm Women's Long Sleeve Cardigan With Pockets | S–5XL | From $7.84 | — |
+  1064→| 180gsm Ankle-length Slip Dress With Straps | S–5XL | From $8.91 | — |
+  1065→| 180gsm Short Sleeved Pajama Set | S–3XL | From $8.91 | — |
+  1066→
+  1067→**POD total: 227 rows extracted.**
+  1068→
+  1069→---
+  1070→
+  1071→## PART C — Beauty / Skincare / Haircare / Makeup
+  1072→
+  1073→| Name | Concern / Ingredient Tags | Size | Price | Badge / Variants |
+  1074→|---|---|---|---|---|
+  1075→| Anti-Age Hydrogel Eye Patches | Anti-age, Niacinamide (B3) | 7 Pcs | $16.35 | New, Coming Soon |
+  1076→| Caffeine + Vitamin C Energizing Hydrogel Eye Patches | Vitamin C, Under-eye fatigue | 7 Pcs | $16.35 | New, Coming Soon |
+  1077→| Anti-Fatigue Hydrogel Eye Patches | Panthenol, Under-eye fatigue | 7 Pcs | $16.35 | New, Coming Soon |
+  1078→| Hyaluronic Hydrogel Lip Mask | Dehydrated skin, Panthenol | 7 Pcs | $20.70 | New, Coming Soon |
+  1079→| Anti-Age Peptide Collection | Anti-age, Dehydrated skin | 3 products | $48.30 | New, Collection Box |
+  1080→| Quick Refresh Dry Shampoo Spray | Propanediol, Lack of volume | 100 ml | $11.60 | New, Coming Soon |
+  1081→| Aluminum-free Roll-on Deodorant | Odor protection, Panthenol | 50 ml | $12.60 | 1 Variant |
+  1082→| Peptide Age-Defying Eye Cream | Anti-age, Vitamin C | 15 ml | $9.10 | New |
+  1083→| Peptide Ageless AM/PM Cream | Anti-age, Vitamin C | 50 ml | $12.50 | New |
+  1084→| Exosome & Niacinamide Serum | Anti-age, Lactic Acid | 30 ml | $14.20 | New |
+  1085→| Lengthening & Volumising Mascara | Peptides, Lack of volume | 6 ml | $13.30 | New |
+  1086→| Matte Lipstick, Dusty Rose | Dehydrated skin, Shea Butter | 4 g | $16.20 | New, 1 Variant |
+  1087→| Matte Lipstick, Terracotta Nude | Dehydrated skin, Shea Butter | 4 g | $16.20 | New, 1 Variant |
+  1088→| Foundation with Peptides, 05 Fair Neutral | Peptides, Dark spots | 30 ml | $16.40 | New, 9 Variants |
+  1089→| Color Correcting Ceramide Stick, 25 Medium | Damaged skin barrier, Ceramides | 12 g | $13.70 | New, 3 Variants |
+  1090→| Color Correcting Ceramide Stick, 35 Deep | Damaged skin barrier, Ceramides | 12 g | $13.70 | New, 3 Variants |
+  1091→| Correcting Concealer, 10 Light Warm | Hyaluronic Acid, Sensitive skin | 4 ml | $13.50 | New, 6 Variants |
+  1092→| Correcting Concealer, 20 Medium Warm | Hyaluronic Acid, Sensitive skin | 4 ml | $13.50 | New, 6 Variants |
+  1093→| Scalp Care Exfoliating Serum | Sodium Hyaluronate, Lack of volume | 30 ml | $13.30 | — |
+  1094→| Color Correcting Ceramide Stick, 20 Light | Damaged skin barrier, Ceramides | 12 g | $13.70 | New, 3 Variants |
+  1095→| Color Correcting Ceramide Stick, 30 Tan | Damaged skin barrier, Ceramides | 12 g | $13.70 | New, 3 Variants |
+  1096→| Correcting Concealer, 30 Tan Neutral | Hyaluronic Acid, Sensitive skin | 4 ml | $13.50 | New, 6 Variants |
+  1097→| Correcting Concealer, 35 Deep Neutral | Hyaluronic Acid, Sensitive skin | 4 ml | $13.50 | New, 6 Variants |
+  1098→| Foundation with Peptides, 10 Light Warm | Peptides, Dark spots | 30 ml | $16.40 | New, 9 Variants |
+  1099→| Foundation with Peptides, 15 Light Cool | Peptides, Dark spots | 30 ml | $16.40 | New, 9 Variants |
+  1100→| Foundation with Peptides, 20 Medium Neutral | Peptides, Dark spots | 30 ml | $16.40 | New, 9 Variants |
+
+[showing lines 701-1100 of 1247; use offset=1101 with limit to continue reading]

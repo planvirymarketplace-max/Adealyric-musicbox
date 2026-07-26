@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PageShell, PageIntro } from "./SiteChrome";
+import { SiteHeader, SiteFooter, PageIntro } from "./SiteChrome";
 import { useAppStore } from "@/lib/store";
 import { RELEASES, TOUR, type ReleaseType } from "@/lib/catalog";
 
@@ -70,28 +70,28 @@ export function DiscographyPage() {
       </section>
 
       {/* ===== SECTION 1b — Filters + Release List ===== */}
-      <section className="relative z-10 border-y border-border bg-ink/70 px-6 backdrop-blur-md md:px-12">
+      <section className="relative z-10 border-b border-black/10 bg-white px-6 md:px-12">
         <div className="mx-auto flex max-w-[1600px] flex-col justify-between gap-6 py-6 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             {TYPES.map((t) => (
-              <button key={t} onClick={() => setFilter(t)} className={`group flex items-center gap-2 border px-4 py-2 text-eyebrow transition-all cursor-pointer ${filter === t ? "border-bone bg-bone text-ink" : "border-border text-bone/70 hover:border-bone hover:text-bone"}`}>
+              <button key={t} onClick={() => setFilter(t)} className={`group flex items-center gap-2 border px-4 py-2 text-eyebrow transition-all cursor-pointer ${filter === t ? "border-black bg-black text-white" : "border-black/15 text-black/50 hover:border-black hover:text-black"}`}>
                 {t}
                 <span className="opacity-60">{counts.get(t) ?? 0}</span>
               </button>
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-eyebrow text-ash">View</span>
-            <button onClick={() => setView("path")} className={`border px-4 py-2 text-eyebrow transition-all cursor-pointer ${view === "path" ? "border-bone bg-bone text-ink" : "border-border text-bone/70 hover:text-bone"}`}>Path</button>
-            <button onClick={() => setView("grid")} className={`border px-4 py-2 text-eyebrow transition-all cursor-pointer ${view === "grid" ? "border-bone bg-bone text-ink" : "border-border text-bone/70 hover:text-bone"}`}>Grid</button>
+            <span className="text-eyebrow text-black/30">View</span>
+            <button onClick={() => setView("path")} className={`border px-4 py-2 text-eyebrow transition-all cursor-pointer ${view === "path" ? "border-black bg-black text-white" : "border-black/15 text-black/50 hover:border-black hover:text-black"}`}>Path</button>
+            <button onClick={() => setView("grid")} className={`border px-4 py-2 text-eyebrow transition-all cursor-pointer ${view === "grid" ? "border-black bg-black text-white" : "border-black/15 text-black/50 hover:border-black hover:text-black"}`}>Grid</button>
           </div>
         </div>
       </section>
 
       {view === "path" ? (
-        <section className="relative z-10 px-6 py-20 md:px-12 md:py-32">
+        <section className="relative z-10 bg-white px-6 py-20 md:px-12 md:py-32">
           <div className="mx-auto max-w-[1600px]">
-            <ul className="divide-y divide-border border-y border-border">
+            <ul className="divide-y divide-black/10 border-y border-black/10">
               {filtered.map((r, i) => {
                 const isActive = active?.slug === r.slug;
                 return (
@@ -101,43 +101,43 @@ export function DiscographyPage() {
                       className="relative flex w-full items-center justify-between gap-8 py-6 md:py-10 text-left cursor-pointer"
                     >
                       <div className="flex items-baseline gap-6 md:gap-12">
-                        <span className="text-eyebrow w-14 text-ash md:w-20">{String(i + 1).padStart(2, "0")}</span>
-                        <span className="text-eyebrow hidden text-ash md:inline-block md:w-32">{r.type}</span>
-                        <h3 className={`text-display text-[clamp(2.5rem,7vw,7rem)] leading-none transition-all duration-500 ${isActive ? "translate-x-4 text-bone" : "text-bone/60 group-hover:text-bone"}`}>{r.title}</h3>
+                        <span className="text-eyebrow w-14 text-black/30 md:w-20">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-eyebrow hidden text-black/30 md:inline-block md:w-32">{r.type}</span>
+                        <h3 className={`text-display text-[clamp(2.5rem,7vw,7rem)] leading-none transition-all duration-500 ${isActive ? "translate-x-4 text-black" : "text-black/40 group-hover:text-black"}`}>{r.title}</h3>
                       </div>
                       <div className="flex items-center gap-4 md:gap-8">
-                        <span className="text-eyebrow text-ash">{r.year}</span>
-                        <span className="hidden text-eyebrow text-ash md:inline">{r.runtime}</span>
-                        <span className={`grid h-12 w-12 place-items-center border border-border transition-all duration-500 ${isActive ? "rotate-45 border-bone bg-bone text-ink" : "text-bone"}`}>
+                        <span className="text-eyebrow text-black/30">{r.year}</span>
+                        <span className="hidden text-eyebrow text-black/30 md:inline">{r.runtime}</span>
+                        <span className={`grid h-12 w-12 place-items-center border border-black/10 transition-all duration-500 ${isActive ? "rotate-45 border-black bg-black text-white" : "text-black/40"}`}>
                           <ArrowIcon />
                         </span>
                       </div>
-                      <div className={`pointer-events-none absolute right-[15%] top-1/2 hidden aspect-[3/4] w-56 -translate-y-1/2 overflow-hidden border border-border shadow-2xl transition-all duration-500 md:block ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
-                        <img src={r.cover} alt="" className="h-full w-full object-cover grayscale" />
+                      <div className={`pointer-events-none absolute right-[15%] top-1/2 hidden aspect-[3/4] w-56 -translate-y-1/2 overflow-hidden border border-black/10 shadow-2xl transition-all duration-500 md:block ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
+                        <img src={r.cover} alt="" className="h-full w-full object-cover" />
                       </div>
                     </button>
                   </li>
                 );
               })}
             </ul>
-            {filtered.length === 0 && <div className="py-24 text-center text-ash">No releases in this format yet.</div>}
+            {filtered.length === 0 && <div className="py-24 text-center text-black/30">No releases in this format yet.</div>}
           </div>
         </section>
       ) : (
-        <section className="relative z-10 px-6 py-20 md:px-12 md:py-32">
+        <section className="relative z-10 bg-white px-6 py-20 md:px-12 md:py-32">
           <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-4 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
             {filtered.map((r) => (
-              <button key={r.slug} onClick={() => setDetailSlug(r.slug, "release")} className="group relative block aspect-square overflow-hidden border border-border cursor-pointer">
-                <img src={r.cover} alt={r.title} className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />
+              <button key={r.slug} onClick={() => setDetailSlug(r.slug, "release")} className="group relative block aspect-square overflow-hidden border border-black/10 cursor-pointer">
+                <img src={r.cover} alt={r.title} className="absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-between p-5">
                   <div className="flex items-center justify-between">
-                    <span className="text-eyebrow text-bone">{r.type}</span>
-                    <span className="text-eyebrow text-bone">{r.year}</span>
+                    <span className="text-eyebrow text-white">{r.type}</span>
+                    <span className="text-eyebrow text-white">{r.year}</span>
                   </div>
                   <div>
-                    <h3 className="text-display text-2xl text-bone md:text-3xl">{r.title}</h3>
-                    <div className="mt-2 text-eyebrow text-bone/60">{r.runtime}</div>
+                    <h3 className="text-display text-2xl text-white md:text-3xl">{r.title}</h3>
+                    <div className="mt-2 text-eyebrow text-white/60">{r.runtime}</div>
                   </div>
                 </div>
               </button>
@@ -147,25 +147,25 @@ export function DiscographyPage() {
       )}
 
       {/* ===== SECTION 2 — Music Player ===== */}
-      <section className="border-t border-border px-6 py-20 md:px-12 md:py-32">
+      <section className="border-t border-black/10 bg-white px-6 py-20 md:px-12 md:py-32">
         <div className="mx-auto max-w-[1600px]">
-          <div className="text-eyebrow mb-4 text-ash">02 — Player</div>
-          <h2 className="text-display text-4xl text-bone md:text-6xl">
-            Continuous, <span className="italic text-ash">uninterrupted.</span>
+          <div className="text-eyebrow mb-4 text-black/30">02 — Player</div>
+          <h2 className="text-display text-4xl text-black md:text-6xl">
+            Continuous, <span className="italic text-black/40">uninterrupted.</span>
           </h2>
-          <p className="mt-4 max-w-lg text-base text-bone/60">The full catalog, in a single player. Every track from every release.</p>
+          <p className="mt-4 max-w-lg text-base text-black/50">The full catalog, in a single player. Every track from every release.</p>
         </div>
       </section>
 
-      <section className="px-6 pb-32 md:px-12">
+      <section className="bg-white px-6 pb-32 md:px-12">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="sticky top-32">
-              <div className="relative aspect-square overflow-hidden border border-border">
+              <div className="relative aspect-square overflow-hidden border border-black/10">
                 <img src={track.release.cover} alt={track.release.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <button onClick={() => setPlaying((v) => !v)} className="absolute inset-0 grid place-items-center cursor-pointer">
-                  <span className="grid h-24 w-24 place-items-center border border-bone/60 bg-ink/40 text-bone backdrop-blur-sm transition-all hover:scale-110 hover:bg-bone hover:text-ink">
+                  <span className="grid h-24 w-24 place-items-center border border-white/60 bg-black/40 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-white hover:text-black">
                     {playing ? (
                       <svg viewBox="0 0 24 24" className="h-8 w-8" fill="currentColor" aria-hidden>
                         <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
@@ -178,30 +178,30 @@ export function DiscographyPage() {
                   </span>
                 </button>
               </div>
-              <div className="mt-6 text-eyebrow text-ash">{track.release.type} · {track.release.year}</div>
-              <h3 className="mt-2 text-display text-4xl text-bone md:text-5xl">{track.title}</h3>
+              <div className="mt-6 text-eyebrow text-black/30">{track.release.type} · {track.release.year}</div>
+              <h3 className="mt-2 text-display text-4xl text-black md:text-5xl">{track.title}</h3>
               <button
                 onClick={() => { setDetailSlug(track.release.slug, "release"); }}
-                className="mt-2 inline-block text-bone/70 hover:text-bone cursor-pointer"
+                className="mt-2 inline-block text-black/50 hover:text-black cursor-pointer"
               >
                 from <span className="italic">{track.release.title}</span>
               </button>
-              <div className="mt-8 flex items-center gap-4 text-eyebrow text-ash">
+              <div className="mt-8 flex items-center gap-4 text-eyebrow text-black/30">
                 <span>0:00</span>
-                <div className="relative h-px flex-1 bg-border">
-                  <div className={`absolute inset-y-0 left-0 bg-bone transition-all duration-1000 ${playing ? "w-1/3" : "w-0"}`} />
+                <div className="relative h-px flex-1 bg-black/10">
+                  <div className={`absolute inset-y-0 left-0 bg-black transition-all duration-1000 ${playing ? "w-1/3" : "w-0"}`} />
                 </div>
                 <span>{track.length}</span>
               </div>
               <div className="mt-6 flex gap-2">
-                <button onClick={() => setCurrent((c) => Math.max(0, c - 1))} className="grid h-12 w-12 place-items-center border border-border text-bone hover:border-bone cursor-pointer">‹</button>
-                <button onClick={() => setPlaying((v) => !v)} className="grid h-12 w-12 place-items-center border border-bone bg-bone text-ink cursor-pointer">{playing ? "❚❚" : "▶"}</button>
-                <button onClick={() => setCurrent((c) => Math.min(allTracks.length - 1, c + 1))} className="grid h-12 w-12 place-items-center border border-border text-bone hover:border-bone cursor-pointer">›</button>
+                <button onClick={() => setCurrent((c) => Math.max(0, c - 1))} className="grid h-12 w-12 place-items-center border border-black/10 text-black/50 hover:border-black cursor-pointer">‹</button>
+                <button onClick={() => setPlaying((v) => !v)} className="grid h-12 w-12 place-items-center border border-black bg-black text-white cursor-pointer">{playing ? "❚❚" : "▶"}</button>
+                <button onClick={() => setCurrent((c) => Math.min(allTracks.length - 1, c + 1))} className="grid h-12 w-12 place-items-center border border-black/10 text-black/50 hover:border-black cursor-pointer">›</button>
               </div>
             </div>
           </div>
           <div className="md:col-span-7">
-            <div className="text-eyebrow mb-4 text-ash">Queue · {allTracks.length} tracks</div>
+            <div className="text-eyebrow mb-4 text-black/30">Queue · {allTracks.length} tracks</div>
             <ul>
               {allTracks.map((tr, i) => {
                 const isActive = i === current;
@@ -209,16 +209,16 @@ export function DiscographyPage() {
                   <li key={`${tr.release.slug}-${tr.n}`}>
                     <button
                       onClick={() => { setCurrent(i); setPlaying(true); }}
-                      className={`group flex w-full items-center justify-between gap-6 border-t border-border py-4 text-left last:border-b transition-colors ${isActive ? "text-bone" : "text-bone/60 hover:text-bone"} cursor-pointer`}
+                      className={`group flex w-full items-center justify-between gap-6 border-t border-black/10 py-4 text-left last:border-b transition-colors ${isActive ? "text-black" : "text-black/40 hover:text-black"} cursor-pointer`}
                     >
                       <div className="flex items-center gap-6">
-                        <span className="text-eyebrow w-6 text-ash">{isActive && playing ? "♪" : String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-eyebrow w-6 text-black/30">{isActive && playing ? "♪" : String(i + 1).padStart(2, "0")}</span>
                         <div>
                           <div className="text-display text-xl md:text-2xl">{tr.title}</div>
-                          <div className="text-eyebrow mt-1 text-ash">{tr.release.title}</div>
+                          <div className="text-eyebrow mt-1 text-black/30">{tr.release.title}</div>
                         </div>
                       </div>
-                      <span className="text-eyebrow text-ash">{tr.length}</span>
+                      <span className="text-eyebrow text-black/30">{tr.length}</span>
                     </button>
                   </li>
                 );
@@ -236,16 +236,20 @@ export function DiscographyPage() {
    ===================================================================== */
 
 export function ReleaseDetailPage() {
-  const { detailSlug, setDetailSlug } = useAppStore();
+  const { detailSlug, setDetailSlug, setActiveTab } = useAppStore();
   const r = RELEASES.find((x) => x.slug === detailSlug);
   if (!r) return null;
   const idx = RELEASES.findIndex((x) => x.slug === r.slug);
   const prev = RELEASES[idx - 1];
   const next = RELEASES[idx + 1];
 
+  const goToShop = () => { setDetailSlug(null, null); setActiveTab("shop"); };
+
   return (
-    <PageShell>
-      <section className="relative min-h-[90svh] overflow-hidden">
+    <>
+      <SiteHeader light={false} />
+      {/* DARK HERO */}
+      <section className="relative min-h-[80svh] overflow-hidden bg-ink text-bone">
         <img src={r.bgImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40 grayscale" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/60 via-ink/40 to-ink" />
         <div className="relative z-10 mx-auto grid max-w-[1600px] grid-cols-1 items-end gap-16 px-6 pb-16 pt-40 md:grid-cols-12 md:px-12 md:pb-24 md:pt-56">
@@ -268,59 +272,65 @@ export function ReleaseDetailPage() {
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
                 Play
               </button>
+              <button onClick={goToShop} className="inline-flex items-center gap-3 border border-bone bg-bone px-8 py-4 text-eyebrow text-ink transition-all hover:bg-transparent hover:text-bone cursor-pointer">
+                Buy Now
+              </button>
               <button className="inline-flex items-center gap-3 border border-border px-8 py-4 text-eyebrow text-bone transition-all hover:border-bone cursor-pointer">Spotify ↗</button>
               <button className="inline-flex items-center gap-3 border border-border px-8 py-4 text-eyebrow text-bone transition-all hover:border-bone cursor-pointer">Apple Music ↗</button>
             </div>
           </div>
         </div>
       </section>
-      <section className="relative bg-ink px-6 py-24 md:px-12 md:py-32">
+      {/* WHITE CONTENT — Tracklist */}
+      <section className="relative bg-white text-black px-6 py-24 md:px-12 md:py-32">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
           <div className="md:col-span-4">
-            <div className="text-eyebrow text-ash">Tracklist</div>
-            <h2 className="mt-6 text-display text-6xl text-bone">Every bar,<br /><span className="italic text-ash">in order.</span></h2>
-            <p className="mt-6 text-bone/60">{r.credits}</p>
+            <div className="text-eyebrow text-black/30">Tracklist</div>
+            <h2 className="mt-6 text-display text-6xl text-black">Every bar,<br /><span className="italic text-black/40">in order.</span></h2>
+            <p className="mt-6 text-black/50">{r.credits}</p>
           </div>
           <ul className="md:col-span-8">
             {r.tracks.map((t) => (
-              <li key={t.n} className="group flex items-center justify-between gap-8 border-t border-border py-6 last:border-b">
+              <li key={t.n} className="group flex items-center justify-between gap-8 border-t border-black/10 py-6 last:border-b">
                 <div className="flex items-center gap-6 md:gap-10">
-                  <span className="text-eyebrow w-8 text-ash">{String(t.n).padStart(2, "0")}</span>
-                  <button className="grid h-10 w-10 place-items-center border border-border text-bone opacity-0 transition-all group-hover:opacity-100 group-hover:border-bone cursor-pointer">
+                  <span className="text-eyebrow w-8 text-black/30">{String(t.n).padStart(2, "0")}</span>
+                  <button className="grid h-10 w-10 place-items-center border border-black/10 text-black/30 opacity-0 transition-all group-hover:opacity-100 group-hover:border-black cursor-pointer">
                     <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
                   </button>
                   <div>
-                    <div className="text-display text-2xl text-bone md:text-3xl">{t.title}</div>
-                    {t.feat && <div className="text-eyebrow mt-1 text-ash">feat. {t.feat}</div>}
+                    <div className="text-display text-2xl text-black md:text-3xl">{t.title}</div>
+                    {t.feat && <div className="text-eyebrow mt-1 text-black/30">feat. {t.feat}</div>}
                   </div>
                 </div>
-                <span className="text-eyebrow text-ash">{t.length}</span>
+                <span className="text-eyebrow text-black/30">{t.length}</span>
               </li>
             ))}
           </ul>
         </div>
       </section>
-      <section className="grid grid-cols-1 border-t border-border md:grid-cols-2">
+      {/* WHITE CONTENT — Prev/Next */}
+      <section className="grid grid-cols-1 border-t border-black/10 bg-white md:grid-cols-2">
         {prev ? (
-          <button onClick={() => setDetailSlug(prev.slug, "release")} className="group relative flex flex-col justify-between gap-6 border-b border-border p-8 transition-colors hover:bg-mist md:border-b-0 md:border-r md:p-12 cursor-pointer text-left">
-            <div className="text-eyebrow text-ash">← Previous</div>
+          <button onClick={() => setDetailSlug(prev.slug, "release")} className="group relative flex flex-col justify-between gap-6 border-b border-black/10 p-8 transition-colors hover:bg-black/[0.02] md:border-b-0 md:border-r md:p-12 cursor-pointer text-left">
+            <div className="text-eyebrow text-black/30">← Previous</div>
             <div>
-              <div className="text-eyebrow text-ash">{prev.year} · {prev.type}</div>
-              <div className="mt-3 text-display text-4xl text-bone md:text-6xl">{prev.title}</div>
+              <div className="text-eyebrow text-black/30">{prev.year} · {prev.type}</div>
+              <div className="mt-3 text-display text-4xl text-black md:text-6xl">{prev.title}</div>
             </div>
           </button>
         ) : <div className="hidden md:block" />}
         {next ? (
-          <button onClick={() => setDetailSlug(next.slug, "release")} className="group relative flex flex-col items-end justify-between gap-6 p-8 transition-colors hover:bg-mist md:p-12 cursor-pointer text-right">
-            <div className="text-eyebrow text-ash">Next →</div>
+          <button onClick={() => setDetailSlug(next.slug, "release")} className="group relative flex flex-col items-end justify-between gap-6 p-8 transition-colors hover:bg-black/[0.02] md:p-12 cursor-pointer text-right">
+            <div className="text-eyebrow text-black/30">Next →</div>
             <div className="text-right">
-              <div className="text-eyebrow text-ash">{next.year} · {next.type}</div>
-              <div className="mt-3 text-display text-4xl text-bone md:text-6xl">{next.title}</div>
+              <div className="text-eyebrow text-black/30">{next.year} · {next.type}</div>
+              <div className="mt-3 text-display text-4xl text-black md:text-6xl">{next.title}</div>
             </div>
           </button>
         ) : <div className="hidden md:block" />}
       </section>
-    </PageShell>
+      <SiteFooter />
+    </>
   );
 }
 
@@ -329,26 +339,35 @@ export function ReleaseDetailPage() {
    ===================================================================== */
 
 export function TourPage() {
+  const { setActiveTab } = useAppStore();
   return (
     <>
-      <PageIntro eyebrow="On the road" title="Tour," italic="live." sub="Direct ticket purchase. Calendar links. Automated map at every stop." />
-      <section className="px-6 pb-24 md:px-12">
+      <PageIntro eyebrow="On the road" title="Tour," italic="live." sub="Direct ticket purchase. Calendar links. Automated map at every stop." dark />
+      <section className="bg-white px-6 pb-12 md:px-12">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between">
+          <p className="text-[11px] text-black/30">{TOUR.length} dates</p>
+          <button onClick={() => setActiveTab("booking")} className="inline-flex items-center gap-3 border border-black bg-black px-6 py-3 text-[12px] uppercase tracking-[0.15em] text-white transition-all hover:bg-black/80 cursor-pointer">
+            Book Adea →
+          </button>
+        </div>
+      </section>
+      <section className="bg-white px-6 pb-24 md:px-12">
         <div className="mx-auto max-w-[1600px]">
-          <ul className="divide-y divide-border border-y border-border">
+          <ul className="divide-y divide-black/10 border-y border-black/10">
             {TOUR.map((d: { date: string; city: string; venue: string; status: string }, i: number) => {
               const sold = d.status === "Sold Out";
               return (
                 <li key={i} className="group grid grid-cols-1 items-center gap-4 py-8 md:grid-cols-12 md:py-12">
-                  <div className="text-display text-4xl text-bone md:col-span-2 md:text-6xl">{d.date}</div>
+                  <div className="text-display text-4xl text-black md:col-span-2 md:text-6xl">{d.date}</div>
                   <div className="md:col-span-4">
-                    <div className="text-display text-2xl text-bone md:text-4xl">{d.city}</div>
-                    <div className="text-eyebrow mt-1 text-ash">{d.venue}</div>
+                    <div className="text-display text-2xl text-black md:text-4xl">{d.city}</div>
+                    <div className="text-eyebrow mt-1 text-black/30">{d.venue}</div>
                   </div>
                   <div className="md:col-span-3">
-                    <span className={`text-eyebrow ${sold ? "text-ash" : d.status === "Low" ? "text-bone" : "text-bone/70"}`}>{d.status}</span>
+                    <span className={`text-eyebrow ${sold ? "text-black/20" : d.status === "Low" ? "text-black" : "text-black/50"}`}>{d.status}</span>
                   </div>
                   <div className="md:col-span-3 md:text-right">
-                    <button disabled={sold} className={`inline-flex items-center gap-3 border px-6 py-3 text-eyebrow transition-all cursor-pointer ${sold ? "cursor-not-allowed border-border text-ash" : "border-bone text-bone hover:bg-bone hover:text-ink"}`}>
+                    <button disabled={sold} className={`inline-flex items-center gap-3 border px-6 py-3 text-eyebrow transition-all cursor-pointer ${sold ? "cursor-not-allowed border-black/10 text-black/20" : "border-black text-black hover:bg-black hover:text-white"}`}>
                       {sold ? "Sold Out" : "Tickets →"}
                     </button>
                   </div>
