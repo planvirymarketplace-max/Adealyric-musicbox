@@ -398,3 +398,26 @@ Stage Summary:
 - Full category taxonomy: 4 top-level nodes, 15+ second-level nodes, 40+ third-level leaf nodes
 - Product_Attributes table in Prisma with indexes on productId, category, sizeType, availability
 - All changes browser-verified and lint-clean
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Fix album detail button text hierarchy to match blueprint
+
+Work Log:
+- User identified that the 4 action buttons had INVERTED text hierarchy (5th time this issue recurred)
+- Analyzed blueprint image: label text should be ghost-faint (~15% opacity), description should be solid black
+- Previous implementation had label as font-semibold (dark) and description as text-black/40 (faint) — exactly backwards
+- Also identified over-engineering: removed hover:scale-105, hover:bg-black/[0.03], group-hover:translate-x-1, transition-all
+- Rewrote all 4 button rows: text-black/15 for labels, font-medium text-black for descriptions
+- Changed from space-y-3 (12px) to gap-4 (16px) for more breathing room
+- Changed from py-5 to py-6 for taller rows
+- Changed from max-w-2xl to max-w-xl for narrower container
+- Removed all group/hover transition classes — clean, still design
+- VLM confirmed: labels are FAINT, descriptions are SOLID BLACK across all buttons
+
+Stage Summary:
+- Text hierarchy now matches blueprint: label=faint ghost, description=solid black
+- All hover micro-interactions removed for clean stillness
+- Generous spacing restored (gap-4, py-6)
+- Container narrowed to max-w-xl

@@ -535,89 +535,89 @@ export function AlbumDetailPage() {
             </div>
           </div>
 
-          {/* ── Action Buttons ── */}
-          <div className="mt-12 max-w-2xl space-y-3">
+          {/* ── Action Rows ── */}
+          <div className="mt-12 max-w-xl flex flex-col gap-4">
             {/* Stream Album */}
             <button
               onClick={() => openStream(album.title + " — Album")}
-              className="w-full flex items-center gap-5 border border-black/12 px-6 py-5 bg-white hover:bg-black/[0.03] hover:border-black/25 transition-all cursor-pointer group"
+              className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-white group-hover:scale-105 transition-transform">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
                 <Play className="h-5 w-5 ml-0.5" />
               </span>
               <div className="flex-1 text-left">
-                <p className="text-[15px] font-semibold tracking-wide">Stream Album</p>
-                <p className="mt-0.5 text-[12px] text-black/40">All platforms</p>
+                <p className="text-[13px] text-black/15">Stream Album</p>
+                <p className="mt-0.5 text-[14px] font-medium text-black">All platforms</p>
               </div>
-              <ArrowRight className="h-5 w-5 text-black/20 group-hover:text-black/60 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="h-4 w-4 text-black" />
             </button>
 
             {/* Stream Single */}
             {album.singleTitle && (
               <button
                 onClick={() => openStream(album.singleTitle! + " — Single")}
-                className="w-full flex items-center gap-5 border border-black/12 px-6 py-5 bg-white hover:bg-black/[0.03] hover:border-black/25 transition-all cursor-pointer group"
+                className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
               >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-white group-hover:scale-105 transition-transform">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
                   <Play className="h-5 w-5 ml-0.5" />
                 </span>
                 <div className="flex-1 text-left">
-                  <p className="text-[15px] font-semibold tracking-wide">Stream Single</p>
-                  <p className="mt-0.5 text-[12px] text-black/40">{album.singleTitle}</p>
+                  <p className="text-[13px] text-black/15">Stream Single</p>
+                  <p className="mt-0.5 text-[14px] font-medium text-black">{album.singleTitle}</p>
                 </div>
-                <ArrowRight className="h-5 w-5 text-black/20 group-hover:text-black/60 group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="h-4 w-4 text-black" />
               </button>
             )}
 
             {/* Add to Cart — Digital */}
             <button
               onClick={() => addToCart()}
-              className="w-full flex items-center gap-5 border border-black/12 px-6 py-5 bg-white hover:bg-black/[0.03] hover:border-black/25 transition-all cursor-pointer group"
+              className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-black text-white group-hover:scale-105 transition-transform">
-                <Plus className="h-6 w-6" />
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black text-white">
+                <Plus className="h-5 w-5" />
               </span>
               <div className="flex-1 text-left">
-                <p className="text-[15px] font-semibold tracking-wide">Add to Cart — Digital</p>
-                <p className="mt-0.5 text-[12px] text-black/40">Digital download</p>
+                <p className="text-[13px] text-black/15">Add to Cart — Digital</p>
+                <p className="mt-0.5 text-[14px] font-medium text-black">Digital download</p>
               </div>
-              <span className="text-[16px] font-semibold tabular-nums">${digitalPrice}.00</span>
+              <span className="text-[14px] text-black/15 tabular-nums">${digitalPrice}.00</span>
             </button>
 
             {/* Add to Cart — Vinyl */}
             <button
               onClick={() => addToCart()}
               disabled={!vinylProduct || vinylProduct.stock === 0}
-              className={`w-full flex items-center gap-5 border px-6 py-5 transition-all group ${
+              className={`w-full flex items-center gap-4 border rounded-md px-5 py-6 ${
                 vinylProduct && vinylProduct.stock > 0
-                  ? "border-black/12 bg-white hover:bg-black/[0.03] hover:border-black/25 cursor-pointer"
-                  : "border-black/5 bg-black/[0.02] opacity-50 cursor-not-allowed"
+                  ? "border-black/10 bg-white cursor-pointer"
+                  : "border-black/5 bg-black/[0.01] opacity-40 cursor-not-allowed"
               }`}
             >
-              <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg transition-transform ${
+              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${
                 vinylProduct && vinylProduct.stock > 0
-                  ? "bg-black text-white group-hover:scale-105"
-                  : "bg-black/10 text-black/30"
+                  ? "bg-black text-white"
+                  : "bg-black/8 text-black/25"
               }`}>
-                <Plus className="h-6 w-6" />
+                <Plus className="h-5 w-5" />
               </span>
               <div className="flex-1 text-left">
-                <p className={`text-[15px] font-semibold tracking-wide ${vinylProduct && vinylProduct.stock > 0 ? "" : "text-black/40"}`}>
+                <p className={`text-[13px] ${vinylProduct && vinylProduct.stock > 0 ? "text-black/15" : "text-black/10"}`}>
                   Add to Cart — Vinyl
                 </p>
-                <p className={`mt-0.5 text-[12px] ${vinylProduct && vinylProduct.stock > 0 ? "text-black/40" : "text-black/25"}`}>
+                <p className={`mt-0.5 text-[14px] font-medium ${vinylProduct && vinylProduct.stock > 0 ? "text-black" : "text-black/30"}`}>
                   {vinylProduct && vinylProduct.stock > 0 ? "180g heavyweight vinyl" : "Currently unavailable"}
                 </p>
               </div>
               {vinylProduct && vinylProduct.stock > 0 ? (
-                <span className="text-[16px] font-semibold tabular-nums">${vinylProduct.price}.00</span>
+                <span className="text-[14px] text-black/15 tabular-nums">${vinylProduct.price}.00</span>
               ) : (
-                <span className="text-[12px] uppercase tracking-widest text-black/30">Sold Out</span>
+                <span className="text-[11px] uppercase tracking-widest text-black/20">Sold Out</span>
               )}
             </button>
 
             {/* Availability */}
-            <p className="pt-2 text-[11px] text-black/30">
+            <p className="pt-1 text-[11px] text-black/25">
               {availableCount} of {album.merch.length} items available
             </p>
           </div>
