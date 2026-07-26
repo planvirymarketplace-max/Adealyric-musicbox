@@ -8,6 +8,7 @@ const NAV: { label: string; id: TabId }[] = [
   { label: "Discography", id: "discography" },
   { label: "Tour", id: "tour" },
   { label: "Shop", id: "shop" },
+  { label: "Get the Look", id: "getthelook" },
   { label: "Bio", id: "bio" },
 ];
 
@@ -15,6 +16,9 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const { activeTab, setActiveTab, cartCount } = useAppStore();
+
+  // Interior pages have white bg — header needs solid dark bg
+  const isLightPage = activeTab !== "home";
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20);
@@ -143,7 +147,7 @@ export function SiteFooter() {
             </button>
             <p className="mt-6 max-w-md text-base leading-relaxed text-ash">The sound of West Philly. Singer, songwriter, and producer creating every record from the soul.</p>
           </div>
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-5 md:col-span-8">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-5 md:col-span-8">
             {FOOTER_LINKS.map((col) => (
               <div key={col.heading}>
                 <div className="text-eyebrow mb-5 text-bone/50">{col.heading}</div>

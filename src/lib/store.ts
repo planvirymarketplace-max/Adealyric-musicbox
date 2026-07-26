@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type TabId = "home" | "discography" | "shop" | "tour" | "booking" | "bio" | "account" | "off" | "login" | "admin" | "portal";
+export type TabId = "home" | "discography" | "shop" | "tour" | "booking" | "bio" | "getthelook" | "account" | "off" | "login" | "admin" | "portal";
 
 export interface AdminRoute {
   path: string;

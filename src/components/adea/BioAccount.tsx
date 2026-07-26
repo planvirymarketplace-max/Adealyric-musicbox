@@ -12,7 +12,7 @@ export function BioPage() {
       <PageIntro eyebrow="The Artist" title="Adea Lyric," italic="in her own key." dark />
       <section className="bg-white px-6 pb-24 md:px-12">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
-          <div className="space-y-8 text-xl leading-relaxed text-black/70 md:col-span-7">
+          <div className="space-y-8 text-xl leading-relaxed text-black md:col-span-7">
             <p>
               Since stepping into the public spotlight in 2017, Adea has remained true to her
               artistry, refusing to compromise her sound or vision.
@@ -24,14 +24,14 @@ export function BioPage() {
             </p>
             <p className="text-display text-4xl leading-tight text-black md:text-6xl">
               Adea Lyric isn&apos;t chasing a sound.{" "}
-              <span className="italic text-black/40">She is the sound of West Philly.</span>
+              <span className="italic text-black">She is the sound of West Philly.</span>
             </p>
           </div>
           <aside className="md:col-span-4 md:col-start-9">
             <div className="grid grid-cols-2 gap-4">
               {[["Since", "2017"], ["Home", "W. Philly"], ["Releases", "5+"], ["Label", "Indie"]].map(([k, v]) => (
                 <div key={k} className="border border-black/10 p-6">
-                  <div className="text-eyebrow text-black/30">{k}</div>
+                  <div className="text-eyebrow text-black">{k}</div>
                   <div className="mt-2 text-display text-3xl text-black">{v}</div>
                 </div>
               ))}

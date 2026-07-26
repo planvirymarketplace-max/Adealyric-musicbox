@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
 import { PlatformIcon } from "./SiteChrome";
 import {
@@ -109,14 +109,14 @@ function ProductCard({ product, onSelect, onQuickAdd }: { product: ShopProduct; 
         )}
         {!available && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
-            <span className="text-[11px] font-medium uppercase tracking-widest text-black/40">Sold Out</span>
+            <span className="text-[11px] font-medium uppercase tracking-widest text-black">Sold Out</span>
           </div>
         )}
       </div>
       <div className="mt-3">
         <p className="text-[12px] font-medium uppercase tracking-wide text-black/80 leading-tight line-clamp-1">{product.name}</p>
         <div className="mt-1 flex items-center gap-3">
-          <span className={`text-sm ${available ? "text-black" : "text-black/30"}`}>{available ? `$${product.price}.00` : "Sold Out"}</span>
+          <span className={`text-sm ${available ? "text-black" : "text-black"}`}>{available ? `$${product.price}.00` : "Sold Out"}</span>
         </div>
         {product.colors.length > 0 && (
           <div className="mt-2 flex gap-1.5">
@@ -171,7 +171,7 @@ function CategorySidebar({
           className={`w-full flex items-center justify-between py-1.5 text-left text-[11px] tracking-wide cursor-pointer transition-colors hover:text-black ${
             isLeaf && selected && JSON.stringify(selected) === JSON.stringify(node.categories)
               ? "text-black font-medium"
-              : "text-black/50"
+              : "text-black"
           }`}
           style={{ paddingLeft: `${depth * 14}px` }}
         >
@@ -190,9 +190,9 @@ function CategorySidebar({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">Categories</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-black">Categories</p>
         {selected && (
-          <button onClick={() => onChange(null)} className="text-[10px] uppercase tracking-wider text-black/30 hover:text-black cursor-pointer underline">Clear</button>
+          <button onClick={() => onChange(null)} className="text-[10px] uppercase tracking-wider text-black hover:text-black cursor-pointer underline">Clear</button>
         )}
       </div>
       {CATEGORY_TREE.map((node) => renderNode(node, 0))}
@@ -228,10 +228,10 @@ function SizeFilter({ categories, selected, onChange }: { categories: ShopCatego
 
   return (
     <div className="mt-6">
-      <p className="text-[10px] uppercase tracking-[0.2em] text-black/30 mb-3">{label}</p>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-black mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((s) => (
-          <button key={s} onClick={() => onChange(selected === s ? null : s)} className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border transition-all cursor-pointer ${selected === s ? "bg-black text-white border-black" : "bg-white text-black/50 border-black/15 hover:border-black/40"}`}>{s}</button>
+          <button key={s} onClick={() => onChange(selected === s ? null : s)} className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border transition-all cursor-pointer ${selected === s ? "bg-black text-white border-black" : "bg-white text-black border-black/15 hover:border-black/40"}`}>{s}</button>
         ))}
       </div>
     </div>
@@ -254,12 +254,12 @@ function ShopNav({ active, onChange, cartCount }: { active: ShopPath; onChange: 
     <div className="flex items-center justify-between border-b border-black/10">
       <div className="flex items-center gap-8">
         {tabs.map((t) => (
-          <button key={t.key} onClick={() => onChange(t.key)} className={`relative pb-3 text-[12px] font-medium uppercase tracking-[0.15em] transition-colors cursor-pointer ${active === t.key ? "text-black border-b-2 border-black" : "text-black/40 hover:text-black/70 border-b-2 border-transparent"}`}>
+          <button key={t.key} onClick={() => onChange(t.key)} className={`relative pb-3 text-[12px] font-medium uppercase tracking-[0.15em] transition-colors cursor-pointer ${active === t.key ? "text-black border-b-2 border-black" : "text-black hover:text-black/70 border-b-2 border-transparent"}`}>
             {t.label}
           </button>
         ))}
       </div>
-      <span className="text-[11px] text-black/30">Cart ({cartCount})</span>
+      <span className="text-[11px] text-black">Cart ({cartCount})</span>
     </div>
   );
 }
@@ -268,7 +268,7 @@ function ShopNav({ active, onChange, cartCount }: { active: ShopPath; onChange: 
 function AlbumsView({ onAlbumClick }: { onAlbumClick: (a: ShopAlbum) => void }) {
   return (
     <div className="mt-10">
-      <p className="text-[11px] text-black/30 mb-8">{SHOP_ALBUMS.length} albums</p>
+      <p className="text-[11px] text-black mb-8">{SHOP_ALBUMS.length} albums</p>
       <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {SHOP_ALBUMS.map((album) => (
           <div key={album.slug} className="group cursor-pointer" onClick={() => onAlbumClick(album)}>
@@ -282,7 +282,7 @@ function AlbumsView({ onAlbumClick }: { onAlbumClick: (a: ShopAlbum) => void }) 
             </div>
             <div className="mt-4">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-black">{album.title}</h3>
-              <p className="mt-1 text-[11px] text-black/40 uppercase tracking-wider">{album.releaseDate}</p>
+              <p className="mt-1 text-[11px] text-black uppercase tracking-wider">{album.releaseDate}</p>
             </div>
           </div>
         ))}
@@ -296,7 +296,7 @@ function CollectionsView({ selectedCats, onCategoryChange }: { selectedCats: Sho
   return (
     <div className="mt-20 flex flex-col items-center justify-center py-20">
       <p className="text-display text-3xl text-black/15">Collections</p>
-      <p className="mt-4 text-sm text-black/30">Special runs and collaborations coming soon.</p>
+      <p className="mt-4 text-sm text-black">Special runs and collaborations coming soon.</p>
     </div>
   );
 }
@@ -320,14 +320,14 @@ function ShopAllView({ onSelectProduct, onQuickAdd }: { onSelectProduct: (p: Sho
         <SizeFilter categories={selectedCats} selected={selectedSize} onChange={setSelectedSize} />
       </div>
       <div>
-        <p className="mb-4 text-[11px] text-black/30">{filtered.length} product{filtered.length !== 1 ? "s" : ""}</p>
+        <p className="mb-4 text-[11px] text-black">{filtered.length} product{filtered.length !== 1 ? "s" : ""}</p>
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
           {filtered.map((p) => (
             <ProductCard key={p.slug} product={p} onSelect={() => onSelectProduct(p)} onQuickAdd={onQuickAdd} />
           ))}
         </div>
         {filtered.length === 0 && (
-          <div className="mt-20 text-center"><p className="text-sm text-black/30">No products match your filters.</p></div>
+          <div className="mt-20 text-center"><p className="text-sm text-black">No products match your filters.</p></div>
         )}
       </div>
     </div>
@@ -340,7 +340,14 @@ function ShopAllView({ onSelectProduct, onQuickAdd }: { onSelectProduct: (p: Sho
 
 export function ShopPage() {
   const { setDetailSlug, addToCart, cartCount, shopSubPath, setShopSubPath } = useAppStore();
-  const [shopPath, setShopPath] = useState<ShopPath>(shopSubPath as ShopPath || "albums");
+  const [shopPath, setShopPath] = useState<ShopPath>((shopSubPath as ShopPath) || "albums");
+
+  // Sync local state with store when shopSubPath changes (e.g. from breadcrumb)
+  useEffect(() => {
+    if (shopSubPath && shopSubPath !== shopPath) {
+      setShopPath(shopSubPath as ShopPath);
+    }
+  }, [shopSubPath]);
 
   const openAlbum = useCallback((album: ShopAlbum) => { setDetailSlug(album.slug, "album"); }, [setDetailSlug]);
   const openProduct = useCallback((p: ShopProduct) => { setDetailSlug(p.slug, "product"); }, [setDetailSlug]);
@@ -349,7 +356,7 @@ export function ShopPage() {
   return (
     <section className="min-h-screen bg-white px-6 pt-36 pb-20 md:px-12 md:pt-48 md:pb-28">
       <div className="mx-auto max-w-[1400px]">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-black/30">06 — Shop</p>
+        <p className="text-[10px] uppercase tracking-[0.25em] text-black">06 — Shop</p>
         <h1 className="mt-6 text-display text-[clamp(3rem,8vw,8rem)] leading-[0.85] text-black">Shop.</h1>
         <div className="mt-12">
           <ShopNav active={shopPath} onChange={setShopPath} cartCount={cartCount} />
@@ -412,7 +419,7 @@ export function AlbumDetailPage() {
   const openStream = useCallback((title: string) => { setStreamTitle(title); setStreamOpen(true); }, []);
 
   if (!album) {
-    return <div className="flex min-h-screen items-center justify-center bg-white"><p className="text-sm text-black/40">Album not found.</p></div>;
+    return <div className="flex min-h-screen items-center justify-center bg-white"><p className="text-sm text-black">Album not found.</p></div>;
   }
 
   return (
@@ -469,15 +476,15 @@ export function AlbumDetailPage() {
               <p className="mt-1 text-[clamp(1rem,2vw,1.35rem)] font-normal text-black">{album.duration}</p>
 
               {/* Note from the artist */}
-              <p className="mt-5 text-[12px] italic text-black/40">A note from the artist:</p>
-              <p className="mt-2 text-[12px] leading-[1.5] uppercase font-medium tracking-wide text-black/50 line-clamp-3">
+              <p className="mt-5 text-[12px] italic text-black">A note from the artist:</p>
+              <p className="mt-2 text-[12px] leading-[1.5] uppercase font-medium tracking-wide text-black line-clamp-3">
                 {album.description}
               </p>
               <p className="mt-3 text-[12px] uppercase tracking-wide font-medium text-black">ADEA LYRIC</p>
 
               {/* Quote */}
               {album.quote && (
-                <p className="mt-3 text-[13px] leading-[1.4] text-black/50 italic">
+                <p className="mt-3 text-[13px] leading-[1.4] text-black italic">
                   &ldquo;{album.quote}&rdquo;
                 </p>
               )}
@@ -491,7 +498,7 @@ export function AlbumDetailPage() {
 
           {/* ── Merch Grid ── */}
           <div className="mt-20">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-black">
               {album.title} — Merchandise
             </p>
             <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-6">
@@ -503,7 +510,7 @@ export function AlbumDetailPage() {
 
           {/* ── Video Grid ── */}
           <div className="mt-20">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">Visuals</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-black">Visuals</p>
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="relative aspect-video overflow-hidden bg-[#f0f0f0]">
@@ -551,7 +558,7 @@ export function ProductDetailPage() {
   const handleNotify = useCallback(() => { if (notifyEmail) setNotifySent(true); }, [notifyEmail]);
 
   if (!product || !enriched) {
-    return <div className="flex min-h-screen items-center justify-center bg-white"><p className="text-sm text-black/40">Product not found.</p></div>;
+    return <div className="flex min-h-screen items-center justify-center bg-white"><p className="text-sm text-black">Product not found.</p></div>;
   }
 
   return (
@@ -589,27 +596,27 @@ export function ProductDetailPage() {
             )}
             {!available && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/70">
-                <span className="text-[11px] font-medium uppercase tracking-widest text-black/40">Sold Out</span>
+                <span className="text-[11px] font-medium uppercase tracking-widest text-black">Sold Out</span>
               </div>
             )}
           </div>
 
           {/* Info */}
           <div className="flex flex-col md:pl-12">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{product.category}</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-black">{product.category}</p>
             <h1 className="mt-3 text-display text-[clamp(2rem,5vw,4.5rem)] leading-[0.9] text-black">{product.name}</h1>
             <p className="mt-4 text-2xl font-light">{available ? `$${product.price}.00` : "Sold Out"}</p>
-            {enriched.availability === "Low Stock" && <p className="mt-1 text-[11px] text-black/40">Low Stock — only {product.stock} left</p>}
-            <p className="mt-4 text-[12px] font-medium uppercase tracking-[0.2em] text-black/40">{product.albumTitle} Collection</p>
-            <p className="mt-4 text-sm leading-relaxed text-black/60">{product.description}</p>
+            {enriched.availability === "Low Stock" && <p className="mt-1 text-[11px] text-black">Low Stock — only {product.stock} left</p>}
+            <p className="mt-4 text-[12px] font-medium uppercase tracking-[0.2em] text-black">{product.albumTitle} Collection</p>
+            <p className="mt-4 text-sm leading-relaxed text-black">{product.description}</p>
 
             {/* Size Selector */}
             {enriched.sizes.length > 0 && (
               <div className="mt-8">
-                <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-black/40">Size</p>
+                <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-black">Size</p>
                 <div className="flex flex-wrap gap-2">
                   {enriched.sizes.map((s) => (
-                    <button key={s} onClick={() => setSelectedSize(s)} className={`h-10 min-w-[48px] px-4 text-[12px] uppercase tracking-wider border transition-all cursor-pointer ${selectedSize === s ? "bg-black text-white border-black" : "bg-white text-black/60 border-black/15 hover:border-black/40"}`}>{s}</button>
+                    <button key={s} onClick={() => setSelectedSize(s)} className={`h-10 min-w-[48px] px-4 text-[12px] uppercase tracking-wider border transition-all cursor-pointer ${selectedSize === s ? "bg-black text-white border-black" : "bg-white text-black border-black/15 hover:border-black/40"}`}>{s}</button>
                   ))}
                 </div>
               </div>
@@ -620,7 +627,7 @@ export function ProductDetailPage() {
               {available ? (
                 <button onClick={handleAddToCart} className="w-full bg-black py-4 text-[12px] uppercase tracking-[0.2em] text-white hover:bg-black/80 transition-colors cursor-pointer">Add to Cart</button>
               ) : notifySent ? (
-                <div className="border border-black/10 py-4 text-center text-[12px] text-black/50">You&apos;ll be notified when available.</div>
+                <div className="border border-black/10 py-4 text-center text-[12px] text-black">You&apos;ll be notified when available.</div>
               ) : (
                 <div className="flex gap-2">
                   <input type="email" placeholder="Email for notification" value={notifyEmail} onChange={(e) => setNotifyEmail(e.target.value)} className="flex-1 border border-black/15 px-4 py-3 text-[12px] placeholder:text-black/25 focus:outline-none focus:border-black/40" />
@@ -630,7 +637,7 @@ export function ProductDetailPage() {
             </div>
 
             <div className="mt-6 border-t border-black/5 pt-6">
-              <p className="text-[11px] text-black/30">Free shipping on orders over $100. Ships in 3–5 business days. 30-day returns.</p>
+              <p className="text-[11px] text-black">Free shipping on orders over $100. Ships in 3–5 business days. 30-day returns.</p>
             </div>
           </div>
         </div>
@@ -638,7 +645,7 @@ export function ProductDetailPage() {
         {/* Related products */}
         {related.length > 0 && (
           <div className="mt-20">
-            <p className="mb-8 text-[10px] uppercase tracking-[0.2em] text-black/30">From the same collection</p>
+            <p className="mb-8 text-[10px] uppercase tracking-[0.2em] text-black">From the same collection</p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6">
               {related.map((p) => (
                 <ProductCard key={p.slug} product={p} onSelect={() => openRelated(p)} onQuickAdd={() => addToCart()} />

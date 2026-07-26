@@ -238,16 +238,16 @@ const letterStyles = `
   .letter-container {
     position: relative;
     background-color: #ffffff;
-    padding: 80px 24px 100px;
+    padding: 60px 24px 40px;
   }
   @media (min-width: 640px) {
     .letter-container {
-      padding: 100px 48px 120px;
+      padding: 80px 48px 48px;
     }
   }
   @media (min-width: 768px) {
     .letter-container {
-      padding: 120px 80px 140px;
+      padding: 100px 80px 48px;
     }
   }
 
@@ -270,7 +270,7 @@ const letterStyles = `
   }
   .letter-sticky {
     position: sticky;
-    top: 120px;
+    top: 100px;
   }
 
   .letter-right {
@@ -283,13 +283,13 @@ const letterStyles = `
     letter-spacing: -0.045em;
     line-height: 0.85;
     color: #000;
-    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-size: clamp(4rem, 10vw, 9rem);
   }
 
   .letter-fade-top {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 40px;
+    height: 20px;
     background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
     pointer-events: none;
     z-index: 2;
@@ -298,7 +298,7 @@ const letterStyles = `
   .letter-fade-bottom {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 120px;
+    height: 40px;
     background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(18,18,18,1) 100%);
     pointer-events: none;
     z-index: 2;
