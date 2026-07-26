@@ -220,6 +220,43 @@ export const PRODUCTS: Product[] = [
    SHOP CATALOG — Albums + Merch with full e-commerce data
    ═══════════════════════════════════════════════════ */
 
+/* ─── Product_Attributes: Size System ─── */
+export type SizeType =
+  | "clothing"
+  | "waist"
+  | "shoe"
+  | "hat"
+  | "drinkware"
+  | "one-size"
+  | "none";
+
+export const SIZE_OPTIONS: Record<SizeType, string[]> = {
+  clothing: ["XS", "S", "M", "L", "XL", "XXL"],
+  waist: ["28", "30", "32", "34", "36"],
+  shoe: ["5", "6", "7", "8", "9", "10"],
+  hat: ["S/M", "L/XL", "Adjustable"],
+  drinkware: ["11oz", "15oz"],
+  "one-size": ["One Size"],
+  none: [],
+};
+
+/* Map each category to its size type for contextual filters */
+export const CATEGORY_SIZE_TYPE: Record<string, SizeType> = {
+  "T-Shirts": "clothing",
+  Hoodies: "clothing",
+  Sweaters: "clothing",
+  Sweatpants: "waist",
+  Joggers: "waist",
+  Pants: "waist",
+  Socks: "one-size",
+  Hats: "hat",
+  Cups: "drinkware",
+  Mugs: "drinkware",
+  Vinyl: "none",
+  Posters: "none",
+  Accessories: "none",
+};
+
 export type ShopCategory =
   | "T-Shirts"
   | "Hoodies"
@@ -235,10 +272,77 @@ export type ShopCategory =
   | "Posters"
   | "Accessories";
 
+/* ─── Category Taxonomy Tree ─── */
+export type CategoryNode = {
+  label: string;
+  slug: string;
+  categories?: ShopCategory[];
+  children?: CategoryNode[];
+};
+
+export const CATEGORY_TREE: CategoryNode[] = [
+  {
+    label: "Clothing",
+    slug: "clothing",
+    children: [
+      {
+        label: "Men's",
+        slug: "mens",
+        children: [
+          { label: "Tops", slug: "mens-tops", categories: ["T-Shirts", "Hoodies", "Sweaters"] },
+          { label: "Bottoms", slug: "mens-bottoms", categories: ["Sweatpants", "Joggers", "Pants"] },
+        ],
+      },
+      {
+        label: "Women's",
+        slug: "womens",
+        children: [
+          { label: "Tops", slug: "womens-tops", categories: ["T-Shirts", "Hoodies", "Sweaters"] },
+          { label: "Bottoms", slug: "womens-bottoms", categories: ["Sweatpants", "Joggers", "Pants"] },
+        ],
+      },
+      { label: "Unisex", slug: "unisex", categories: ["T-Shirts", "Hoodies", "Sweaters", "Sweatpants", "Joggers", "Pants", "Socks"] },
+    ],
+  },
+  {
+    label: "Accessories",
+    slug: "accessories",
+    categories: ["Hats"],
+  },
+  {
+    label: "Home & Lifestyle",
+    slug: "home-lifestyle",
+    children: [
+      { label: "Drinkware", slug: "drinkware", categories: ["Cups", "Mugs"] },
+      { label: "Barware", slug: "barware", categories: ["Accessories"] },
+    ],
+  },
+  {
+    label: "Music",
+    slug: "music",
+    categories: ["Vinyl", "Posters"],
+  },
+];
+
+/* Collect all leaf category names from the tree */
+export function getLeafCategories(node: CategoryNode): ShopCategory[] {
+  if (node.categories) return node.categories;
+  if (node.children) return node.children.flatMap(getLeafCategories);
+  return [];
+}
+
 export type ColorSwatch = {
   name: string;
   hex: string;
 };
+
+export type AvailabilityStatus = "In Stock" | "Low Stock" | "Out of Stock" | "Pre-Order";
+
+function getAvailability(stock: number): AvailabilityStatus {
+  if (stock === 0) return "Out of Stock";
+  if (stock <= 10) return "Low Stock";
+  return "In Stock";
+}
 
 export type ShopProduct = {
   slug: string;
@@ -253,6 +357,19 @@ export type ShopProduct = {
   albumSlug: string;
   albumTitle: string;
 };
+
+export type EnrichedProduct = ShopProduct & {
+  sizeType: SizeType;
+  availability: AvailabilityStatus;
+};
+
+export function enrichProduct(p: ShopProduct): EnrichedProduct {
+  return {
+    ...p,
+    sizeType: CATEGORY_SIZE_TYPE[p.category] ?? "none",
+    availability: getAvailability(p.stock),
+  };
+}
 
 export type ShopAlbum = {
   slug: string;
@@ -405,42 +522,20 @@ export const SHOP_ALBUMS: ShopAlbum[] = [
   },
 ];
 
-/* Flat list of all products for filtering */
-export const ALL_PRODUCTS: ShopProduct[] = SHOP_ALBUMS.flatMap((a) => a.merch);
+/* Flat list of all products — enriched with sizeType and availability */
+export const ALL_PRODUCTS: EnrichedProduct[] = (() => {
+  const raw = SHOP_ALBUMS.flatMap((a) =>
+    a.merch.map((m) => ({ ...m, albumSlug: a.slug, albumTitle: a.title }))
+  );
+  return raw.map(enrichProduct);
+})();
 
 /* All unique categories */
-export const ALL_CATEGORIES: ShopCategory[] = [
-  "T-Shirts",
-  "Hoodies",
-  "Sweaters",
-  "Sweatpants",
-  "Joggers",
-  "Pants",
-  "Socks",
-  "Hats",
-  "Cups",
-  "Mugs",
-  "Vinyl",
-  "Posters",
-  "Accessories",
-];
+export const ALL_CATEGORIES: ShopCategory[] = Object.keys(CATEGORY_SIZE_TYPE) as ShopCategory[];
 
-/* Tab labels for the shop navigation */
-export const SHOP_TABS = ["Shop All", "Collections"];
-
-/* Product group filters for Shop All */
-export type ProductGroup = {
-  label: string;
-  categories: ShopCategory[] | null;
-};
-export const PRODUCT_GROUPS: ProductGroup[] = [
-  { label: "All", categories: null },
-  { label: "Clothes", categories: ["T-Shirts", "Hoodies", "Sweaters", "Sweatpants", "Joggers", "Pants", "Socks"] },
-  { label: "Products", categories: ["Vinyl", "Posters", "Accessories"] },
-  { label: "Cups", categories: ["Cups"] },
-  { label: "Mugs", categories: ["Mugs"] },
-  { label: "Hats", categories: ["Hats"] },
-];
+/* Backward compat aliases */
+export type AlbumMerchProduct = ShopProduct;
+export const ALBUMS = SHOP_ALBUMS;
 
 export const TOUR = [
   { date: "OCT 12", city: "Philadelphia, PA", venue: "The Fillmore", status: "On Sale" },
@@ -451,7 +546,3 @@ export const TOUR = [
   { date: "NOV 16", city: "Chicago, IL", venue: "Thalia Hall", status: "Sold Out" },
   { date: "NOV 23", city: "Los Angeles, CA", venue: "The Novo", status: "On Sale" },
 ];
-
-/* Backward compat aliases */
-export type AlbumMerchProduct = ShopProduct;
-export const ALBUMS = SHOP_ALBUMS;
