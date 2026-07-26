@@ -238,16 +238,17 @@ const letterStyles = `
   .letter-container {
     position: relative;
     background-color: #ffffff;
-    padding: 60px 24px 40px;
+    padding: 60px 0 40px;
+    width: 100%;
   }
   @media (min-width: 640px) {
     .letter-container {
-      padding: 80px 48px 48px;
+      padding: 80px 0 48px;
     }
   }
   @media (min-width: 768px) {
     .letter-container {
-      padding: 100px 80px 48px;
+      padding: 100px 0 48px;
     }
   }
 
@@ -255,18 +256,23 @@ const letterStyles = `
     display: grid;
     grid-template-columns: 1fr;
     gap: 0;
-    max-width: 1100px;
-    margin: 0 auto;
+    width: 100%;
   }
   @media (min-width: 768px) {
     .letter-grid {
-      grid-template-columns: 320px 1fr;
-      gap: 0 64px;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
     }
   }
 
   .letter-left {
     position: relative;
+    padding: 0 16px;
+  }
+  @media (min-width: 768px) {
+    .letter-left {
+      padding: 0;
+    }
   }
   .letter-sticky {
     position: sticky;
@@ -275,6 +281,12 @@ const letterStyles = `
 
   .letter-right {
     min-width: 0;
+    padding: 0 16px;
+  }
+  @media (min-width: 768px) {
+    .letter-right {
+      padding: 0 32px 0 0;
+    }
   }
 
   .letter-title-block {
