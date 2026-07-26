@@ -126,7 +126,14 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1600px]">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-5">
-            <button onClick={() => go("home")} className="text-display text-5xl leading-none text-bone md:text-7xl cursor-pointer text-left">Adea Lyric</button>
+            <button onClick={() => go("home")} className="relative block cursor-pointer group" aria-label="Adea Lyric Home">
+              <img
+                src="/logo-footer.png"
+                alt="Adea Lyric"
+                className="h-auto w-36 sm:w-44 md:w-52 transition-transform duration-300 group-hover:scale-105"
+                style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
+              />
+            </button>
             <p className="mt-6 max-w-md text-base leading-relaxed text-ash">The sound of West Philly. Singer, songwriter, and producer creating every record from the soul.</p>
           </div>
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-4 md:col-span-7">

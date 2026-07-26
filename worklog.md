@@ -277,3 +277,29 @@ Stage Summary:
 - 58 products across 13 categories with color swatches, sizes, stock counts, availability indicators
 - Filtering: Category dropdown + color pills + clear button + product/available count display
 - Product detail: Size selector, color swatches, add to cart, notify me, shipping info, related products
+
+---
+Task ID: 1
+Agent: Main
+Task: Add ADEA LYRIC logo to footer + make Letter to My Fans bleed edge-to-edge
+
+Work Log:
+- Copied uploaded logo (pasted_image_1785054316088.png) to /public/logo-footer.png
+- Analyzed logo with VLM: black triangle+text on white background (non-transparent PNG)
+- Updated SiteChrome.tsx footer: replaced text "Adea Lyric" with <img> using filter:invert(1) + mix-blend-mode:screen to render white-on-transparent on dark bg
+- Completely rewrote LetterToMyFans.tsx for full-bleed brown parchment:
+  - Removed constrained max-w-3xl white wrapper
+  - Made brown parchment (#f5f0e6) extend full viewport width (edge-to-edge)
+  - Added top fade gradient (white→brown) to integrate with Bio section above
+  - Added bottom fade gradient (brown→dark) to integrate with Discography section below
+  - Widened content area to 800-900px (from 768px)
+  - Reduced scroll space from 60vh to 50vh since bleed layout is more compact
+  - Kept all typewriter logic: scroll-driven character reveal with rAF easing, mouse nudge
+  - Kept Special Elite + IM Fell English fonts, blinking caret, scroll hint
+- Browser verified: Letter section is full-bleed (brown touches both screen edges), typewriter text is revealing, footer logo is visible as white on dark background, no compile errors
+
+Stage Summary:
+- Footer now displays the ADEA LYRIC triangle logo (inverted + screen blend for white-on-dark)
+- Letter to My Fans parchment now bleeds edge-to-edge with gradient fade transitions at top/bottom
+- The letter section integrates naturally between white Bio section and dark Discography section
+- No parse errors, clean dev server, all 200s

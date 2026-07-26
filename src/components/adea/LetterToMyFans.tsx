@@ -48,14 +48,12 @@ const RANGES = (() => {
 })();
 
 export function LetterToMyFans() {
-  // Single ref wrapping the ENTIRE letter area (header + parchment + scroll space)
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(0);
   const currentRef = useRef(0);
   const mouseBonusRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
-  // Load Google Fonts
   useEffect(() => {
     const id = "letter-fonts";
     if (document.getElementById(id)) return;
@@ -74,7 +72,6 @@ export function LetterToMyFans() {
       const rect = el.getBoundingClientRect();
       const elHeight = el.scrollHeight;
       const viewable = window.innerHeight;
-      // How far through the wrapper the user has scrolled (0..1)
       const scrolled = Math.max(
         0,
         Math.min(1, -rect.top / (elHeight - viewable))
@@ -132,69 +129,57 @@ export function LetterToMyFans() {
   return (
     <div
       ref={wrapperRef}
-      className="relative bg-white"
-      style={{ minHeight: "100vh" }}
+      className="relative"
+      style={{ minHeight: "60vh" }}
     >
-      {/* Header — white bg, dark text */}
-      <div className="px-6 pt-24 pb-12 md:px-12 md:pt-32 md:pb-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="letter-header-eyebrow">02 — Letter</div>
-          <h2 className="letter-heading mt-6">
-            A Letter to My{" "}
-            <span className="italic">Fans.</span>
-          </h2>
-          <p className="letter-sub mt-6">
-            Scroll to read. Every word typed in real time — a covenant from
-            Adea to the people who make the music matter.
-          </p>
-        </div>
-      </div>
+      {/* Full-bleed brown parchment */}
+      <style>{letterStyles}</style>
+      <div className="letter-bleed">
+        {/* Top fade: white (bio section) → brown */}
+        <div className="letter-fade-top" />
 
-      {/* White parchment letter */}
-      <div className="px-4 sm:px-8 md:px-0">
-        <style>{letterStyles}</style>
-
-        <div className="letter-frame">
-          <article className="letter-sheet relative mx-auto max-w-3xl px-6 pt-20 pb-24 sm:px-16 sm:pt-24">
-            <header className="mb-14 text-center">
-              <p className="text-[10px] uppercase tracking-[0.5em] opacity-60">
-                Philadelphia · PA
-              </p>
-              <h3 className="letter-title mt-5 text-4xl sm:text-5xl">
-                A Letter to My Fans
-              </h3>
-              <div className="mt-6 flex items-center justify-center gap-3 text-xs opacity-70">
-                <span className="h-px w-10 bg-current" />
-                <span className="tracking-[0.3em] uppercase">
-                  from Adea Lyric
-                </span>
-                <span className="h-px w-10 bg-current" />
-              </div>
-              <p className="scroll-hint mt-12 text-[10px] uppercase tracking-[0.4em] opacity-60">
-                scroll ↓ to read
-              </p>
-            </header>
-
-            <div className="letter-body">
-              {BLOCKS.map((block, i) => (
-                <BlockView
-                  key={i}
-                  block={block}
-                  range={RANGES.ranges[i]}
-                  revealed={revealed}
-                />
-              ))}
+        <article className="letter-sheet-bleed">
+          <header className="mb-14 text-center">
+            <p className="text-[10px] uppercase tracking-[0.5em] opacity-50">
+              Philadelphia · PA
+            </p>
+            <h3 className="letter-title mt-5 text-4xl sm:text-5xl">
+              A Letter to My Fans
+            </h3>
+            <div className="mt-6 flex items-center justify-center gap-3 text-xs opacity-50">
+              <span className="h-px w-10 bg-current" />
+              <span className="tracking-[0.3em] uppercase">
+                from Adea Lyric
+              </span>
+              <span className="h-px w-10 bg-current" />
             </div>
+            <p className="scroll-hint mt-10 text-[10px] uppercase tracking-[0.4em] opacity-40">
+              scroll ↓ to read
+            </p>
+          </header>
 
-            <footer className="mt-20 border-t border-current/20 pt-6 text-center text-[10px] uppercase tracking-[0.45em] opacity-60">
-              Made in Philly · With love
-            </footer>
-          </article>
-        </div>
+          <div className="letter-body-bleed">
+            {BLOCKS.map((block, i) => (
+              <BlockView
+                key={i}
+                block={block}
+                range={RANGES.ranges[i]}
+                revealed={revealed}
+              />
+            ))}
+          </div>
 
-        {/* Extra scroll space so user can reveal the full letter */}
-        <div aria-hidden className="h-[60vh]" />
+          <footer className="mt-16 border-t border-current/15 pt-6 text-center text-[10px] uppercase tracking-[0.45em] opacity-40">
+            Made in Philly · With love
+          </footer>
+        </article>
+
+        {/* Bottom fade: brown → dark (discography section) */}
+        <div className="letter-fade-bottom" />
       </div>
+
+      {/* Extra scroll space so user can reveal the full letter */}
+      <div aria-hidden className="h-[50vh]" />
     </div>
   );
 }
@@ -214,8 +199,8 @@ function BlockView({
   if (block.kind === "break") {
     return (
       <div
-        className="my-8 flex items-center justify-center gap-3 text-xs opacity-50"
-        style={{ opacity: revealed >= range.end ? 0.5 : isActive ? 0.35 : 0.15 }}
+        className="my-8 flex items-center justify-center gap-3 text-xs opacity-40"
+        style={{ opacity: revealed >= range.end ? 0.4 : isActive ? 0.25 : 0.1 }}
       >
         <span className="h-px w-8 bg-current" />
         <span>❦</span>
@@ -249,86 +234,92 @@ function BlockView({
 }
 
 const letterStyles = `
-  .letter-header-eyebrow {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: rgba(0,0,0,0.3);
-  }
-  .letter-heading {
-    font-family: 'IM Fell English', serif;
-    font-size: clamp(2.5rem, 7vw, 5.5rem);
-    line-height: 0.95;
-    color: #1a1a1a;
-    letter-spacing: -0.01em;
-  }
-  .letter-sub {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: rgba(0,0,0,0.5);
-    max-width: 32rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .letter-frame { position: relative; }
-
-  .letter-sheet {
-    background-color: #f8f7f4;
+  /* ─── Full-bleed parchment wrapper ─── */
+  .letter-bleed {
+    position: relative;
+    background-color: #f5f0e6;
     background-image:
-      radial-gradient(circle at 8% 12%, rgba(0,0,0,0.04), transparent 42%),
-      radial-gradient(circle at 92% 82%, rgba(0,0,0,0.05), transparent 46%),
-      radial-gradient(circle at 50% 55%, rgba(255,255,255,0.08), transparent 70%),
-      repeating-linear-gradient(38deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 7px),
-      repeating-linear-gradient(-52deg, rgba(0,0,0,0.015) 0 1px, transparent 1px 9px);
-    box-shadow:
-      inset 0 0 80px rgba(0,0,0,0.06),
-      inset 0 0 220px rgba(0,0,0,0.03),
-      0 20px 60px rgba(0,0,0,0.08),
-      0 4px 12px rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 2px;
-    color: #1a1a1a;
-    font-family: 'Special Elite', 'Courier New', ui-monospace, monospace;
+      radial-gradient(circle at 8% 12%, rgba(139,119,80,0.06), transparent 42%),
+      radial-gradient(circle at 92% 82%, rgba(139,119,80,0.08), transparent 46%),
+      radial-gradient(circle at 50% 55%, rgba(255,255,255,0.1), transparent 70%),
+      repeating-linear-gradient(38deg, rgba(139,119,80,0.025) 0 2px, transparent 2px 7px),
+      repeating-linear-gradient(-52deg, rgba(139,119,80,0.02) 0 1px, transparent 1px 9px);
+    color: #2a2118;
+    padding: 80px 24px 100px;
   }
-  .letter-sheet::before,
-  .letter-sheet::after {
-    content: "";
-    position: absolute; left: 0; right: 0;
-    height: 40px; pointer-events: none;
-    background:
-      radial-gradient(ellipse 60% 100% at 20% 100%, rgba(0,0,0,0.04), transparent 65%),
-      radial-gradient(ellipse 70% 100% at 75% 100%, rgba(0,0,0,0.03), transparent 65%);
+  @media (min-width: 640px) {
+    .letter-bleed {
+      padding: 100px 48px 120px;
+    }
   }
-  .letter-sheet::before { top: 0; transform: scaleY(-1); }
-  .letter-sheet::after  { bottom: 0; }
+  @media (min-width: 768px) {
+    .letter-bleed {
+      padding: 120px 80px 140px;
+    }
+  }
 
+  /* ─── Top fade: white → brown ─── */
+  .letter-fade-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ─── Bottom fade: brown → dark ─── */
+  .letter-fade-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(245,240,230,0) 0%, rgba(18,18,18,1) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ─── Bleed sheet (wider than before) ─── */
+  .letter-sheet-bleed {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .letter-sheet-bleed {
+      max-width: 900px;
+    }
+  }
+
+  /* ─── Typography ─── */
   .letter-title {
     font-family: 'IM Fell English', 'Special Elite', serif;
     font-weight: 400;
     letter-spacing: 0.01em;
-    color: #1a1a1a;
+    color: #2a2118;
   }
   .signature {
     font-family: 'IM Fell English', serif;
     font-style: italic;
   }
 
-  .letter-body .letter-p {
+  /* ─── Body text ─── */
+  .letter-body-bleed .letter-p {
+    font-family: 'Special Elite', 'Courier New', ui-monospace, monospace;
     line-height: 1.95;
     letter-spacing: 0.005em;
     margin: 0 0 1.6rem 0;
-    text-shadow: 0 0 1px rgba(0,0,0,0.12);
+    text-shadow: 0 0 1px rgba(42,33,24,0.12);
   }
-  .letter-body .letter-p .ghost,
-  .letter-body .signature .ghost {
+  .letter-body-bleed .letter-p .ghost,
+  .letter-body-bleed .signature .ghost {
     opacity: 0;
   }
 
+  /* ─── Typewriter caret ─── */
   .typewriter-caret {
     display: inline-block;
     margin: 0 1px;
-    color: #1a1a1a;
+    color: #2a2118;
     animation: caret-blink 0.85s steps(1) infinite;
   }
   @keyframes caret-blink {
@@ -336,9 +327,10 @@ const letterStyles = `
     50%, 100% { opacity: 0; }
   }
 
+  /* ─── Scroll hint bounce ─── */
   .scroll-hint { animation: hint-bounce 2.2s ease-in-out infinite; }
   @keyframes hint-bounce {
-    0%, 100% { transform: translateY(0); opacity: 0.6; }
-    50%      { transform: translateY(6px); opacity: 1; }
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50%      { transform: translateY(6px); opacity: 0.7; }
   }
 `;

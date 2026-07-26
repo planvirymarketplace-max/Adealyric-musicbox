@@ -1,0 +1,931 @@
+     1→     1→"use client";
+     2→     2→
+     3→     3→import { useState, useMemo, useEffect, useCallback } from "react";
+     4→     4→import { PageShell } from "./SiteChrome";
+     5→     5→import { useAppStore } from "@/lib/store";
+     6→     6→import {
+     7→     7→  SHOP_ALBUMS,
+     8→     8→  ALL_PRODUCTS,
+     9→     9→  ALL_CATEGORIES,
+    10→    10→  SHOP_TABS,
+    11→    11→  type ShopProduct,
+    12→    12→  type ShopAlbum,
+    13→    13→} from "@/lib/catalog";
+    14→    14→import { Play, Plus, X, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+    15→    15→
+    16→    16→/* ═══════════════════════════════════════════════════
+    17→    17→   STREAMING OVERLAY
+    18→    18→   ═══════════════════════════════════════════════════ */
+    19→    19→
+    20→    20→const STREAM_PLATFORMS = [
+    21→    21→  { key: "spotify", label: "Spotify" },
+    22→    22→  { key: "appleMusic", label: "Apple Music" },
+    23→    23→  { key: "tiktok", label: "TikTok" },
+    24→    24→  { key: "instagram", label: "Instagram" },
+    25→    25→  { key: "amazonMusic", label: "Amazon Music" },
+    26→    26→  { key: "youtube", label: "YouTube" },
+    27→    27→  { key: "tidal", label: "Tidal" },
+    28→    28→  { key: "pandora", label: "Pandora" },
+    29→    29→];
+    30→    30→
+    31→    31→function StreamingOverlay({
+    32→    32→  open,
+    33→    33→  onOpenChange,
+    34→    34→  title,
+    35→    35→}: {
+    36→    36→  open: boolean;
+    37→    37→  onOpenChange: (v: boolean) => void;
+    38→    38→  title: string;
+    39→    39→}) {
+    40→    40→  return (
+    41→    41→    <div
+    42→    42→      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
+    43→    43→        open
+    44→    44→          ? "opacity-100 pointer-events-auto"
+    45→    45→          : "opacity-0 pointer-events-none"
+    46→    46→      }`}
+    47→    47→    >
+    48→    48→      <div className="absolute inset-0 bg-black/60" onClick={() => onOpenChange(false)} />
+    49→    49→      <div className="relative bg-black text-white rounded-sm w-full max-w-lg mx-4 p-10">
+    50→    50→        <button
+    51→    51→          onClick={() => onOpenChange(false)}
+    52→    52→          className="absolute top-4 right-4 text-white/50 hover:text-white cursor-pointer"
+    53→    53→        >
+    54→    54→          <X className="h-5 w-5" />
+    55→    55→        </button>
+    56→    56→        <h2 className="text-center text-xs uppercase tracking-[0.25em] text-white/40">
+    57→    57→          Stream Now
+    58→    58→        </h2>
+    59→    59→        <h3 className="mt-4 text-center text-3xl font-light">{title}</h3>
+    60→    60→        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    61→    61→          {STREAM_PLATFORMS.map((p) => (
+    62→    62→            <a
+    63→    63→              key={p.key}
+    64→    64→              href="#"
+    65→    65→              onClick={(e) => e.preventDefault()}
+    66→    66→              className="flex flex-col items-center gap-2 border border-white/10 px-3 py-5 text-center hover:border-white/30 hover:bg-white/5 transition-all cursor-pointer"
+    67→    67→            >
+    68→    68→              <Play className="h-5 w-5 text-white/40" />
+    69→    69→              <span className="text-[10px] uppercase tracking-[0.2em] text-white/60">
+    70→    70→                {p.label}
+    71→    71→              </span>
+    72→    72→            </a>
+    73→    73→          ))}
+    74→    74→        </div>
+    75→    75→      </div>
+    76→    76→    </div>
+    77→    77→  );
+    78→    78→}
+    79→    79→
+    80→    80→/* ═══════════════════════════════════════════════════
+    81→    81→   PRODUCT CARD (grid item)
+    82→    82→   ═══════════════════════════════════════════════════ */
+    83→    83→
+    84→    84→function ProductCard({
+    85→    85→  product,
+    86→    86→  onSelect,
+    87→    87→  onQuickAdd,
+    88→    88→}: {
+    89→    89→  product: ShopProduct;
+    90→    90→  onSelect: () => void;
+    91→    91→  onQuickAdd?: () => void;
+    92→    92→}) {
+    93→    93→  const available = product.stock > 0;
+    94→    94→  return (
+    95→    95→    <div className="group cursor-pointer" onClick={onSelect}>
+    96→    96→      {/* Image area */}
+    97→    97→      <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+    98→    98→        {available && onQuickAdd && (
+    99→    99→          <button
+   100→   100→            onClick={(e) => {
+   101→   101→              e.stopPropagation();
+   102→   102→              onQuickAdd();
+   103→   103→            }}
+   104→   104→            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center border border-black/10 bg-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 cursor-pointer hover:bg-black hover:text-white"
+   105→   105→            aria-label="Quick add"
+   106→   106→          >
+   107→   107→            <Plus className="h-3.5 w-3.5" />
+   108→   108→          </button>
+   109→   109→        )}
+   110→   110→        {!available && (
+   111→   111→          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+   112→   112→            <span className="text-[11px] font-medium uppercase tracking-widest text-black/40">
+   113→   113→              Sold Out
+   114→   114→            </span>
+   115→   115→          </div>
+   116→   116→        )}
+   117→   117→      </div>
+   118→   118→
+   119→   119→      {/* Info */}
+   120→   120→      <div className="mt-3">
+   121→   121→        <p className="text-[13px] font-medium uppercase tracking-wide text-black leading-tight">
+   122→   122→          {product.name}
+   123→   123→        </p>
+   124→   124→        <div className="mt-1.5 flex items-center gap-3">
+   125→   125→          <span
+   126→   126→            className={`text-sm ${available ? "text-black" : "text-black/30"}`}
+   127→   127→          >
+   128→   128→            {available ? `$${product.price}.00` : "Sold Out"}
+   129→   129→          </span>
+   130→   130→          {available && onQuickAdd && (
+   131→   131→            <button
+   132→   132→              onClick={(e) => {
+   133→   133→                e.stopPropagation();
+   134→   134→                onQuickAdd();
+   135→   135→              }}
+   136→   136→              className="flex h-6 w-6 items-center justify-center border border-black/20 text-black/60 hover:bg-black hover:text-white hover:border-black transition-colors cursor-pointer"
+   137→   137→              aria-label="Add to cart"
+   138→   138→            >
+   139→   139→              <Plus className="h-3 w-3" />
+   140→   140→            </button>
+   141→   141→          )}
+   142→   142→        </div>
+   143→   143→        {/* Color swatches */}
+   144→   144→        {product.colors.length > 0 && (
+   145→   145→          <div className="mt-2 flex gap-1.5">
+   146→   146→            {product.colors.map((c) => (
+   147→   147→              <span
+   148→   148→                key={c.hex}
+   149→   149→                className="block h-3.5 w-3.5 rounded-full border border-black/10"
+   150→   150→                style={{ backgroundColor: c.hex }}
+   151→   151→                title={c.name}
+   152→   152→              />
+   153→   153→            ))}
+   154→   154→          </div>
+   155→   155→        )}
+   156→   156→      </div>
+   157→   157→    </div>
+   158→   158→  );
+   159→   159→}
+   160→   160→
+   161→   161→/* ═══════════════════════════════════════════════════
+   162→   162→   IMAGE GALLERY
+   163→   163→   ═══════════════════════════════════════════════════ */
+   164→   164→
+   165→   165→function ImageGallery({
+   166→   166→  total,
+   167→   167→  label,
+   168→   168→  bgClass = "bg-[#f0f0f0]",
+   169→   169→}: {
+   170→   170→  total: number;
+   171→   171→  label: string;
+   172→   172→  bgClass?: string;
+   173→   173→}) {
+   174→   174→  const [idx, setIdx] = useState(0);
+   175→   175→  return (
+   176→   176→    <div className={`relative aspect-square overflow-hidden ${bgClass}`}>
+   177→   177→      <div className="flex h-full w-full items-center justify-center text-sm text-black/20">
+   178→   178→        {label}
+   179→   179→      </div>
+   180→   180→      {total > 1 && (
+   181→   181→        <>
+   182→   182→          <button
+   183→   183→            onClick={() => setIdx((p) => (p > 0 ? p - 1 : total - 1))}
+   184→   184→            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white/80 border border-black/5 hover:bg-white transition-colors cursor-pointer"
+   185→   185→            aria-label="Previous"
+   186→   186→          >
+   187→   187→            <ChevronLeft className="h-4 w-4" />
+   188→   188→          </button>
+   189→   189→          <button
+   190→   190→            onClick={() => setIdx((p) => (p < total - 1 ? p + 1 : 0))}
+   191→   191→            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-white/80 border border-black/5 hover:bg-white transition-colors cursor-pointer"
+   192→   192→            aria-label="Next"
+   193→   193→          >
+   194→   194→            <ChevronRight className="h-4 w-4" />
+   195→   195→          </button>
+   196→   196→          <span className="absolute left-3 bottom-3 text-[11px] text-black/30">
+   197→   197→            {idx + 1}/{total}
+   198→   198→          </span>
+   199→   199→        </>
+   200→   200→      )}
+   201→   201→    </div>
+   202→   202→  );
+   203→   203→}
+   204→   204→
+   205→   205→/* ═══════════════════════════════════════════════════
+   206→   206→   SHOP MAIN PAGE
+   207→   207→   ═══════════════════════════════════════════════════ */
+   208→   208→
+   209→   209→export function ShopPage() {
+   210→   210→  const { cartCount, setDetailSlug, addToCart } = useAppStore();
+   211→   211→  const [activeTab, setActiveTab] = useState(0); // index into SHOP_TABS
+   212→   212→  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+   213→   213→  const [colorFilter, setColorFilter] = useState<string | null>(null);
+   214→   214→
+   215→   215→  const tabLabel = SHOP_TABS[activeTab];
+   216→   216→  const selectedAlbum =
+   217→   217→    activeTab > 0 ? SHOP_ALBUMS[activeTab - 1] : null;
+   218→   218→
+   219→   219→  // Products for the current tab
+   220→   220→  const products = useMemo(() => {
+   221→   221→    let list: ShopProduct[] = selectedAlbum
+   222→   222→      ? selectedAlbum.merch
+   223→   223→      : ALL_PRODUCTS;
+   224→   224→
+   225→   225→    if (categoryFilter) {
+   226→   226→      list = list.filter((p) => p.category === categoryFilter);
+   227→   227→    }
+   228→   228→    if (colorFilter) {
+   229→   229→      list = list.filter((p) =>
+   230→   230→        p.colors.some((c) => c.name.toLowerCase() === colorFilter)
+   231→   231→      );
+   232→   232→    }
+   233→   233→    return list;
+   234→   234→  }, [selectedAlbum, categoryFilter, colorFilter]);
+   235→   235→
+   236→   236→  // Count available
+   237→   237→  const availableCount = useMemo(
+   238→   238→    () => products.filter((p) => p.stock > 0).length,
+   239→   239→    [products]
+   240→   240→  );
+   241→   241→
+   242→   242→  // All unique color names across current products
+   243→   243→  const availableColors = useMemo(() => {
+   244→   244→    const names = new Set<string>();
+   245→   245→    const baseList = selectedAlbum
+   246→   246→      ? selectedAlbum.merch
+   247→   247→      : ALL_PRODUCTS;
+   248→   248→    baseList.forEach((p) =>
+   249→   249→      p.colors.forEach((c) => names.add(c.name.toLowerCase()))
+   250→   250→    );
+   251→   251→    return [...names].sort();
+   252→   252→  }, [selectedAlbum]);
+   253→   253→
+   254→   254→  const resetFilters = () => {
+   255→   255→    setCategoryFilter(null);
+   256→   256→    setColorFilter(null);
+   257→   257→  };
+   258→   258→
+   259→   259→  const handleTabChange = (idx: number) => {
+   260→   260→    setActiveTab(idx);
+   261→   261→    resetFilters();
+   262→   262→  };
+   263→   263→
+   264→   264→  return (
+   265→   265→    <PageShell>
+   266→   266→      <div className="min-h-screen bg-white text-black">
+   267→   267→        {/* Top bar: tabs + cart */}
+   268→   268→        <nav className="border-b border-black/10">
+   269→   269→          <div className="mx-auto max-w-[1400px] px-6">
+   270→   270→            <div className="flex items-center justify-between">
+   271→   271→              {/* Tabs */}
+   272→   272→              <div className="flex gap-0 overflow-x-auto scrollbar-hide">
+   273→   273→                {SHOP_TABS.map((tab, i) => (
+   274→   274→                  <button
+   275→   275→                    key={tab}
+   276→   276→                    onClick={() => handleTabChange(i)}
+   277→   277→                    className={`shrink-0 px-4 py-4 text-[12px] uppercase tracking-[0.15em] transition-colors cursor-pointer border-b-2 -mb-px ${
+   278→   278→                      activeTab === i
+   279→   279→                        ? "text-black border-black"
+   280→   280→                        : "text-black/30 border-transparent hover:text-black/60"
+   281→   281→                    }`}
+   282→   282→                  >
+   283→   283→                    {tab}
+   284→   284→                  </button>
+   285→   285→                ))}
+   286→   286→              </div>
+   287→   287→
+   288→   288→              {/* Cart */}
+   289→   289→              <button className="shrink-0 px-4 py-4 text-[12px] uppercase tracking-[0.15em] text-black/40 hover:text-black transition-colors cursor-pointer">
+   290→   290→                Cart ({cartCount})
+   291→   291→              </button>
+   292→   292→            </div>
+   293→   293→          </div>
+   294→   294→        </nav>
+   295→   295→
+   296→   296→        {/* Featured album header (when on an album tab) */}
+   297→   297→        {selectedAlbum && (
+   298→   298→          <section className="border-b border-black/10">
+   299→   299→            <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
+   300→   300→              <div className="grid grid-cols-1 gap-10 md:gap-16 md:grid-cols-2">
+   301→   301→                {/* Album art gallery */}
+   302→   302→                <ImageGallery
+   303→   303→                  total={2}
+   304→   304→                  label={selectedAlbum.title}
+   305→   305→                />
+   306→   306→
+   307→   307→                {/* Album info */}
+   308→   308→                <div className="flex flex-col justify-center">
+   309→   309→                  <h1 className="text-3xl font-bold uppercase tracking-tight md:text-4xl">
+   310→   310→                    {selectedAlbum.title}
+   311→   311→                  </h1>
+   312→   312→                  <div className="mt-3 flex items-center gap-3 text-[13px] text-black/40">
+   313→   313→                    <span>{selectedAlbum.releaseDate}</span>
+   314→   314→                    <span>·</span>
+   315→   315→                    <span>{selectedAlbum.duration}</span>
+   316→   316→                  </div>
+   317→   317→
+   318→   318→                  <p className="mt-6 text-sm leading-relaxed text-black/50 max-w-md">
+   319→   319→                    {selectedAlbum.description}
+   320→   320→                  </p>
+   321→   321→
+   322→   322→                  {selectedAlbum.quote && (
+   323→   323→                    <blockquote className="mt-4 border-l-2 border-black/10 pl-4 text-sm italic text-black/40">
+   324→   324→                      {selectedAlbum.quote}
+   325→   325→                    </blockquote>
+   326→   326→                  )}
+   327→   327→
+   328→   328→                  {/* Action list */}
+   329→   329→                  <div className="mt-8">
+   330→   330→                    <ActionButton
+   331→   331→                      icon={<Play className="h-3.5 w-3.5" />}
+   332→   332→                      label="Stream"
+   333→   333→                      albumTitle={selectedAlbum.title}
+   334→   334→                    />
+   335→   335→                    <ActionButton
+   336→   336→                      icon={<Plus className="h-3.5 w-3.5" />}
+   337→   337→                      label="Add to Cart (Digital)"
+   338→   338→                    />
+   339→   339→                    <ActionButton
+   340→   340→                      icon={<Plus className="h-3.5 w-3.5" />}
+   341→   341→                      label="Add to Cart (Vinyl)"
+   342→   342→                    />
+   343→   343→                  </div>
+   344→   344→                </div>
+   345→   345→              </div>
+   346→   346→            </div>
+   347→   347→          </section>
+   348→   348→        )}
+   349→   349→
+   350→   350→        {/* Filters + product grid */}
+   351→   351→        <section className="px-6 py-12 md:py-16">
+   352→   352→          <div className="mx-auto max-w-[1400px]">
+   353→   353→            {/* Section header + filters */}
+   354→   354→            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+   355→   355→              <div>
+   356→   356→                <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30">
+   357→   357→                  {selectedAlbum ? selectedAlbum.title : "All Merchandise"}
+   358→   358→                </h2>
+   359→   359→                <p className="mt-1 text-[12px] text-black/30">
+   360→   360→                  {products.length} product{products.length !== 1 ? "s" : ""}{" "}
+   361→   361→                  · {availableCount} available
+   362→   362→                </p>
+   363→   363→              </div>
+   364→   364→
+   365→   365→              {/* Category filter pills */}
+   366→   366→              <div className="flex flex-wrap gap-2">
+   367→   367→                {/* Category dropdown */}
+   368→   368→                <select
+   369→   369→                  value={categoryFilter ?? ""}
+   370→   370→                  onChange={(e) =>
+   371→   371→                    setCategoryFilter(e.target.value || null)
+   372→   372→                  }
+   373→   373→                  className="appearance-none border border-black/15 px-3 py-2 text-[12px] uppercase tracking-wider bg-white text-black/70 cursor-pointer hover:border-black/40 transition-colors pr-8"
+   374→   374→                  style={{
+   375→   375→                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+   376→   376→                    backgroundRepeat: "no-repeat",
+   377→   377→                    backgroundPosition: "right 8px center",
+   378→   378→                  }}
+   379→   379→                >
+   380→   380→                  <option value="">Category</option>
+   381→   381→                  {ALL_CATEGORIES.map((cat) => (
+   382→   382→                    <option key={cat} value={cat}>
+   383→   383→                      {cat}
+   384→   384→                    </option>
+   385→   385→                  ))}
+   386→   386→                </select>
+   387→   387→
+   388→   388→                {/* Color filter pills */}
+   389→   389→                {availableColors.map((c) => (
+   390→   390→                  <button
+   391→   391→                    key={c}
+   392→   392→                    onClick={() => setColorFilter(colorFilter === c ? null : c)}
+   393→   393→                    className={`px-3 py-2 text-[12px] uppercase tracking-wider border transition-colors cursor-pointer ${
+   394→   394→                      colorFilter === c
+   395→   395→                        ? "border-black bg-black text-white"
+   396→   396→                        : "border-black/15 text-black/50 hover:border-black/40"
+   397→   397→                    }`}
+   398→   398→                  >
+   399→   399→                    {c}
+   400→   400→                  </button>
+   401→   401→                ))}
+   402→   402→
+   403→   403→                {/* Clear filters */}
+   404→   404→                {(categoryFilter || colorFilter) && (
+   405→   405→                  <button
+   406→   406→                    onClick={resetFilters}
+   407→   407→                    className="px-3 py-2 text-[12px] uppercase tracking-wider text-black/30 underline underline-offset-2 hover:text-black/60 transition-colors cursor-pointer"
+   408→   408→                  >
+   409→   409→                    Clear
+   410→   410→                  </button>
+   411→   411→                )}
+   412→   412→              </div>
+   413→   413→            </div>
+   414→   414→
+   415→   415→            {/* Product grid */}
+   416→   416→            {products.length > 0 ? (
+   417→   417→              <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+   418→   418→                {products.map((p) => (
+   419→   419→                  <ProductCard
+   420→   420→                    key={p.slug}
+   421→   421→                    product={p}
+   422→   422→                    onSelect={() => setDetailSlug(p.slug, "product")}
+   423→   423→                    onQuickAdd={p.stock > 0 ? () => addToCart() : undefined}
+   424→   424→                  />
+   425→   425→                ))}
+   426→   426→              </div>
+   427→   427→            ) : (
+   428→   428→              <div className="mt-20 flex flex-col items-center justify-center py-20 text-center">
+   429→   429→                <p className="text-[13px] uppercase tracking-widest text-black/20">
+   430→   430→                  No products found
+   431→   431→                </p>
+   432→   432→                <button
+   433→   433→                  onClick={resetFilters}
+   434→   434→                  className="mt-4 text-[12px] uppercase tracking-wider underline underline-offset-2 text-black/40 hover:text-black/60 cursor-pointer"
+   435→   435→                >
+   436→   436→                  Clear filters
+   437→   437→                </button>
+   438→   438→              </div>
+   439→   439→            )}
+   440→   440→          </div>
+   441→   441→        </section>
+   442→   442→
+   443→   443→        {/* Newsletter footer */}
+   444→   444→        <footer className="border-t border-black/10 mt-8">
+   445→   445→          <div className="mx-auto max-w-[1400px] px-6 py-16 grid grid-cols-1 gap-10 md:grid-cols-3 md:py-20">
+   446→   446→            <div>
+   447→   447→              <h3 className="text-[12px] font-medium uppercase tracking-[0.2em]">
+   448→   448→                Subscribe
+   449→   449→              </h3>
+   450→   450→              <p className="mt-3 text-[13px] leading-relaxed text-black/40">
+   451→   451→                Receive email updates about launches, new product info,
+   452→   452→                exclusive access, and more.
+   453→   453→              </p>
+   454→   454→            </div>
+   455→   455→            <div className="flex flex-col gap-3">
+   456→   456→              <h3 className="text-[12px] font-medium uppercase tracking-[0.2em]">
+   457→   457→                Legal
+   458→   458→              </h3>
+   459→   459→              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
+   460→   460→                Terms &amp; Conditions
+   461→   461→              </a>
+   462→   462→              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
+   463→   463→                Privacy Policy
+   464→   464→              </a>
+   465→   465→              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
+   466→   466→                FAQs
+   467→   467→              </a>
+   468→   468→            </div>
+   469→   469→            <div className="flex flex-col gap-3">
+   470→   470→              <h3 className="text-[12px] font-medium uppercase tracking-[0.2em]">
+   471→   471→                Social
+   472→   472→              </h3>
+   473→   473→              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
+   474→   474→                Instagram
+   475→   475→              </a>
+   476→   476→              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
+   477→   477→                Twitter
+   478→   478→              </a>
+   479→   479→              <a href="#" className="text-[13px] text-black/40 hover:text-black/70 transition-colors">
+   480→   480→                TikTok
+   481→   481→              </a>
+   482→   482→            </div>
+   483→   483→          </div>
+   484→   484→        </footer>
+   485→   485→      </div>
+   486→   486→    </PageShell>
+   487→   487→  );
+   488→   488→}
+   489→   489→
+   490→   490→/* ── Action button in album header ── */
+   491→   491→function ActionButton({
+   492→   492→  icon,
+   493→   493→  label,
+   494→   494→  albumTitle,
+   495→   495→}: {
+   496→   496→  icon: React.ReactNode;
+   497→   497→  label: string;
+   498→   498→  albumTitle?: string;
+   499→   499→}) {
+   500→   500→  const { addToCart } = useAppStore();
+   501→   501→  const [streamOpen, setStreamOpen] = useState(false);
+   502→   502→
+   503→   503→  if (label === "Stream" && albumTitle) {
+   504→   504→    return (
+   505→   505→      <>
+   506→   506→        <button
+   507→   507→          onClick={() => setStreamOpen(true)}
+   508→   508→          className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
+   509→   509→        >
+   510→   510→          <span className="text-black/30 group-hover:text-black/60 transition-colors">
+   511→   511→            {icon}
+   512→   512→          </span>
+   513→   513→          <span className="text-[13px] text-black/50 group-hover:text-black/80 transition-colors">
+   514→   514→            {label}
+   515→   515→          </span>
+   516→   516→        </button>
+   517→   517→        <StreamingOverlay
+   518→   518→          open={streamOpen}
+   519→   519→          onOpenChange={setStreamOpen}
+   520→   520→          title={albumTitle}
+   521→   521→        />
+   522→   522→      </>
+   523→   523→    );
+   524→   524→  }
+   525→   525→
+   526→   526→  return (
+   527→   527→    <button
+   528→   528→      onClick={() => addToCart()}
+   529→   529→      className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
+   530→   530→    >
+   531→   531→      <span className="text-black/30 group-hover:text-black/60 transition-colors">
+   532→   532→        {icon}
+   533→   533→      </span>
+   534→   534→      <span className="text-[13px] text-black/50 group-hover:text-black/80 transition-colors">
+   535→   535→        {label}
+   536→   536→      </span>
+   537→   537→    </button>
+   538→   538→  );
+   539→   539→}
+   540→   540→
+   541→   541→/* ═══════════════════════════════════════════════════
+   542→   542→   ALBUM DETAIL PAGE
+   543→   543→   When clicking an album cover from the shop, show album + merch.
+   544→   544→   ═══════════════════════════════════════════════════ */
+   545→   545→
+   546→   546→export function AlbumDetailPage() {
+   547→   547→  const { detailSlug, setDetailSlug, addToCart } = useAppStore();
+   548→   548→  const [streamOpen, setStreamOpen] = useState(false);
+   549→   549→
+   550→   550→  const album = SHOP_ALBUMS.find((a) => a.slug === detailSlug);
+   551→   551→
+   552→   552→  if (!album) return null;
+   553→   553→
+   554→   554→  return (
+   555→   555→    <PageShell>
+   556→   556→      <div className="min-h-screen bg-white text-black">
+   557→   557→        {/* Back link */}
+   558→   558→        <div className="border-b border-black/10">
+   559→   559→          <div className="mx-auto max-w-[1400px] px-6 py-4">
+   560→   560→            <button
+   561→   561→              onClick={() => setDetailSlug(null, null)}
+   562→   562→              className="group flex items-center gap-2 text-[12px] uppercase tracking-[0.15em] text-black/30 hover:text-black transition-colors cursor-pointer"
+   563→   563→            >
+   564→   564→              <ArrowLeft className="h-3.5 w-3.5" />
+   565→   565→              <span>Back to Shop</span>
+   566→   566→            </button>
+   567→   567→          </div>
+   568→   568→        </div>
+   569→   569→
+   570→   570→        {/* Album header */}
+   571→   571→        <section className="border-b border-black/10">
+   572→   572→          <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
+   573→   573→            <div className="grid grid-cols-1 gap-10 md:gap-16 md:grid-cols-2">
+   574→   574→              <ImageGallery total={2} label={album.title} />
+   575→   575→              <div className="flex flex-col justify-center">
+   576→   576→                <h1 className="text-3xl font-bold uppercase tracking-tight md:text-4xl">
+   577→   577→                  {album.title}
+   578→   578→                </h1>
+   579→   579→                <div className="mt-3 flex items-center gap-3 text-[13px] text-black/40">
+   580→   580→                  <span>{album.releaseDate}</span>
+   581→   581→                  <span>·</span>
+   582→   582→                  <span>{album.duration}</span>
+   583→   583→                </div>
+   584→   584→                <p className="mt-6 text-sm leading-relaxed text-black/50 max-w-md">
+   585→   585→                  {album.description}
+   586→   586→                </p>
+   587→   587→                {album.quote && (
+   588→   588→                  <blockquote className="mt-4 border-l-2 border-black/10 pl-4 text-sm italic text-black/40">
+   589→   589→                    {album.quote}
+   590→   590→                  </blockquote>
+   591→   591→                )}
+   592→   592→                <div className="mt-8">
+   593→   593→                  <button
+   594→   594→                    onClick={() => setStreamOpen(true)}
+   595→   595→                    className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
+   596→   596→                  >
+   597→   597→                    <Play className="h-3.5 w-3.5 text-black/30 group-hover:text-black/60" />
+   598→   598→                    <span className="text-[13px] text-black/50 group-hover:text-black/80">Stream Album</span>
+   599→   599→                  </button>
+   600→   600→                  <button
+   601→   601→                    onClick={() => addToCart()}
+   602→   602→                    className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
+   603→   603→                  >
+   604→   604→                    <Plus className="h-3.5 w-3.5 text-black/30 group-hover:text-black/60" />
+   605→   605→                    <span className="text-[13px] text-black/50 group-hover:text-black/80">Add to Cart — Digital Album</span>
+   606→   606→                  </button>
+   607→   607→                  <button
+   608→   608→                    onClick={() => addToCart()}
+   609→   609→                    className="group flex w-full items-center gap-3 border-t border-black/10 py-3.5 text-left hover:bg-black/[0.02] transition-colors cursor-pointer"
+   610→   610→                  >
+   611→   611→                    <Plus className="h-3.5 w-3.5 text-black/30 group-hover:text-black/60" />
+   612→   612→                    <span className="text-[13px] text-black/50 group-hover:text-black/80">Add to Cart — Vinyl</span>
+   613→   613→                  </button>
+   614→   614→                </div>
+   615→   615→              </div>
+   616→   616→            </div>
+   617→   617→          </div>
+   618→   618→        </section>
+   619→   619→
+   620→   620→        {/* Merch grid */}
+   621→   621→        <section className="px-6 py-12 md:py-16">
+   622→   622→          <div className="mx-auto max-w-[1400px]">
+   623→   623→            <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30">
+   624→   624→              {album.title} Merch
+   625→   625→            </h2>
+   626→   626→            <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+   627→   627→              {album.merch.map((p) => (
+   628→   628→                <ProductCard
+   629→   629→                  key={p.slug}
+   630→   630→                  product={p}
+   631→   631→                  onSelect={() => setDetailSlug(p.slug, "product")}
+   632→   632→                  onQuickAdd={p.stock > 0 ? () => addToCart() : undefined}
+   633→   633→                />
+   634→   634→              ))}
+   635→   635→            </div>
+   636→   636→          </div>
+   637→   637→        </section>
+   638→   638→
+   639→   639→        <StreamingOverlay
+   640→   640→          open={streamOpen}
+   641→   641→          onOpenChange={setStreamOpen}
+   642→   642→          title={album.title}
+   643→   643→        />
+   644→   644→      </div>
+   645→   645→    </PageShell>
+   646→   646→  );
+   647→   647→}
+   648→   648→
+   649→   649→/* ═══════════════════════════════════════════════════
+   650→   650→   PRODUCT DETAIL PAGE
+   651→   651→   ═══════════════════════════════════════════════════ */
+   652→   652→
+   653→   653→export function ProductDetailPage() {
+   654→   654→  const { detailSlug, setDetailSlug, addToCart } = useAppStore();
+   655→   655→  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+   656→   656→  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+   657→   657→  const [added, setAdded] = useState(false);
+   658→   658→  const [notifyEmail, setNotifyEmail] = useState("");
+   659→   659→  const [notified, setNotified] = useState(false);
+   660→   660→
+   661→   661→  const product = ALL_PRODUCTS.find((p) => p.slug === detailSlug);
+   662→   662→
+   663→   663→  // Related: same album, different product, limit 4
+   664→   664→  const related = useMemo(() => {
+   665→   665→    if (!product) return [];
+   666→   666→    return ALL_PRODUCTS.filter(
+   667→   667→      (p) => p.slug !== product.slug && p.albumSlug === product.albumSlug
+   668→   668→    ).slice(0, 4);
+   669→   669→  }, [product]);
+   670→   670→
+   671→   671→  // Reset state when product changes
+   672→   672→  useEffect(() => {
+   673→   673→    setSelectedSize(null);
+   674→   674→    setSelectedColor(null);
+   675→   675→    setAdded(false);
+   676→   676→    setNotifyEmail("");
+   677→   677→    setNotified(false);
+   678→   678→  }, [detailSlug]);
+   679→   679→
+   680→   680→  if (!product) return null;
+   681→   681→
+   682→   682→  const available = product.stock > 0;
+   683→   683→  const hasSizes = product.sizes.length > 0;
+   684→   684→  const hasColors = product.colors.length > 0;
+   685→   685→
+   686→   686→  const handleAdd = () => {
+   687→   687→    setAdded(true);
+   688→   688→    addToCart();
+   689→   689→    setTimeout(() => setAdded(false), 1500);
+   690→   690→  };
+   691→   691→
+   692→   692→  const handleNotify = () => {
+   693→   693→    if (notifyEmail.trim()) {
+   694→   694→      setNotified(true);
+   695→   695→      setNotifyEmail("");
+   696→   696→    }
+   697→   697→  };
+   698→   698→
+   699→   699→  return (
+   700→   700→    <PageShell>
+   701→   701→      <div className="min-h-screen bg-white text-black">
+   702→   702→        {/* Back link */}
+   703→   703→        <div className="border-b border-black/10">
+   704→   704→          <div className="mx-auto max-w-[1400px] px-6 py-4">
+   705→   705→            <button
+   706→   706→              onClick={() => setDetailSlug(null, null)}
+   707→   707→              className="group flex items-center gap-2 text-[12px] uppercase tracking-[0.15em] text-black/30 hover:text-black transition-colors cursor-pointer"
+   708→   708→            >
+   709→   709→              <ArrowLeft className="h-3.5 w-3.5" />
+   710→   710→              <span>Back to Shop</span>
+   711→   711→            </button>
+   712→   712→          </div>
+   713→   713→        </div>
+   714→   714→
+   715→   715→        {/* Product detail */}
+   716→   716→        <section>
+   717→   717→          <div className="mx-auto max-w-[1400px] px-6 py-10 md:py-16">
+   718→   718→            <div className="grid grid-cols-1 gap-10 md:gap-16 md:grid-cols-2">
+   719→   719→              {/* Image gallery */}
+   720→   720→              <ImageGallery total={3} label={product.name} />
+   721→   721→
+   722→   722→              {/* Product info */}
+   723→   723→              <div className="flex flex-col">
+   724→   724→                <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30">
+   725→   725→                  {product.category}
+   726→   726→                </p>
+   727→   727→                <h1 className="mt-3 text-3xl font-bold uppercase tracking-tight md:text-4xl">
+   728→   728→                  {product.name}
+   729→   729→                </h1>
+   730→   730→
+   731→   731→                <p className="mt-4 text-2xl">
+   732→   732→                  {available ? `$${product.price}.00` : "Sold Out"}
+   733→   733→                </p>
+   734→   734→
+   735→   735→                <p className="mt-6 text-[13px] leading-relaxed text-black/50 max-w-md">
+   736→   736→                  {product.description}
+   737→   737→                </p>
+   738→   738→
+   739→   739→                {/* Size guide link */}
+   740→   740→                {hasSizes && (
+   741→   741→                  <button className="mt-4 text-[12px] underline underline-offset-2 text-black/30 hover:text-black/60 transition-colors cursor-pointer text-left">
+   742→   742→                    Size Guide
+   743→   743→                  </button>
+   744→   744→                )}
+   745→   745→
+   746→   746→                {/* Divider */}
+   747→   747→                <div className="my-6 border-t border-black/10" />
+   748→   748→
+   749→   749→                {/* Size selector */}
+   750→   750→                {hasSizes && (
+   751→   751→                  <div>
+   752→   752→                    <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.15em] text-black/40">
+   753→   753→                      <span>Size</span>
+   754→   754→                      {selectedSize && (
+   755→   755→                        <span className="text-black">{selectedSize}</span>
+   756→   756→                      )}
+   757→   757→                    </div>
+   758→   758→                    <div className="mt-2">
+   759→   759→                      {product.sizes.map((size) => {
+   760→   760→                        const isSelected = selectedSize === size;
+   761→   761→                        return (
+   762→   762→                          <button
+   763→   763→                            key={size}
+   764→   764→                            onClick={() => available && setSelectedSize(size)}
+   765→   765→                            disabled={!available}
+   766→   766→                            className={`flex w-full items-center justify-between border-t border-black/10 py-3 text-[13px] cursor-pointer transition-colors ${
+   767→   767→                              !available
+   768→   768→                                ? "text-black/20 cursor-not-allowed"
+   769→   769→                                : isSelected
+   770→   770→                                  ? "text-black"
+   771→   771→                                  : "text-black/50 hover:text-black"
+   772→   772→                            }`}
+   773→   773→                          >
+   774→   774→                            <span>{size}</span>
+   775→   775→                            <span
+   776→   776→                              className={
+   777→   777→                                available
+   778→   778→                                  ? "text-black"
+   779→   779→                                  : "text-black/20"
+   780→   780→                              }
+   781→   781→                            >
+   782→   782→                              {isSelected && available ? "●" : "○"}
+   783→   783→                            </span>
+   784→   784→                          </button>
+   785→   785→                        );
+   786→   786→                      })}
+   787→   787→                    </div>
+   788→   788→                  </div>
+   789→   789→                )}
+   790→   790→
+   791→   791→                {/* Color selector */}
+   792→   792→                {hasColors && (
+   793→   793→                  <div className="mt-6">
+   794→   794→                    <div className="text-[12px] uppercase tracking-[0.15em] text-black/40">
+   795→   795→                      {selectedColor || "Color"}
+   796→   796→                    </div>
+   797→   797→                    <div className="mt-3 flex gap-2.5">
+   798→   798→                      {product.colors.map((c) => (
+   799→   799→                        <button
+   800→   800→                          key={c.hex}
+   801→   801→                          onClick={() =>
+   802→   802→                            available && setSelectedColor(c.name)
+   803→   803→                          }
+   804→   804→                          disabled={!available}
+   805→   805→                          className={`h-8 w-8 rounded-full border-2 transition-all cursor-pointer ${
+   806→   806→                            selectedColor === c.name
+   807→   807→                              ? "border-black scale-110"
+   808→   808→                              : "border-black/10 hover:border-black/30"
+   809→   809→                          } ${!available ? "opacity-30 cursor-not-allowed" : ""}`}
+   810→   810→                          style={{ backgroundColor: c.hex }}
+   811→   811→                          title={c.name}
+   812→   812→                        />
+   813→   813→                      ))}
+   814→   814→                    </div>
+   815→   815→                  </div>
+   816→   816→                )}
+   817→   817→
+   818→   818→                {/* Availability */}
+   819→   819→                <div className="mt-6 text-[12px] text-black/40">
+   820→   820→                  {available
+   821→   821→                    ? `${product.stock} in stock`
+   822→   822→                    : "Sold Out"}
+   823→   823→                </div>
+   824→   824→
+   825→   825→                {/* Add to Cart */}
+   826→   826→                <button
+   827→   827→                  onClick={handleAdd}
+   828→   828→                  disabled={!available}
+   829→   829→                  className={`mt-6 w-full py-4 text-[12px] font-medium uppercase tracking-[0.2em] transition-all duration-200 cursor-pointer ${
+   830→   830→                    added
+   831→   831→                      ? "bg-black text-white"
+   832→   832→                      : available
+   833→   833→                        ? "bg-black text-white hover:bg-black/80"
+   834→   834→                        : "bg-black/5 text-black/20 cursor-not-allowed"
+   835→   835→                  }`}
+   836→   836→                >
+   837→   837→                  {added
+   838→   838→                    ? "Added to Cart"
+   839→   839→                    : available
+   840→   840→                      ? "Add to Cart"
+   841→   841→                      : "Sold Out"}
+   842→   842→                </button>
+   843→   843→
+   844→   844→                {/* Notify Me for sold out */}
+   845→   845→                {!available && (
+   846→   846→                  <div className="mt-6">
+   847→   847→                    <p className="text-[12px] text-black/30 mb-3">
+   848→   848→                      This item is currently unavailable.
+   849→   849→                    </p>
+   850→   850→                    {notified ? (
+   851→   851→                      <p className="text-[12px] text-black/50">
+   852→   852→                        You&apos;ll be notified when back in stock.
+   853→   853→                      </p>
+   854→   854→                    ) : (
+   855→   855→                      <div className="flex gap-2">
+   856→   856→                        <input
+   857→   857→                          type="email"
+   858→   858→                          placeholder="Email address"
+   859→   859→                          value={notifyEmail}
+   860→   860→                          onChange={(e) => setNotifyEmail(e.target.value)}
+   861→   861→                          className="flex-1 border border-black/15 bg-white px-3 py-2.5 text-[13px] text-black placeholder:text-black/20 outline-none focus:border-black/40 transition-colors"
+   862→   862→                        />
+   863→   863→                        <button
+   864→   864→                          onClick={handleNotify}
+   865→   865→                          className="px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.15em] bg-black text-white hover:bg-black/80 transition-colors cursor-pointer"
+   866→   866→                        >
+   867→   867→                          Submit
+   868→   868→                        </button>
+   869→   869→                      </div>
+   870→   870→                    )}
+   871→   871→                  </div>
+   872→   872→                )}
+   873→   873→
+   874→   874→                {/* Shipping info */}
+   875→   875→                <div className="mt-8 grid grid-cols-2 gap-6">
+   876→   876→                  <div className="border-t border-black/10 pt-3">
+   877→   877→                    <span className="text-[11px] uppercase tracking-[0.15em] text-black/30">
+   878→   878→                      Ships
+   879→   879→                    </span>
+   880→   880→                    <p className="mt-1 text-[13px] text-black/60">
+   881→   881→                      3–5 business days
+   882→   882→                    </p>
+   883→   883→                  </div>
+   884→   884→                  <div className="border-t border-black/10 pt-3">
+   885→   885→                    <span className="text-[11px] uppercase tracking-[0.15em] text-black/30">
+   886→   886→                      Returns
+   887→   887→                    </span>
+   888→   888→                    <p className="mt-1 text-[13px] text-black/60">
+   889→   889→                      30 days
+   890→   890→                    </p>
+   891→   891→                  </div>
+   892→   892→                </div>
+   893→   893→              </div>
+   894→   894→            </div>
+   895→   895→          </div>
+   896→   896→        </section>
+   897→   897→
+   898→   898→        {/* Related Products */}
+   899→   899→        {related.length > 0 && (
+   900→   900→          <section className="border-t border-black/10">
+   901→   901→            <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
+   902→   902→              <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-black/30 text-center">
+   903→   903→                Related Products
+   904→   904→              </h2>
+   905→   905→              <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+   906→   906→                {related.map((r) => (
+   907→   907→                  <ProductCard
+   908→   908→                    key={r.slug}
+   909→   909→                    product={r}
+   910→   910→                    onSelect={() => setDetailSlug(r.slug, "product")}
+   911→   911→                    onQuickAdd={
+   912→   912→                      r.stock > 0 ? () => addToCart() : undefined
+   913→   913→                    }
+   914→   914→                  />
+   915→   915→                ))}
+   916→   916→              </div>
+   917→   917→            </div>
+   918→   918→          </section>
+   919→   919→        )}
+   920→   920→
+   921→   921→        {/* Footer */}
+   922→   922→        <footer className="border-t border-black/10">
+   923→   923→          <div className="mx-auto max-w-[1400px] px-6 py-12 text-center text-[11px] text-black/30 uppercase tracking-[0.15em]">
+   924→   924→            © {new Date().getFullYear()} Adea Lyric. All rights reserved.
+   925→   925→          </div>
+   926→   926→        </footer>
+   927→   927→      </div>
+   928→   928→    </PageShell>
+   929→   929→  );
+   930→   930→}
+   931→   931→
