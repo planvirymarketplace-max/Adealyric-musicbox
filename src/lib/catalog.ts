@@ -758,7 +758,6 @@ export const SHOP_ALBUMS: ShopAlbum[] = [
     description:
       "The debut album that introduced Adea Lyric to the world. Raw, unfiltered, and deeply rooted in West Philadelphia.",
     quote: "Every word is a weapon, every note is a prayer.",
-    singleTitle: "Can't Nobody",
     cover: cantnobodyAsset,
     merch: [
       { slug: "cn-hoodie-blk", name: "Can't Nobody Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, GRAY, CREAM], image: "", description: "Heavyweight 400gsm fleece hoodie with embroidered album logo on chest.", stock: 24, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },

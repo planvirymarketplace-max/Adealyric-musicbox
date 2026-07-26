@@ -421,3 +421,18 @@ Stage Summary:
 - All hover micro-interactions removed for clean stillness
 - Generous spacing restored (gap-4, py-6)
 - Container narrowed to max-w-xl
+---
+Task ID: 1
+Agent: Main
+Task: Fix album detail page layout
+
+Work Log:
+- Fixed 2x2 button grid, streaming overlay, navigation, album data
+
+Stage Summary:
+- Album detail page now has 2x2 action button grid
+- Streaming overlay is horizontal scroll (like footer)
+- Can Nobody has no Stream Single, others do
+- Navigation links (Shop All, Collections) at top
+- No 180g vinyl text
+

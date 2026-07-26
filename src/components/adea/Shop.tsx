@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════
-   STREAMING OVERLAY
+   STREAMING OVERLAY — horizontal scroll like footer
    ═══════════════════════════════════════════════════ */
 
 const STREAM_PLATFORMS = [
@@ -42,6 +42,8 @@ const STREAM_PLATFORMS = [
   { key: "tidal", label: "Tidal" },
   { key: "pandora", label: "Pandora" },
 ];
+
+const SCROLL_PLATFORMS = [...STREAM_PLATFORMS, ...STREAM_PLATFORMS, ...STREAM_PLATFORMS, ...STREAM_PLATFORMS];
 
 function StreamingOverlay({
   open,
@@ -59,35 +61,39 @@ function StreamingOverlay({
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
       />
-      <div className="relative bg-white text-black w-full max-w-2xl mx-4 p-8 sm:p-12 border border-black/10">
-        <button
-          onClick={() => onOpenChange(false)}
-          className="absolute top-4 right-4 text-black/30 hover:text-black cursor-pointer"
-          aria-label="Close"
-        >
-          <X className="h-5 w-5" />
-        </button>
-        <div className="text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">
-            Stream Now
-          </p>
-          <h3 className="mt-3 text-2xl sm:text-3xl font-medium">{title}</h3>
+      <div className="relative w-full max-w-3xl mx-4">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">Stream Now</p>
+            <h3 className="mt-1 text-xl font-medium text-white">{title}</h3>
+          </div>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="flex h-9 w-9 items-center justify-center border border-white/10 text-white/40 hover:text-white hover:border-white/30 transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {STREAM_PLATFORMS.map((p) => (
-            <a
-              key={p.key}
-              href="#"
-              onClick={(e) => e.preventDefault()}
-              className="group/plt flex items-center gap-3 border border-black/10 px-4 py-4 hover:border-black/40 hover:bg-black/5 transition-all cursor-pointer"
-            >
-              <PlatformIcon name={p.key} className="h-4 w-4 text-black/40 group-hover/plt:text-black shrink-0" />
-              <span className="text-[11px] uppercase tracking-[0.15em] text-black/40 group-hover/plt:text-black">
-                {p.label}
-              </span>
-              <Play className="ml-auto h-3.5 w-3.5 text-black/15 group-hover/plt:text-black opacity-0 group-hover/plt:opacity-100 transition-opacity shrink-0" />
-            </a>
-          ))}
+        <div className="relative overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-md">
+          <div className="py-6 overflow-x-auto scrollbar-hide">
+            <div className="flex w-max items-center gap-0">
+              {SCROLL_PLATFORMS.map((p, i) => (
+                <a
+                  key={`${p.key}-${i}`}
+                  href="#"
+                  onClick={(e) => e.preventDefault()}
+                  className="flex shrink-0 items-center gap-3 px-6 py-3 hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  <PlatformIcon name={p.key} className="h-5 w-5 text-white/40" />
+                  <span className="whitespace-nowrap text-sm tracking-wide text-white/60">{p.label}</span>
+                  <span className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                    <Play className="h-3.5 w-3.5 ml-0.5 text-white/60" />
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -494,20 +500,33 @@ export function AlbumDetailPage() {
 
   const digitalPrice = 12;
   const vinylProduct = album.merch.find((m) => m.category === "Vinyl");
-  const availableCount = album.merch.filter((m) => m.stock > 0).length;
 
   return (
     <>
       <section className="min-h-screen bg-white px-6 pt-36 pb-20 md:px-12 md:pt-48 md:pb-28">
         <div className="mx-auto max-w-[1400px]">
-          {/* Back button */}
-          <button
-            onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }}
-            className="mb-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Shop
-          </button>
+          {/* Top nav links */}
+          <div className="mb-10 flex items-center gap-6">
+            <button
+              onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }}
+              className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Shop
+            </button>
+            <button
+              onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }}
+              className="text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
+            >
+              Shop All
+            </button>
+            <button
+              onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }}
+              className="text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
+            >
+              Collections
+            </button>
+          </div>
 
           {/* Two-column hero */}
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
@@ -535,91 +554,76 @@ export function AlbumDetailPage() {
             </div>
           </div>
 
-          {/* ── Action Rows ── */}
-          <div className="mt-12 max-w-xl flex flex-col gap-4">
+          {/* ── Action Buttons — 2 columns ── */}
+          <div className="mt-12 max-w-xl grid grid-cols-2 gap-4">
             {/* Stream Album */}
             <button
               onClick={() => openStream(album.title + " — Album")}
-              className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
+              className="flex items-center gap-3 border border-black/10 px-4 py-5 hover:border-black/25 transition-colors cursor-pointer"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
-                <Play className="h-5 w-5 ml-0.5" />
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-white">
+                <Play className="h-4 w-4 ml-0.5" />
               </span>
-              <div className="flex-1 text-left">
-                <p className="text-[13px] text-black/15">Stream Album</p>
-                <p className="mt-0.5 text-[14px] font-medium text-black">All platforms</p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-black" />
+              <span className="text-[13px] font-medium text-black">Stream Album</span>
             </button>
 
             {/* Stream Single */}
-            {album.singleTitle && (
+            {album.singleTitle ? (
               <button
                 onClick={() => openStream(album.singleTitle! + " — Single")}
-                className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
+                className="flex items-center gap-3 border border-black/10 px-4 py-5 hover:border-black/25 transition-colors cursor-pointer"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
-                  <Play className="h-5 w-5 ml-0.5" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-white">
+                  <Play className="h-4 w-4 ml-0.5" />
                 </span>
-                <div className="flex-1 text-left">
-                  <p className="text-[13px] text-black/15">Stream Single</p>
-                  <p className="mt-0.5 text-[14px] font-medium text-black">{album.singleTitle}</p>
-                </div>
-                <ArrowRight className="h-4 w-4 text-black" />
+                <span className="text-[13px] font-medium text-black">Stream Single</span>
               </button>
+            ) : (
+              <div /> /* empty cell to keep grid aligned */
             )}
 
             {/* Add to Cart — Digital */}
             <button
               onClick={() => addToCart()}
-              className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
+              className="flex items-center gap-3 border border-black/10 px-4 py-5 hover:border-black/25 transition-colors cursor-pointer"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black text-white">
-                <Plus className="h-5 w-5" />
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-black text-white">
+                <Plus className="h-4 w-4" />
               </span>
-              <div className="flex-1 text-left">
-                <p className="text-[13px] text-black/15">Add to Cart — Digital</p>
-                <p className="mt-0.5 text-[14px] font-medium text-black">Digital download</p>
+              <div className="flex flex-col items-start">
+                <span className="text-[13px] font-medium text-black">Digital</span>
+                <span className="text-[11px] text-black/40 tabular-nums">${digitalPrice}.00</span>
               </div>
-              <span className="text-[14px] text-black/15 tabular-nums">${digitalPrice}.00</span>
             </button>
 
             {/* Add to Cart — Vinyl */}
-            <button
-              onClick={() => addToCart()}
-              disabled={!vinylProduct || vinylProduct.stock === 0}
-              className={`w-full flex items-center gap-4 border rounded-md px-5 py-6 ${
-                vinylProduct && vinylProduct.stock > 0
-                  ? "border-black/10 bg-white cursor-pointer"
-                  : "border-black/5 bg-black/[0.01] opacity-40 cursor-not-allowed"
-              }`}
-            >
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${
-                vinylProduct && vinylProduct.stock > 0
-                  ? "bg-black text-white"
-                  : "bg-black/8 text-black/25"
-              }`}>
-                <Plus className="h-5 w-5" />
-              </span>
-              <div className="flex-1 text-left">
-                <p className={`text-[13px] ${vinylProduct && vinylProduct.stock > 0 ? "text-black/15" : "text-black/10"}`}>
-                  Add to Cart — Vinyl
-                </p>
-                <p className={`mt-0.5 text-[14px] font-medium ${vinylProduct && vinylProduct.stock > 0 ? "text-black" : "text-black/30"}`}>
-                  {vinylProduct && vinylProduct.stock > 0 ? "180g heavyweight vinyl" : "Currently unavailable"}
-                </p>
-              </div>
-              {vinylProduct && vinylProduct.stock > 0 ? (
-                <span className="text-[14px] text-black/15 tabular-nums">${vinylProduct.price}.00</span>
-              ) : (
-                <span className="text-[11px] uppercase tracking-widest text-black/20">Sold Out</span>
-              )}
-            </button>
-
-            {/* Availability */}
-            <p className="pt-1 text-[11px] text-black/25">
-              {availableCount} of {album.merch.length} items available
-            </p>
+            {vinylProduct && vinylProduct.stock > 0 ? (
+              <button
+                onClick={() => addToCart()}
+                className="flex items-center gap-3 border border-black/10 px-4 py-5 hover:border-black/25 transition-colors cursor-pointer"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-black text-white">
+                  <Plus className="h-4 w-4" />
+                </span>
+                <div className="flex flex-col items-start">
+                  <span className="text-[13px] font-medium text-black">Vinyl</span>
+                  <span className="text-[11px] text-black/40 tabular-nums">${vinylProduct.price}.00</span>
+                </div>
+              </button>
+            ) : (
+              <button
+                disabled
+                className="flex items-center gap-3 border border-black/5 px-4 py-5 opacity-40 cursor-not-allowed"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-black/8 text-black/25">
+                  <Plus className="h-4 w-4" />
+                </span>
+                <div className="flex flex-col items-start">
+                  <span className="text-[13px] font-medium text-black/30">Vinyl</span>
+                  <span className="text-[11px] text-black/20 uppercase tracking-widest">Sold Out</span>
+                </div>
+              </button>
+            )}
           </div>
 
           {/* ── Merch Grid ── */}

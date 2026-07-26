@@ -1,0 +1,801 @@
+     1→"use client";
+     2→
+     3→import { useState, useMemo, useCallback } from "react";
+     4→import { useAppStore } from "@/lib/store";
+     5→import { PlatformIcon } from "./SiteChrome";
+     6→import {
+     7→  SHOP_ALBUMS,
+     8→  ALL_PRODUCTS,
+     9→  CATEGORY_TREE,
+    10→  getLeafCategories,
+    11→  SIZE_OPTIONS,
+    12→  CATEGORY_SIZE_TYPE,
+    13→  enrichProduct,
+    14→  type ShopProduct,
+    15→  type ShopAlbum,
+    16→  type EnrichedProduct,
+    17→  type ShopCategory,
+    18→  type SizeType,
+    19→} from "@/lib/catalog";
+    20→import {
+    21→  Play,
+    22→  Plus,
+    23→  X,
+    24→  ArrowLeft,
+    25→  ArrowRight,
+    26→  ShoppingBag,
+    27→  ChevronDown,
+    28→  ChevronRight,
+    29→} from "lucide-react";
+    30→
+    31→/* ═══════════════════════════════════════════════════
+    32→   STREAMING OVERLAY
+    33→   ═══════════════════════════════════════════════════ */
+    34→
+    35→const STREAM_PLATFORMS = [
+    36→  { key: "spotify", label: "Spotify" },
+    37→  { key: "appleMusic", label: "Apple Music" },
+    38→  { key: "tiktok", label: "TikTok" },
+    39→  { key: "instagram", label: "Instagram" },
+    40→  { key: "amazonMusic", label: "Amazon Music" },
+    41→  { key: "youtube", label: "YouTube" },
+    42→  { key: "tidal", label: "Tidal" },
+    43→  { key: "pandora", label: "Pandora" },
+    44→];
+    45→
+    46→function StreamingOverlay({
+    47→  open,
+    48→  onOpenChange,
+    49→  title,
+    50→}: {
+    51→  open: boolean;
+    52→  onOpenChange: (v: boolean) => void;
+    53→  title: string;
+    54→}) {
+    55→  if (!open) return null;
+    56→  return (
+    57→    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    58→      <div
+    59→        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+    60→        onClick={() => onOpenChange(false)}
+    61→      />
+    62→      <div className="relative bg-white text-black w-full max-w-2xl mx-4 p-8 sm:p-12 border border-black/10">
+    63→        <button
+    64→          onClick={() => onOpenChange(false)}
+    65→          className="absolute top-4 right-4 text-black/30 hover:text-black cursor-pointer"
+    66→          aria-label="Close"
+    67→        >
+    68→          <X className="h-5 w-5" />
+    69→        </button>
+    70→        <div className="text-center">
+    71→          <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">
+    72→            Stream Now
+    73→          </p>
+    74→          <h3 className="mt-3 text-2xl sm:text-3xl font-medium">{title}</h3>
+    75→        </div>
+    76→        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    77→          {STREAM_PLATFORMS.map((p) => (
+    78→            <a
+    79→              key={p.key}
+    80→              href="#"
+    81→              onClick={(e) => e.preventDefault()}
+    82→              className="group/plt flex items-center gap-3 border border-black/10 px-4 py-4 hover:border-black/40 hover:bg-black/5 transition-all cursor-pointer"
+    83→            >
+    84→              <PlatformIcon name={p.key} className="h-4 w-4 text-black/40 group-hover/plt:text-black shrink-0" />
+    85→              <span className="text-[11px] uppercase tracking-[0.15em] text-black/40 group-hover/plt:text-black">
+    86→                {p.label}
+    87→              </span>
+    88→              <Play className="ml-auto h-3.5 w-3.5 text-black/15 group-hover/plt:text-black opacity-0 group-hover/plt:opacity-100 transition-opacity shrink-0" />
+    89→            </a>
+    90→          ))}
+    91→        </div>
+    92→      </div>
+    93→    </div>
+    94→  );
+    95→}
+    96→
+    97→/* ═══════════════════════════════════════════════════
+    98→   PRODUCT CARD
+    99→   ═══════════════════════════════════════════════════ */
+   100→
+   101→function ProductCard({
+   102→  product,
+   103→  onSelect,
+   104→  onQuickAdd,
+   105→}: {
+   106→  product: ShopProduct;
+   107→  onSelect: () => void;
+   108→  onQuickAdd?: () => void;
+   109→}) {
+   110→  const available = product.stock > 0;
+   111→  return (
+   112→    <div className="group cursor-pointer" onClick={onSelect}>
+   113→      <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+   114→        {product.image ? (
+   115→          <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+   116→        ) : (
+   117→          <div className="flex h-full w-full items-center justify-center">
+   118→            <ShoppingBag className="h-8 w-8 text-black/10" />
+   119→          </div>
+   120→        )}
+   121→        {available && onQuickAdd && (
+   122→          <button
+   123→            onClick={(e) => { e.stopPropagation(); onQuickAdd(); }}
+   124→            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center border border-black/10 bg-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 cursor-pointer hover:bg-black hover:text-white"
+   125→            aria-label="Quick add"
+   126→          >
+   127→            <Plus className="h-3.5 w-3.5" />
+   128→          </button>
+   129→        )}
+   130→        {!available && (
+   131→          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+   132→            <span className="text-[11px] font-medium uppercase tracking-widest text-black/40">
+   133→              Sold Out
+   134→            </span>
+   135→          </div>
+   136→        )}
+   137→      </div>
+   138→      <div className="mt-3">
+   139→        <p className="text-[12px] font-medium uppercase tracking-wide text-black/80 leading-tight line-clamp-1">
+   140→          {product.name}
+   141→        </p>
+   142→        <div className="mt-1 flex items-center gap-3">
+   143→          <span className={`text-sm ${available ? "text-black" : "text-black/30"}`}>
+   144→            {available ? `$${product.price}.00` : "Sold Out"}
+   145→          </span>
+   146→        </div>
+   147→        {product.colors.length > 0 && (
+   148→          <div className="mt-2 flex gap-1.5">
+   149→            {product.colors.map((c) => (
+   150→              <span key={c.hex} className="block h-3 w-3 rounded-full border border-black/10" style={{ backgroundColor: c.hex }} title={c.name} />
+   151→            ))}
+   152→          </div>
+   153→        )}
+   154→      </div>
+   155→    </div>
+   156→  );
+   157→}
+   158→
+   159→/* ═══════════════════════════════════════════════════
+   160→   SHOP PAGE — 3 paths: Albums | Collections | Shop All
+   161→   ═══════════════════════════════════════════════════ */
+   162→
+   163→type ShopPath = "albums" | "collections" | "shop-all";
+   164→
+   165→function ShopNav({
+   166→  active,
+   167→  onChange,
+   168→  cartCount,
+   169→}: {
+   170→  active: ShopPath;
+   171→  onChange: (p: ShopPath) => void;
+   172→  cartCount: number;
+   173→}) {
+   174→  const tabs: { label: string; key: ShopPath }[] = [
+   175→    { label: "Albums", key: "albums" },
+   176→    { label: "Collections", key: "collections" },
+   177→    { label: "Shop All", key: "shop-all" },
+   178→  ];
+   179→  return (
+   180→    <div className="flex items-center justify-between border-b border-black/10">
+   181→      <div className="flex items-center gap-8">
+   182→        {tabs.map((t) => (
+   183→          <button
+   184→            key={t.key}
+   185→            onClick={() => onChange(t.key)}
+   186→            className={`relative pb-3 text-[12px] font-medium uppercase tracking-[0.15em] transition-colors cursor-pointer ${
+   187→              active === t.key
+   188→                ? "text-black border-b-2 border-black"
+   189→                : "text-black/40 hover:text-black/70 border-b-2 border-transparent"
+   190→            }`}
+   191→          >
+   192→            {t.label}
+   193→          </button>
+   194→        ))}
+   195→      </div>
+   196→      <span className="text-[11px] text-black/30">Cart ({cartCount})</span>
+   197→    </div>
+   198→  );
+   199→}
+   200→
+   201→/* ─── Albums View ─── */
+   202→function AlbumsView({ onAlbumClick }: { onAlbumClick: (a: ShopAlbum) => void }) {
+   203→  return (
+   204→    <div className="mt-10">
+   205→      <p className="text-[11px] text-black/30 mb-8">{SHOP_ALBUMS.length} albums</p>
+   206→      <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+   207→        {SHOP_ALBUMS.map((album) => (
+   208→          <div key={album.slug} className="group cursor-pointer" onClick={() => onAlbumClick(album)}>
+   209→            <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+   210→              {album.cover ? (
+   211→                <img src={album.cover} alt={album.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+   212→              ) : (
+   213→                <div className="flex h-full w-full items-center justify-center">
+   214→                  <ShoppingBag className="h-10 w-10 text-black/10" />
+   215→                </div>
+   216→              )}
+   217→              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+   218→            </div>
+   219→            <div className="mt-4">
+   220→              <h3 className="text-sm font-semibold uppercase tracking-wide text-black">{album.title}</h3>
+   221→              <p className="mt-1 text-[11px] text-black/40 uppercase tracking-wider">{album.releaseDate}</p>
+   222→            </div>
+   223→          </div>
+   224→        ))}
+   225→      </div>
+   226→    </div>
+   227→  );
+   228→}
+   229→
+   230→/* ─── Collections View (placeholder) ─── */
+   231→function CollectionsView() {
+   232→  return (
+   233→    <div className="mt-20 flex flex-col items-center justify-center py-20">
+   234→      <p className="text-display text-3xl text-black/15">Collections</p>
+   235→      <p className="mt-4 text-sm text-black/30">Special runs and collaborations coming soon.</p>
+   236→    </div>
+   237→  );
+   238→}
+   239→
+   240→/* ─── Category Sidebar ─── */
+   241→function CategorySidebar({
+   242→  selected,
+   243→  onChange,
+   244→}: {
+   245→  selected: ShopCategory[] | null;
+   246→  onChange: (cats: ShopCategory[] | null) => void;
+   247→}) {
+   248→  const [openNodes, setOpenNodes] = useState<Set<string>>(new Set());
+   249→
+   250→  const toggle = (slug: string) => {
+   251→    setOpenNodes((prev) => {
+   252→      const next = new Set(prev);
+   253→      if (next.has(slug)) next.delete(slug);
+   254→      else next.add(slug);
+   255→      return next;
+   256→    });
+   257→  };
+   258→
+   259→  const handleLeaf = (cats: ShopCategory[]) => {
+   260→    onChange(cats);
+   261→  };
+   262→
+   263→  const handleClear = () => {
+   264→    onChange(null);
+   265→  };
+   266→
+   267→  function renderNode(node: { label: string; slug: string; categories?: ShopCategory[]; children?: any[] }, depth: number) {
+   268→    const hasChildren = node.children && node.children.length > 0;
+   269→    const isOpen = openNodes.has(node.slug);
+   270→    const isLeaf = !!node.categories;
+   271→
+   272→    return (
+   273→      <div key={node.slug}>
+   274→        <button
+   275→          onClick={() => {
+   276→            if (isLeaf) handleLeaf(node.categories!);
+   277→            else if (hasChildren) toggle(node.slug);
+   278→          }}
+   279→          className={`w-full flex items-center justify-between py-2 text-left text-[12px] tracking-wide cursor-pointer transition-colors hover:text-black ${
+   280→            isLeaf && selected && JSON.stringify(selected) === JSON.stringify(node.categories)
+   281→              ? "text-black font-medium"
+   282→              : "text-black/50"
+   283→          }`}
+   284→          style={{ paddingLeft: `${depth * 16}px` }}
+   285→        >
+   286→          <span>{node.label}</span>
+   287→          {hasChildren && (
+   288→            <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+   289→          )}
+   290→        </button>
+   291→        {hasChildren && isOpen && (
+   292→          <div>
+   293→            {node.children.map((child: any) => renderNode(child, depth + 1))}
+   294→          </div>
+   295→        )}
+   296→      </div>
+   297→    );
+   298→  }
+   299→
+   300→  return (
+   301→    <div className="w-full">
+   302→      <div className="flex items-center justify-between mb-6">
+   303→        <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">Categories</p>
+   304→        {selected && (
+   305→          <button onClick={handleClear} className="text-[10px] uppercase tracking-wider text-black/30 hover:text-black cursor-pointer underline">
+   306→            Clear
+   307→          </button>
+   308→        )}
+   309→      </div>
+   310→      {CATEGORY_TREE.map((node) => renderNode(node, 0))}
+   311→    </div>
+   312→  );
+   313→}
+   314→
+   315→/* ─── Size Filter (contextual) ─── */
+   316→const SIZE_LABELS: Record<string, string> = {
+   317→  clothing: "Clothing Size",
+   318→  waist: "Waist Size",
+   319→  shoe: "Shoe Size",
+   320→  hat: "Hat Size",
+   321→  drinkware: "Size",
+   322→  "one-size": "",
+   323→  none: "",
+   324→};
+   325→
+   326→function SizeFilter({
+   327→  categories,
+   328→  selected,
+   329→  onChange,
+   330→}: {
+   331→  categories: ShopCategory[] | null;
+   332→  selected: string | null;
+   333→  onChange: (size: string | null) => void;
+   334→}) {
+   335→  /* Determine which size type applies based on selected categories */
+   336→  let activeSizeType: SizeType = "none";
+   337→  if (categories) {
+   338→    const types = new Set(categories.map((c) => CATEGORY_SIZE_TYPE[c] ?? "none"));
+   339→    if (types.size === 1) {
+   340→      activeSizeType = [...types][0];
+   341→    } else {
+   342→      /* Mixed types — default to clothing */
+   343→      activeSizeType = "clothing";
+   344→    }
+   345→  }
+   346→
+   347→  const options = SIZE_OPTIONS[activeSizeType];
+   348→  const label = SIZE_LABELS[activeSizeType];
+   349→  if (!options || options.length === 0 || !label) return null;
+   350→
+   351→  return (
+   352→    <div className="mt-6">
+   353→      <p className="text-[10px] uppercase tracking-[0.2em] text-black/30 mb-3">{label}</p>
+   354→      <div className="flex flex-wrap gap-2">
+   355→        {options.map((s) => (
+   356→          <button
+   357→            key={s}
+   358→            onClick={() => onChange(selected === s ? null : s)}
+   359→            className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border transition-all cursor-pointer ${
+   360→              selected === s
+   361→                ? "bg-black text-white border-black"
+   362→                : "bg-white text-black/50 border-black/15 hover:border-black/40"
+   363→            }`}
+   364→          >
+   365→            {s}
+   366→          </button>
+   367→        ))}
+   368→      </div>
+   369→    </div>
+   370→  );
+   371→}
+   372→
+   373→/* ─── Shop All View ─── */
+   374→function ShopAllView({
+   375→  onSelectProduct,
+   376→  onQuickAdd,
+   377→}: {
+   378→  onSelectProduct: (p: ShopProduct) => void;
+   379→  onQuickAdd: () => void;
+   380→}) {
+   381→  const [selectedCats, setSelectedCats] = useState<ShopCategory[] | null>(null);
+   382→  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+   383→
+   384→  const filtered = useMemo(() => {
+   385→    let list = ALL_PRODUCTS;
+   386→    if (selectedCats) {
+   387→      list = list.filter((p) => selectedCats.includes(p.category));
+   388→    }
+   389→    if (selectedSize) {
+   390→      list = list.filter((p) => p.sizes.includes(selectedSize));
+   391→    }
+   392→    return list;
+   393→  }, [selectedCats, selectedSize]);
+   394→
+   395→  return (
+   396→    <div className="mt-8 grid grid-cols-1 gap-12 md:grid-cols-4 lg:grid-cols-5">
+   397→      {/* Sidebar */}
+   398→      <div className="md:col-span-1">
+   399→        <CategorySidebar selected={selectedCats} onChange={setSelectedCats} />
+   400→        <SizeFilter categories={selectedCats} selected={selectedSize} onChange={setSelectedSize} />
+   401→      </div>
+   402→
+   403→      {/* Product Grid */}
+   404→      <div className="md:col-span-3 lg:col-span-4">
+   405→        <p className="mb-4 text-[11px] text-black/30">
+   406→          {filtered.length} product{filtered.length !== 1 ? "s" : ""}
+   407→        </p>
+   408→        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:gap-x-6">
+   409→          {filtered.map((p) => (
+   410→            <ProductCard
+   411→              key={p.slug}
+   412→              product={p}
+   413→              onSelect={() => onSelectProduct(p)}
+   414→              onQuickAdd={onQuickAdd}
+   415→            />
+   416→          ))}
+   417→        </div>
+   418→        {filtered.length === 0 && (
+   419→          <div className="mt-20 text-center">
+   420→            <p className="text-sm text-black/30">No products match your filters.</p>
+   421→          </div>
+   422→        )}
+   423→      </div>
+   424→    </div>
+   425→  );
+   426→}
+   427→
+   428→/* ═══════════════════════════════════════════════════
+   429→   SHOP PAGE
+   430→   ═══════════════════════════════════════════════════ */
+   431→
+   432→export function ShopPage() {
+   433→  const { setDetailSlug, addToCart, cartCount } = useAppStore();
+   434→  const [shopPath, setShopPath] = useState<ShopPath>("albums");
+   435→
+   436→  const openAlbum = useCallback(
+   437→    (album: ShopAlbum) => {
+   438→      setDetailSlug(album.slug, "album");
+   439→    },
+   440→    [setDetailSlug]
+   441→  );
+   442→
+   443→  const openProduct = useCallback(
+   444→    (p: ShopProduct) => {
+   445→      setDetailSlug(p.slug, "product");
+   446→    },
+   447→    [setDetailSlug]
+   448→  );
+   449→
+   450→  const handleQuickAdd = useCallback(() => {
+   451→    addToCart();
+   452→  }, [addToCart]);
+   453→
+   454→  return (
+   455→    <section className="min-h-screen bg-white px-6 pt-36 pb-20 md:px-12 md:pt-48 md:pb-28">
+   456→      <div className="mx-auto max-w-[1400px]">
+   457→        <p className="text-[10px] uppercase tracking-[0.25em] text-black/30">06 — Shop</p>
+   458→        <h1 className="mt-6 text-display text-[clamp(3rem,8vw,8rem)] leading-[0.85] text-black">
+   459→          Shop.
+   460→        </h1>
+   461→
+   462→        <div className="mt-12">
+   463→          <ShopNav active={shopPath} onChange={setShopPath} cartCount={cartCount} />
+   464→
+   465→          {shopPath === "albums" && <AlbumsView onAlbumClick={openAlbum} />}
+   466→          {shopPath === "collections" && <CollectionsView />}
+   467→          {shopPath === "shop-all" && (
+   468→            <ShopAllView onSelectProduct={openProduct} onQuickAdd={handleQuickAdd} />
+   469→          )}
+   470→        </div>
+   471→      </div>
+   472→    </section>
+   473→  );
+   474→}
+   475→
+   476→/* ═══════════════════════════════════════════════════
+   477→   ALBUM DETAIL PAGE
+   478→   ═══════════════════════════════════════════════════ */
+   479→
+   480→export function AlbumDetailPage() {
+   481→  const { detailSlug, setDetailSlug, addToCart, setActiveTab } = useAppStore();
+   482→  const [streamOpen, setStreamOpen] = useState(false);
+   483→  const [streamTitle, setStreamTitle] = useState("");
+   484→
+   485→  const album = useMemo(() => SHOP_ALBUMS.find((a) => a.slug === detailSlug), [detailSlug]);
+   486→
+   487→  const openProduct = useCallback((p: ShopProduct) => { setDetailSlug(p.slug, "product"); }, [setDetailSlug]);
+   488→  const handleQuickAdd = useCallback(() => { addToCart(); }, [addToCart]);
+   489→  const openStream = useCallback((title: string) => { setStreamTitle(title); setStreamOpen(true); }, []);
+   490→
+   491→  if (!album) {
+   492→    return <div className="flex min-h-screen items-center justify-center bg-white"><p className="text-sm text-black/40">Album not found.</p></div>;
+   493→  }
+   494→
+   495→  const digitalPrice = 12;
+   496→  const vinylProduct = album.merch.find((m) => m.category === "Vinyl");
+   497→  const availableCount = album.merch.filter((m) => m.stock > 0).length;
+   498→
+   499→  return (
+   500→    <>
+   501→      <section className="min-h-screen bg-white px-6 pt-36 pb-20 md:px-12 md:pt-48 md:pb-28">
+   502→        <div className="mx-auto max-w-[1400px]">
+   503→          {/* Back button */}
+   504→          <button
+   505→            onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }}
+   506→            className="mb-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
+   507→          >
+   508→            <ArrowLeft className="h-4 w-4" />
+   509→            Back to Shop
+   510→          </button>
+   511→
+   512→          {/* Two-column hero */}
+   513→          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
+   514→            <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+   515→              {album.cover ? (
+   516→                <img src={album.cover} alt={album.title} className="h-full w-full object-cover" />
+   517→              ) : (
+   518→                <div className="flex h-full w-full items-center justify-center text-black/10">
+   519→                  <ShoppingBag className="h-16 w-16" />
+   520→                </div>
+   521→              )}
+   522→            </div>
+   523→            <div className="flex flex-col justify-center">
+   524→              <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">Collection</p>
+   525→              <h1 className="mt-4 text-display text-[clamp(2.5rem,6vw,5.5rem)] leading-[0.9] text-black">
+   526→                {album.title}
+   527→              </h1>
+   528→              <p className="mt-3 text-[12px] uppercase tracking-[0.15em] text-black/40">
+   529→                {album.releaseDate} · {album.duration}
+   530→              </p>
+   531→              <p className="mt-6 max-w-md text-base leading-relaxed text-black/60">{album.description}</p>
+   532→              {album.quote && (
+   533→                <p className="mt-4 text-sm italic text-black/30">&ldquo;{album.quote}&rdquo;</p>
+   534→              )}
+   535→            </div>
+   536→          </div>
+   537→
+   538→          {/* ── Action Rows ── */}
+   539→          <div className="mt-12 max-w-xl flex flex-col gap-4">
+   540→            {/* Stream Album */}
+   541→            <button
+   542→              onClick={() => openStream(album.title + " — Album")}
+   543→              className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
+   544→            >
+   545→              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
+   546→                <Play className="h-5 w-5 ml-0.5" />
+   547→              </span>
+   548→              <div className="flex-1 text-left">
+   549→                <p className="text-[13px] text-black/15">Stream Album</p>
+   550→                <p className="mt-0.5 text-[14px] font-medium text-black">All platforms</p>
+   551→              </div>
+   552→              <ArrowRight className="h-4 w-4 text-black" />
+   553→            </button>
+   554→
+   555→            {/* Stream Single */}
+   556→            {album.singleTitle && (
+   557→              <button
+   558→                onClick={() => openStream(album.singleTitle! + " — Single")}
+   559→                className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
+   560→              >
+   561→                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
+   562→                  <Play className="h-5 w-5 ml-0.5" />
+   563→                </span>
+   564→                <div className="flex-1 text-left">
+   565→                  <p className="text-[13px] text-black/15">Stream Single</p>
+   566→                  <p className="mt-0.5 text-[14px] font-medium text-black">{album.singleTitle}</p>
+   567→                </div>
+   568→                <ArrowRight className="h-4 w-4 text-black" />
+   569→              </button>
+   570→            )}
+   571→
+   572→            {/* Add to Cart — Digital */}
+   573→            <button
+   574→              onClick={() => addToCart()}
+   575→              className="w-full flex items-center gap-4 border border-black/10 rounded-md px-5 py-6 bg-white cursor-pointer"
+   576→            >
+   577→              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black text-white">
+   578→                <Plus className="h-5 w-5" />
+   579→              </span>
+   580→              <div className="flex-1 text-left">
+   581→                <p className="text-[13px] text-black/15">Add to Cart — Digital</p>
+   582→                <p className="mt-0.5 text-[14px] font-medium text-black">Digital download</p>
+   583→              </div>
+   584→              <span className="text-[14px] text-black/15 tabular-nums">${digitalPrice}.00</span>
+   585→            </button>
+   586→
+   587→            {/* Add to Cart — Vinyl */}
+   588→            <button
+   589→              onClick={() => addToCart()}
+   590→              disabled={!vinylProduct || vinylProduct.stock === 0}
+   591→              className={`w-full flex items-center gap-4 border rounded-md px-5 py-6 ${
+   592→                vinylProduct && vinylProduct.stock > 0
+   593→                  ? "border-black/10 bg-white cursor-pointer"
+   594→                  : "border-black/5 bg-black/[0.01] opacity-40 cursor-not-allowed"
+   595→              }`}
+   596→            >
+   597→              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${
+   598→                vinylProduct && vinylProduct.stock > 0
+   599→                  ? "bg-black text-white"
+   600→                  : "bg-black/8 text-black/25"
+   601→              }`}>
+   602→                <Plus className="h-5 w-5" />
+   603→              </span>
+   604→              <div className="flex-1 text-left">
+   605→                <p className={`text-[13px] ${vinylProduct && vinylProduct.stock > 0 ? "text-black/15" : "text-black/10"}`}>
+   606→                  Add to Cart — Vinyl
+   607→                </p>
+   608→                <p className={`mt-0.5 text-[14px] font-medium ${vinylProduct && vinylProduct.stock > 0 ? "text-black" : "text-black/30"}`}>
+   609→                  {vinylProduct && vinylProduct.stock > 0 ? "180g heavyweight vinyl" : "Currently unavailable"}
+   610→                </p>
+   611→              </div>
+   612→              {vinylProduct && vinylProduct.stock > 0 ? (
+   613→                <span className="text-[14px] text-black/15 tabular-nums">${vinylProduct.price}.00</span>
+   614→              ) : (
+   615→                <span className="text-[11px] uppercase tracking-widest text-black/20">Sold Out</span>
+   616→              )}
+   617→            </button>
+   618→
+   619→            {/* Availability */}
+   620→            <p className="pt-1 text-[11px] text-black/25">
+   621→              {availableCount} of {album.merch.length} items available
+   622→            </p>
+   623→          </div>
+   624→
+   625→          {/* ── Merch Grid ── */}
+   626→          <div className="mt-20">
+   627→            <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">
+   628→              {album.title} — Merchandise
+   629→            </p>
+   630→            <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6">
+   631→              {album.merch.map((p) => (
+   632→                <ProductCard
+   633→                  key={p.slug}
+   634→                  product={p}
+   635→                  onSelect={() => openProduct(p)}
+   636→                  onQuickAdd={handleQuickAdd}
+   637→                />
+   638→              ))}
+   639→            </div>
+   640→          </div>
+   641→
+   642→          {/* ── Video Grid ── */}
+   643→          <div className="mt-20">
+   644→            <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">Visuals</p>
+   645→            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+   646→              {[1, 2, 3, 4].map((i) => (
+   647→                <div key={i} className="relative aspect-video overflow-hidden bg-[#f0f0f0]">
+   648→                  <div className="flex h-full w-full items-center justify-center text-[11px] uppercase tracking-widest text-black/15">
+   649→                    Video {i}
+   650→                  </div>
+   651→                </div>
+   652→              ))}
+   653→            </div>
+   654→          </div>
+   655→        </div>
+   656→      </section>
+   657→
+   658→      <StreamingOverlay open={streamOpen} onOpenChange={setStreamOpen} title={streamTitle} />
+   659→    </>
+   660→  );
+   661→}
+   662→
+   663→/* ═══════════════════════════════════════════════════
+   664→   PRODUCT DETAIL PAGE
+   665→   ═══════════════════════════════════════════════════ */
+   666→
+   667→export function ProductDetailPage() {
+   668→  const { detailSlug, setDetailSlug, addToCart, setActiveTab } = useAppStore();
+   669→  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+   670→  const [notifyEmail, setNotifyEmail] = useState("");
+   671→  const [notifySent, setNotifySent] = useState(false);
+   672→
+   673→  const product = useMemo(() => ALL_PRODUCTS.find((p) => p.slug === detailSlug), [detailSlug]);
+   674→  const available = product ? product.stock > 0 : false;
+   675→  const enriched = product ? enrichProduct(product as ShopProduct) : null;
+   676→
+   677→  const related = useMemo(() => {
+   678→    if (!product) return [];
+   679→    return ALL_PRODUCTS.filter((p) => p.albumSlug === product.albumSlug && p.slug !== product.slug).slice(0, 4);
+   680→  }, [product]);
+   681→
+   682→  const openRelated = useCallback((p: EnrichedProduct) => {
+   683→    setDetailSlug(p.slug, "product");
+   684→    setSelectedSize(null);
+   685→    setNotifySent(false);
+   686→  }, [setDetailSlug]);
+   687→
+   688→  const handleAddToCart = useCallback(() => { if (available) addToCart(); }, [available, addToCart]);
+   689→  const handleNotify = useCallback(() => { if (notifyEmail) setNotifySent(true); }, [notifyEmail]);
+   690→
+   691→  if (!product || !enriched) {
+   692→    return <div className="flex min-h-screen items-center justify-center bg-white"><p className="text-sm text-black/40">Product not found.</p></div>;
+   693→  }
+   694→
+   695→  return (
+   696→    <section className="min-h-screen bg-white px-6 pt-36 pb-20 md:px-12 md:pt-48 md:pb-28">
+   697→      <div className="mx-auto max-w-[1400px]">
+   698→        <button
+   699→          onClick={() => {
+   700→            const parentAlbum = SHOP_ALBUMS.find((a) => a.slug === product.albumSlug);
+   701→            if (parentAlbum) { setDetailSlug(parentAlbum.slug, "album"); }
+   702→            else { setDetailSlug(null, null); setActiveTab("shop"); }
+   703→          }}
+   704→          className="mb-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
+   705→        >
+   706→          <ArrowLeft className="h-4 w-4" />
+   707→          Back
+   708→        </button>
+   709→
+   710→        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+   711→          {/* Left: Image */}
+   712→          <div>
+   713→            <div className="relative aspect-square overflow-hidden bg-[#f0f0f0]">
+   714→              {product.image ? (
+   715→                <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+   716→              ) : (
+   717→                <div className="flex h-full w-full items-center justify-center">
+   718→                  <ShoppingBag className="h-12 w-12 text-black/10" />
+   719→                </div>
+   720→              )}
+   721→              {!available && (
+   722→                <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+   723→                  <span className="text-[11px] font-medium uppercase tracking-widest text-black/40">Sold Out</span>
+   724→                </div>
+   725→              )}
+   726→            </div>
+   727→            {product.colors.length > 0 && (
+   728→              <div className="mt-4 flex items-center gap-3">
+   729→                <span className="text-[10px] uppercase tracking-[0.2em] text-black/30">Color</span>
+   730→                {product.colors.map((c) => (
+   731→                  <span key={c.hex} className="block h-5 w-5 rounded-full border-2 border-black/10 cursor-pointer hover:border-black/40 transition-colors" style={{ backgroundColor: c.hex }} title={c.name} />
+   732→                ))}
+   733→              </div>
+   734→            )}
+   735→          </div>
+   736→
+   737→          {/* Right: Info */}
+   738→          <div className="flex flex-col">
+   739→            <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{product.category}</p>
+   740→            <h1 className="mt-3 text-display text-[clamp(2rem,5vw,4.5rem)] leading-[0.9] text-black">{product.name}</h1>
+   741→            <p className="mt-4 text-2xl font-light">{available ? `$${product.price}.00` : "Sold Out"}</p>
+   742→            {enriched.availability === "Low Stock" && <p className="mt-1 text-[11px] text-black/40">Low Stock — only {product.stock} left</p>}
+   743→            <p className="mt-4 text-[12px] font-medium uppercase tracking-[0.2em] text-black/40">{product.albumTitle} Collection</p>
+   744→            <p className="mt-4 text-sm leading-relaxed text-black/60">{product.description}</p>
+   745→
+   746→            {/* Contextual Size Selector */}
+   747→            {enriched.sizes.length > 0 && (
+   748→              <div className="mt-8">
+   749→                <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-black/40">Size</p>
+   750→                <div className="flex flex-wrap gap-2">
+   751→                  {enriched.sizes.map((s) => (
+   752→                    <button
+   753→                      key={s}
+   754→                      onClick={() => setSelectedSize(s)}
+   755→                      className={`h-10 min-w-[48px] px-4 text-[12px] uppercase tracking-wider border transition-all cursor-pointer ${
+   756→                        selectedSize === s ? "bg-black text-white border-black" : "bg-white text-black/60 border-black/15 hover:border-black/40"
+   757→                      }`}
+   758→                    >{s}</button>
+   759→                  ))}
+   760→                </div>
+   761→              </div>
+   762→            )}
+   763→
+   764→            {/* Add to Cart / Notify Me */}
+   765→            <div className="mt-8">
+   766→              {available ? (
+   767→                <button onClick={handleAddToCart} className="w-full bg-black py-4 text-[12px] uppercase tracking-[0.2em] text-white hover:bg-black/80 transition-colors cursor-pointer">
+   768→                  Add to Cart
+   769→                </button>
+   770→              ) : notifySent ? (
+   771→                <div className="border border-black/10 py-4 text-center text-[12px] text-black/50">You&apos;ll be notified when available.</div>
+   772→              ) : (
+   773→                <div className="flex gap-2">
+   774→                  <input type="email" placeholder="Email for notification" value={notifyEmail} onChange={(e) => setNotifyEmail(e.target.value)} className="flex-1 border border-black/15 px-4 py-3 text-[12px] placeholder:text-black/25 focus:outline-none focus:border-black/40" />
+   775→                  <button onClick={handleNotify} className="bg-black px-6 py-3 text-[12px] uppercase tracking-[0.15em] text-white hover:bg-black/80 transition-colors cursor-pointer">Notify Me</button>
+   776→                </div>
+   777→              )}
+   778→            </div>
+   779→
+   780→            <div className="mt-6 border-t border-black/5 pt-6">
+   781→              <p className="text-[11px] text-black/30">Free shipping on orders over $100. Ships in 3–5 business days. 30-day returns.</p>
+   782→            </div>
+   783→          </div>
+   784→        </div>
+   785→
+   786→        {/* Related products */}
+   787→        {related.length > 0 && (
+   788→          <div className="mt-20">
+   789→            <p className="mb-8 text-[10px] uppercase tracking-[0.2em] text-black/30">From the same collection</p>
+   790→            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6">
+   791→              {related.map((p) => (
+   792→                <ProductCard key={p.slug} product={p} onSelect={() => openRelated(p)} onQuickAdd={() => addToCart()} />
+   793→              ))}
+   794→            </div>
+   795→          </div>
+   796→        )}
+   797→      </div>
+   798→    </section>
+   799→  );
+   800→}
+   801→
