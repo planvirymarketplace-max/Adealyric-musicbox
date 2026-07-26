@@ -48,7 +48,8 @@ const RANGES = (() => {
 })();
 
 export function LetterToMyFans() {
-  const sectionRef = useRef<HTMLElement>(null);
+  // Single ref wrapping the ENTIRE letter area (header + parchment + scroll space)
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(0);
   const currentRef = useRef(0);
   const mouseBonusRef = useRef(0);
@@ -68,15 +69,15 @@ export function LetterToMyFans() {
 
   useLayoutEffect(() => {
     const computeScrollTarget = () => {
-      const section = sectionRef.current;
-      if (!section) return 0;
-      const rect = section.getBoundingClientRect();
-      const sectionHeight = section.scrollHeight;
+      const el = wrapperRef.current;
+      if (!el) return 0;
+      const rect = el.getBoundingClientRect();
+      const elHeight = el.scrollHeight;
       const viewable = window.innerHeight;
-      // How far through the section the user has scrolled (0..1)
+      // How far through the wrapper the user has scrolled (0..1)
       const scrolled = Math.max(
         0,
-        Math.min(1, -rect.top / (sectionHeight - viewable))
+        Math.min(1, -rect.top / (elHeight - viewable))
       );
       return scrolled * RANGES.total;
     };
@@ -129,72 +130,72 @@ export function LetterToMyFans() {
   }, []);
 
   return (
-    <>
-      <section
-        id="letter"
-        ref={sectionRef}
-        className="relative bg-ink px-6 py-32 md:px-12 md:py-48"
-      >
-        <div className="mx-auto max-w-[1600px]">
-          <div className="text-eyebrow text-ash">02 — Letter</div>
-          <h2 className="mt-6 text-display text-[clamp(3rem,7vw,7rem)] text-bone">
+    <div
+      ref={wrapperRef}
+      className="relative bg-white"
+      style={{ minHeight: "100vh" }}
+    >
+      {/* Header — white bg, dark text */}
+      <div className="px-6 pt-24 pb-12 md:px-12 md:pt-32 md:pb-16">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="letter-header-eyebrow">02 — Letter</div>
+          <h2 className="letter-heading mt-6">
             A Letter to My{" "}
             <span className="italic">Fans.</span>
           </h2>
-          <p className="mt-6 max-w-xl text-lg text-bone/70">
+          <p className="letter-sub mt-6">
             Scroll to read. Every word typed in real time — a covenant from
             Adea to the people who make the music matter.
           </p>
         </div>
-      </section>
+      </div>
 
       {/* White parchment letter */}
-      <section className="relative bg-ink pb-16">
-        <div className="letter-page mx-auto px-4 sm:px-8 md:px-0">
-          <style>{letterStyles}</style>
+      <div className="px-4 sm:px-8 md:px-0">
+        <style>{letterStyles}</style>
 
-          <div className="letter-frame">
-            <article className="letter-sheet relative mx-auto max-w-3xl px-6 pt-20 pb-24 sm:px-16 sm:pt-24">
-              <header className="mb-14 text-center">
-                <p className="text-[10px] uppercase tracking-[0.5em] opacity-60">
-                  Philadelphia · PA
-                </p>
-                <h3 className="letter-title mt-5 text-4xl sm:text-5xl">
-                  A Letter to My Fans
-                </h3>
-                <div className="mt-6 flex items-center justify-center gap-3 text-xs opacity-70">
-                  <span className="h-px w-10 bg-current" />
-                  <span className="tracking-[0.3em] uppercase">
-                    from Adea Lyric
-                  </span>
-                  <span className="h-px w-10 bg-current" />
-                </div>
-                <p className="scroll-hint mt-12 text-[10px] uppercase tracking-[0.4em] opacity-60">
-                  scroll ↓ to read
-                </p>
-              </header>
-
-              <div className="letter-body">
-                {BLOCKS.map((block, i) => (
-                  <BlockView
-                    key={i}
-                    block={block}
-                    range={RANGES.ranges[i]}
-                    revealed={revealed}
-                  />
-                ))}
+        <div className="letter-frame">
+          <article className="letter-sheet relative mx-auto max-w-3xl px-6 pt-20 pb-24 sm:px-16 sm:pt-24">
+            <header className="mb-14 text-center">
+              <p className="text-[10px] uppercase tracking-[0.5em] opacity-60">
+                Philadelphia · PA
+              </p>
+              <h3 className="letter-title mt-5 text-4xl sm:text-5xl">
+                A Letter to My Fans
+              </h3>
+              <div className="mt-6 flex items-center justify-center gap-3 text-xs opacity-70">
+                <span className="h-px w-10 bg-current" />
+                <span className="tracking-[0.3em] uppercase">
+                  from Adea Lyric
+                </span>
+                <span className="h-px w-10 bg-current" />
               </div>
+              <p className="scroll-hint mt-12 text-[10px] uppercase tracking-[0.4em] opacity-60">
+                scroll ↓ to read
+              </p>
+            </header>
 
-              <footer className="mt-20 border-t border-current/20 pt-6 text-center text-[10px] uppercase tracking-[0.45em] opacity-60">
-                Made in Philly · With love
-              </footer>
-            </article>
-          </div>
+            <div className="letter-body">
+              {BLOCKS.map((block, i) => (
+                <BlockView
+                  key={i}
+                  block={block}
+                  range={RANGES.ranges[i]}
+                  revealed={revealed}
+                />
+              ))}
+            </div>
 
-          <div aria-hidden className="h-[40vh]" />
+            <footer className="mt-20 border-t border-current/20 pt-6 text-center text-[10px] uppercase tracking-[0.45em] opacity-60">
+              Made in Philly · With love
+            </footer>
+          </article>
         </div>
-      </section>
-    </>
+
+        {/* Extra scroll space so user can reveal the full letter */}
+        <div aria-hidden className="h-[60vh]" />
+      </div>
+    </div>
   );
 }
 
@@ -248,10 +249,28 @@ function BlockView({
 }
 
 const letterStyles = `
-  .letter-page {
-    background: #0a0a0a;
-    padding: clamp(24px, 5vw, 64px) clamp(12px, 3vw, 32px);
+  .letter-header-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(0,0,0,0.3);
   }
+  .letter-heading {
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    color: #1a1a1a;
+    letter-spacing: -0.01em;
+  }
+  .letter-sub {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(0,0,0,0.5);
+    max-width: 32rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .letter-frame { position: relative; }
 
   .letter-sheet {
@@ -263,11 +282,11 @@ const letterStyles = `
       repeating-linear-gradient(38deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 7px),
       repeating-linear-gradient(-52deg, rgba(0,0,0,0.015) 0 1px, transparent 1px 9px);
     box-shadow:
-      inset 0 0 80px rgba(0,0,0,0.08),
-      inset 0 0 220px rgba(0,0,0,0.04),
-      0 30px 80px rgba(0,0,0,0.45),
-      0 6px 18px rgba(0,0,0,0.25);
-    border: 1px solid rgba(0,0,0,0.1);
+      inset 0 0 80px rgba(0,0,0,0.06),
+      inset 0 0 220px rgba(0,0,0,0.03),
+      0 20px 60px rgba(0,0,0,0.08),
+      0 4px 12px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 2px;
     color: #1a1a1a;
     font-family: 'Special Elite', 'Courier New', ui-monospace, monospace;
@@ -278,8 +297,8 @@ const letterStyles = `
     position: absolute; left: 0; right: 0;
     height: 40px; pointer-events: none;
     background:
-      radial-gradient(ellipse 60% 100% at 20% 100%, rgba(0,0,0,0.06), transparent 65%),
-      radial-gradient(ellipse 70% 100% at 75% 100%, rgba(0,0,0,0.04), transparent 65%);
+      radial-gradient(ellipse 60% 100% at 20% 100%, rgba(0,0,0,0.04), transparent 65%),
+      radial-gradient(ellipse 70% 100% at 75% 100%, rgba(0,0,0,0.03), transparent 65%);
   }
   .letter-sheet::before { top: 0; transform: scaleY(-1); }
   .letter-sheet::after  { bottom: 0; }
@@ -288,6 +307,7 @@ const letterStyles = `
     font-family: 'IM Fell English', 'Special Elite', serif;
     font-weight: 400;
     letter-spacing: 0.01em;
+    color: #1a1a1a;
   }
   .signature {
     font-family: 'IM Fell English', serif;
@@ -298,7 +318,7 @@ const letterStyles = `
     line-height: 1.95;
     letter-spacing: 0.005em;
     margin: 0 0 1.6rem 0;
-    text-shadow: 0 0 1px rgba(0,0,0,0.15);
+    text-shadow: 0 0 1px rgba(0,0,0,0.12);
   }
   .letter-body .letter-p .ghost,
   .letter-body .signature .ghost {

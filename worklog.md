@@ -251,3 +251,29 @@ Stage Summary:
 - Left: dark editorial panel with 'Behind the sound.' headline
 - Right: white form panel with ink-colored inputs
 - Credentials admin/adminphilly → routes to AdminPortal (full GitHub dashboard clone)
+
+---
+Task ID: 3-a
+Agent: Main
+Task: Fix LetterToMyFans (white bg, working scroll typewriter) + Rewrite Shop as clean white e-commerce
+
+Work Log:
+- Analyzed uploaded screenshots (OVO/Drake-style shop) to understand desired design
+- Fixed LetterToMyFans.tsx: Changed dark bg-ink sections to white background, moved scroll ref to wrapper div covering entire letter area for proper scroll-driven typewriter effect
+- Expanded catalog.ts: Added 13 product categories (T-Shirts, Hoodies, Sweaters, Sweatpants, Joggers, Pants, Socks, Hats, Cups, Mugs, Vinyl, Posters, Accessories), 12 color swatches (Black, White, Gray, Navy, Cream, Burgundy, Forest, Charcoal, Sand, Olive, Wine, Slate), stock counts for 58 products across 5 albums
+- Completely rewrote Shop.tsx as clean white e-commerce page:
+  - ShopPage: White background, tab navigation (Shop All + 5 album tabs), Cart counter, Category dropdown filter, Color pill filters, Product grid with color swatches + prices + quick-add buttons, Sold Out overlays, product count/available count, Newsletter footer
+  - AlbumDetailPage: White background, two-column layout with image gallery, album info, Stream/Add to Cart actions, merch product grid
+  - ProductDetailPage: White background, image gallery with counter/arrows, size selector (radio-button style), color swatches, availability count, Add to Cart, Notify Me for sold-out, shipping info, Related Products grid
+- Fixed multiple catalog.ts parsing errors (mismatched quotes, apostrophes in strings)
+- Fixed React hooks rules violation in ActionButton component
+- Lint: 0 errors (1 pre-existing warning)
+- Dev log: clean 200s, no runtime errors
+- Browser verified: Homepage renders, Letter section has white background, Shop page shows white e-commerce with all filters/products working, Banner carousel functioning
+
+Stage Summary:
+- Letter to My Fans: White background (no dark frame), scroll-driven typewriter with single ref covering entire letter area
+- Shop: Complete rewrite as clean white e-commerce matching OVO/Drake reference screenshots
+- 58 products across 13 categories with color swatches, sizes, stock counts, availability indicators
+- Filtering: Category dropdown + color pills + clear button + product/available count display
+- Product detail: Size selector, color swatches, add to cart, notify me, shipping info, related products
