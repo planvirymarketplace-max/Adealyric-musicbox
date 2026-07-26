@@ -346,3 +346,28 @@ Stage Summary:
 - Every product is associated with a song/EP/album (the core integration pattern)
 - Discography page can link to shop via album slug → album detail → merch
 - Clean dark-to-white transition, editorial typography, no black e-commerce bg
+
+---
+Task ID: 3
+Agent: Main
+Task: Fix letter headline weight + strip shop to clean white with progressive album disclosure
+
+Work Log:
+- Fixed LetterToMyFans headline (.letter-title CSS): switched from IM Fell English weight 400 to Fraunces (var(--font-display)) weight 500 with matching letter-spacing -0.045em and line-height 0.85 — now matches Heart and Soul headline boldness exactly
+- Completely rewrote Shop.tsx (~350 lines, down from 924):
+  - ShopPage: ALL WHITE, no dark hero, no filters, no tabs. Just "06 — Shop" eyebrow + "Albums +" clickable display heading. Clicking toggles album list reveal. 5 albums in 5-column grid.
+  - AlbumDetailPage: ALL WHITE. Back button → two-column (cover left, title/date/quote right) → 4 action rows (Stream Album, Stream Single, Add Digital $12, Add Vinyl) → availability count → 4-column merch grid → 2×2 video grid → streaming overlay
+  - ProductDetailPage: ALL WHITE. Back button → two-column (image left, info right with category, title, price, collection, sizes, colors, add-to-cart/notify-me, shipping) → related products grid
+  - StreamingOverlay: White background (was dark), 8 platform icons with play button hover
+  - ProductCard: Kept from previous (image + quick-add + sold-out overlay + name/price/sizes/colors)
+- Removed: ShopDarkHeader component, all filter pills, color swatches, tab navigation, PRODUCT_GROUPS import, SHOP_TABS import, ChevronLeft/Right imports, useMemo for filtering
+- Muted footer logo further: opacity-40 → opacity-20, removed hover scale, reduced max width (w-36 → w-28)
+- Lint: 0 errors (1 pre-existing warning)
+- Browser verified: Shop landing is clean white with just "Albums" text → click reveals 5 albums → click album → white detail page with all 4 action rows + merch + videos → click product → white product detail with sizes + add-to-cart + related products
+
+Stage Summary:
+- Letter headline now uses same Fraunces 500 weight as "Heart and Soul" — visually identical boldness
+- Shop landing: zero filters, zero dark hero, zero tabs — just "Albums" progressive disclosure on white
+- Album detail: all-white two-column with stream/cart actions, merch grid, video grid
+- Product detail: all-white with sizes, colors, add-to-cart, notify-me, related products
+- Footer logo now at 20% opacity — barely visible, adapts to footer without competing</arg_value>  

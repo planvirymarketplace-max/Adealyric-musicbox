@@ -130,7 +130,7 @@ export function SiteFooter() {
               <img
                 src="/logo-footer.png"
                 alt="Adea Lyric"
-                className="h-auto w-36 sm:w-44 md:w-52 transition-all duration-300 group-hover:scale-105 opacity-40 group-hover:opacity-70"
+                className="h-auto w-28 sm:w-32 md:w-36 opacity-20 hover:opacity-30 transition-opacity duration-300"
                 style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
               />
             </button>

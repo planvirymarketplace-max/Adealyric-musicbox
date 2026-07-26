@@ -292,10 +292,11 @@ const letterStyles = `
 
   /* ─── Typography ─── */
   .letter-title {
-    font-family: 'IM Fell English', 'Special Elite', serif;
-    font-weight: 400;
-    letter-spacing: 0.01em;
+    font-family: var(--font-display, 'Fraunces', serif);
+    font-weight: 500;
+    letter-spacing: -0.045em;
     color: #2a2118;
+    line-height: 0.85;
   }
   .signature {
     font-family: 'IM Fell English', serif;

@@ -1,0 +1,458 @@
+     1→const fkboiAsset = "/fkboi.jpg";
+     2→const cantnobodyAsset = "/cantnobody.webp";
+     3→const philly1 = "/philly-1.jpg";
+     4→const philly2 = "/philly-2.jpg";
+     5→const philly3 = "/philly-3.jpg";
+     6→
+     7→export type ReleaseType = "Album" | "EP" | "Single" | "Mixtape";
+     8→
+     9→export type Release = {
+    10→  slug: string;
+    11→  title: string;
+    12→  year: number;
+    13→  type: ReleaseType;
+    14→  cover: string;
+    15→  runtime: string;
+    16→  tracks: { n: number; title: string; length: string; feat?: string }[];
+    17→  color: string;
+    18→  credits: string;
+    19→  story: string;
+    20→  bgImage: string;
+    21→};
+    22→
+    23→export const RELEASES: Release[] = [
+    24→  {
+    25→    slug: "fk-boi",
+    26→    title: "F**K Boi",
+    27→    year: 2024,
+    28→    type: "Single",
+    29→    cover: fkboiAsset,
+    30→    runtime: "3:42",
+    31→    color: "oklch(0.6 0.02 0)",
+    32→    credits: "Written by Adea Lyric. Produced in West Philly.",
+    33→    story: "A confrontation, a mirror, a warning. Unapologetic to the last bar.",
+    34→    bgImage: philly2,
+    35→    tracks: [{ n: 1, title: "F**K Boi", length: "3:42" }],
+    36→  },
+    37→  {
+    38→    slug: "the-lyric-ep",
+    39→    title: "The Lyric",
+    40→    year: 2023,
+    41→    type: "EP",
+    42→    cover: philly3,
+    43→    runtime: "22:14",
+    44→    color: "oklch(0.55 0.02 0)",
+    45→    credits: "Six tracks. Zero compromises.",
+    46→    story: "The refusal record. Made without a table she wasn't invited to.",
+    47→    bgImage: philly1,
+    48→    tracks: [
+    49→      { n: 1, title: "Prelude / West", length: "2:11" },
+    50→      { n: 2, title: "Signal", length: "3:48", feat: "K. Rue" },
+    51→      { n: 3, title: "Rachi", length: "4:02" },
+    52→      { n: 4, title: "No Chase", length: "3:29" },
+    53→      { n: 5, title: "Streetlight", length: "4:17" },
+    54→      { n: 6, title: "Lyric", length: "4:27" },
+    55→    ],
+    56→  },
+    57→  {
+    58→    slug: "cant-nobody",
+    59→    title: "Can't Nobody",
+    60→    year: 2022,
+    61→    type: "Single",
+    62→    cover: cantnobodyAsset,
+    63→    runtime: "3:58",
+    64→    color: "oklch(0.5 0.02 0)",
+    65→    credits: "Rachi Lyfe.",
+    66→    story: "A statement of arrival, tuned to a Philly frequency.",
+    67→    bgImage: philly3,
+    68→    tracks: [{ n: 1, title: "Can't Nobody", length: "3:58" }],
+    69→  },
+    70→  {
+    71→    slug: "west-philly",
+    72→    title: "West Philly",
+    73→    year: 2021,
+    74→    type: "Mixtape",
+    75→    cover: philly2,
+    76→    runtime: "38:20",
+    77→    color: "oklch(0.45 0.02 0)",
+    78→    credits: "Ten tracks. One block.",
+    79→    story: "The mixtape that turned a neighborhood into a language.",
+    80→    bgImage: philly2,
+    81→    tracks: [
+    82→      { n: 1, title: "52nd", length: "3:20" },
+    83→      { n: 2, title: "Row House", length: "4:05" },
+    84→      { n: 3, title: "Cornerstore", length: "3:44" },
+    85→      { n: 4, title: "Market Frankford", length: "4:12" },
+    86→      { n: 5, title: "Overbrook", length: "3:33" },
+    87→      { n: 6, title: "Cobbs Creek", length: "4:01" },
+    88→      { n: 7, title: "Belmont", length: "3:48" },
+    89→      { n: 8, title: "Fairmount", length: "3:56" },
+    90→      { n: 9, title: "Malcolm X", length: "3:41" },
+    91→      { n: 10, title: "Home", length: "4:00" },
+    92→    ],
+    93→  },
+    94→  {
+    95→    slug: "debut-2017",
+    96→    title: "First Light",
+    97→    year: 2017,
+    98→    type: "EP",
+    99→    cover: philly1,
+   100→    runtime: "18:02",
+   101→    color: "oklch(0.4 0.02 0)",
+   102→    credits: "The introduction.",
+   103→    story: "Where it started. A voice deciding to be heard.",
+   104→    bgImage: philly1,
+   105→    tracks: [
+   106→      { n: 1, title: "Introduction", length: "2:44" },
+   107→      { n: 2, title: "Grown", length: "3:52" },
+   108→      { n: 3, title: "Say My Name", length: "4:08" },
+   109→      { n: 4, title: "Philly Blues", length: "3:31" },
+   110→      { n: 5, title: "Light", length: "3:47" },
+   111→    ],
+   112→  },
+   113→];
+   114→
+   115→export type Product = {
+   116→  slug: string;
+   117→  name: string;
+   118→  price: number;
+   119→  type: "Vinyl" | "CD" | "Apparel" | "Print";
+   120→  category: string;
+   121→  image: string;
+   122→  color: string;
+   123→  sizes?: string[];
+   124→  edition?: string;
+   125→  description: string;
+   126→};
+   127→
+   128→export const PRODUCTS: Product[] = [
+   129→  {
+   130→    slug: "fkboi-vinyl",
+   131→    name: 'F**K Boi 12" Vinyl',
+   132→    price: 34,
+   133→    type: "Vinyl",
+   134→    category: "Music",
+   135→    image: fkboiAsset,
+   136→    color: "oklch(0.2 0 0)",
+   137→    edition: "Limited / 500",
+   138→    description: "Heavyweight 180g black vinyl. Screen-printed sleeve. Signed insert.",
+   139→  },
+   140→  {
+   141→    slug: "west-philly-cassette",
+   142→    name: "West Philly Cassette",
+   143→    price: 18,
+   144→    type: "CD",
+   145→    category: "Music",
+   146→    image: cantnobodyAsset,
+   147→    color: "oklch(0.25 0 0)",
+   148→    edition: "Numbered / 250",
+   149→    description: "Chrome tape. Fold-out J-card with lyrics.",
+   150→  },
+   151→  {
+   152→    slug: "lyric-hoodie-black",
+   153→    name: "Lyric Hoodie — Black",
+   154→    price: 88,
+   155→    type: "Apparel",
+   156→    category: "Wear",
+   157→    image: fkboiAsset,
+   158→    color: "oklch(0.1 0 0)",
+   159→    sizes: ["S", "M", "L", "XL", "XXL"],
+   160→    description: "Heavyweight 500gsm cotton. Embroidered chain-stitch lyric on the back.",
+   161→  },
+   162→  {
+   163→    slug: "lyric-tee-bone",
+   164→    name: "Lyric Tee — Bone",
+   165→    price: 42,
+   166→    type: "Apparel",
+   167→    category: "Wear",
+   168→    image: cantnobodyAsset,
+   169→    color: "oklch(0.9 0 0)",
+   170→    sizes: ["S", "M", "L", "XL"],
+   171→    description: "Boxy fit. 260gsm ring-spun cotton. Puff-print logo.",
+   172→  },
+   173→  {
+   174→    slug: "west-print",
+   175→    name: 'West Philly Print 18"',
+   176→    price: 65,
+   177→    type: "Print",
+   178→    category: "Object",
+   179→    image: philly2,
+   180→    color: "oklch(0.15 0 0)",
+   181→    edition: "Signed / 100",
+   182→    description: "Giclée on cotton rag. Signed and numbered by Adea.",
+   183→  },
+   184→  {
+   185→    slug: "row-print",
+   186→    name: 'Row House Print 24"',
+   187→    price: 95,
+   188→    type: "Print",
+   189→    category: "Object",
+   190→    image: philly1,
+   191→    color: "oklch(0.18 0 0)",
+   192→    edition: "Signed / 100",
+   193→    description: "Large-format giclée. Museum-grade paper. Numbered.",
+   194→  },
+   195→  {
+   196→    slug: "el-print",
+   197→    name: 'The El Print 18"',
+   198→    price: 65,
+   199→    type: "Print",
+   200→    category: "Object",
+   201→    image: philly3,
+   202→    color: "oklch(0.16 0 0)",
+   203→    edition: "Signed / 100",
+   204→    description: "Giclée on cotton rag. Signed and numbered.",
+   205→  },
+   206→  {
+   207→    slug: "lyric-cap",
+   208→    name: "Lyric Cap — Black",
+   209→    price: 38,
+   210→    type: "Apparel",
+   211→    category: "Wear",
+   212→    image: fkboiAsset,
+   213→    color: "oklch(0.08 0 0)",
+   214→    sizes: ["One Size"],
+   215→    description: "Unstructured 6-panel. Waxed cotton. Metal clasp back.",
+   216→  },
+   217→];
+   218→
+   219→/* ═══════════════════════════════════════════════════
+   220→   SHOP CATALOG — Albums + Merch with full e-commerce data
+   221→   ═══════════════════════════════════════════════════ */
+   222→
+   223→export type ShopCategory =
+   224→  | "T-Shirts"
+   225→  | "Hoodies"
+   226→  | "Sweaters"
+   227→  | "Sweatpants"
+   228→  | "Joggers"
+   229→  | "Pants"
+   230→  | "Socks"
+   231→  | "Hats"
+   232→  | "Cups"
+   233→  | "Mugs"
+   234→  | "Vinyl"
+   235→  | "Posters"
+   236→  | "Accessories";
+   237→
+   238→export type ColorSwatch = {
+   239→  name: string;
+   240→  hex: string;
+   241→};
+   242→
+   243→export type ShopProduct = {
+   244→  slug: string;
+   245→  name: string;
+   246→  price: number;
+   247→  category: ShopCategory;
+   248→  sizes: string[];
+   249→  colors: ColorSwatch[];
+   250→  image: string;
+   251→  description: string;
+   252→  stock: number;
+   253→  albumSlug: string;
+   254→  albumTitle: string;
+   255→};
+   256→
+   257→export type ShopAlbum = {
+   258→  slug: string;
+   259→  title: string;
+   260→  releaseDate: string;
+   261→  duration: string;
+   262→  description: string;
+   263→  quote: string;
+   264→  singleTitle?: string;
+   265→  cover: string;
+   266→  merch: ShopProduct[];
+   267→};
+   268→
+   269→/* ---- Color Swatches ---- */
+   270→const BLACK: ColorSwatch = { name: "Black", hex: "#111111" };
+   271→const WHITE: ColorSwatch = { name: "White", hex: "#F5F5F5" };
+   272→const GRAY: ColorSwatch = { name: "Gray", hex: "#6B6B6B" };
+   273→const NAVY: ColorSwatch = { name: "Navy", hex: "#1B2A4A" };
+   274→const CREAM: ColorSwatch = { name: "Cream", hex: "#E8DFD0" };
+   275→const BURGUNDY: ColorSwatch = { name: "Burgundy", hex: "#5C1A1B" };
+   276→const FOREST: ColorSwatch = { name: "Forest", hex: "#2D4A3E" };
+   277→const CHARCOAL: ColorSwatch = { name: "Charcoal", hex: "#36454F" };
+   278→const SAND: ColorSwatch = { name: "Sand", hex: "#C2B280" };
+   279→const OLIVE: ColorSwatch = { name: "Olive", hex: "#556B2F" };
+   280→const WINE: ColorSwatch = { name: "Wine", hex: "#722F37" };
+   281→const SLATE: ColorSwatch = { name: "Slate", hex: "#708090" };
+   282→
+   283→export const SHOP_ALBUMS: ShopAlbum[] = [
+   284→  {
+   285→    slug: "cant-nobody-album",
+   286→    title: "Can't Nobody",
+   287→    releaseDate: "March 2022",
+   288→    duration: "42:18",
+   289→    description:
+   290→      "The debut album that introduced Adea Lyric to the world. Raw, unfiltered, and deeply rooted in West Philadelphia.",
+   291→    quote: "Every word is a weapon, every note is a prayer.",
+   292→    singleTitle: "Can't Nobody",
+   293→    cover: cantnobodyAsset,
+   294→    merch: [
+   295→      { slug: "cn-hoodie-blk", name: "Can't Nobody Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, GRAY, CREAM], image: "", description: "Heavyweight 400gsm fleece hoodie with embroidered album logo on chest.", stock: 24, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   296→      { slug: "cn-tee-blk", name: "Can't Nobody Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, WHITE, CREAM], image: "", description: "Premium 220gsm cotton tee with puff-print album artwork.", stock: 48, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   297→      { slug: "cn-sweater-navy", name: "Can't Nobody Crewneck", price: 78, category: "Sweaters", sizes: ["S", "M", "L", "XL"], colors: [NAVY, BURGUNDY, CHARCOAL], image: "", description: "Heavy-knit crewneck sweater with woven label on hem.", stock: 16, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   298→      { slug: "cn-sweatpant", name: "Can't Nobody Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, CHARCOAL, NAVY], image: "", description: "Relaxed-fit French terry sweatpant with embroidered detail.", stock: 20, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   299→      { slug: "cn-jogger", name: "Can't Nobody Jogger", price: 72, category: "Joggers", sizes: ["S", "M", "L", "XL"], colors: [BLACK, OLIVE], image: "", description: "Tapered jogger with zip pockets and ribbed cuffs.", stock: 12, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   300→      { slug: "cn-socks", name: "Can't Nobody Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [BLACK, WHITE], image: "", description: "Ribbed cotton-blend socks with album logo.", stock: 60, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   301→      { slug: "cn-vinyl", name: "Can't Nobody Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "180g heavyweight vinyl with printed inner sleeve.", stock: 8, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   302→      { slug: "cn-mug", name: "Can't Nobody Mug", price: 18, category: "Mugs", sizes: [], colors: [BLACK, WHITE], image: "", description: "Ceramic 11oz mug with wrap-around album artwork.", stock: 35, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   303→      { slug: "cn-cup", name: "Can't Nobody Cup", price: 12, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Double-wall insulated tumbler with lid.", stock: 40, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   304→      { slug: "cn-hat", name: "Can't Nobody Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [BLACK, CREAM, OLIVE], image: "", description: "Unstructured 6-panel dad hat with embroidered script.", stock: 0, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   305→      { slug: "cn-poster", name: "Can't Nobody Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: '18" x 24" gig poster on premium stock.', stock: 30, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   306→      { slug: "cn-bottle-opener", name: "Can't Nobody Bottle Opener", price: 12, category: "Accessories", sizes: [], colors: [BLACK], image: "", description: "Flat stainless steel bottle opener with laser engraving.", stock: 50, albumSlug: "cant-nobody-album", albumTitle: "Can't Nobody" },
+   307→    ],
+   308→  },
+   309→  {
+   310→    slug: "after-lyric",
+   311→    title: "After Lyric",
+   312→    releaseDate: "January 2023",
+   313→    duration: "48:35",
+   314→    description:
+   315→      "The sophomore record. A deeper cut into the psyche — love, loss, and everything that comes after the bars fade.",
+   316→    quote: "After the lyric, the silence speaks louder.",
+   317→    singleTitle: "Fuck Boi",
+   318→    cover: philly2,
+   319→    merch: [
+   320→      { slug: "al-hoodie", name: "After Lyric Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BLACK, NAVY, FOREST], image: "", description: "Oversized heavyweight hoodie with back graphic.", stock: 18, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   321→      { slug: "al-tee", name: "After Lyric Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WHITE, SAND, CHARCOAL], image: "", description: "Relaxed-fit tee with tonal album graphic.", stock: 55, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   322→      { slug: "al-sweater", name: "After Lyric Sweater", price: 78, category: "Sweaters", sizes: ["S", "M", "L", "XL"], colors: [CREAM, SLATE], image: "", description: "Cozy lambswool blend crewneck.", stock: 10, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   323→      { slug: "al-sweatpant", name: "After Lyric Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [CHARCOAL, NAVY], image: "", description: "French terry sweatpant with tonal embroidery.", stock: 14, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   324→      { slug: "al-jogger", name: "After Lyric Jogger", price: 72, category: "Joggers", sizes: ["S", "M", "L", "XL"], colors: [BLACK], image: "", description: "Tech-fabric jogger with reflective details.", stock: 8, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   325→      { slug: "al-pants", name: "After Lyric Cargo Pant", price: 85, category: "Pants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, OLIVE], image: "", description: "Relaxed cargo pant with utility pockets.", stock: 11, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   326→      { slug: "al-socks", name: "After Lyric Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [BLACK, CHARCOAL], image: "", description: "Cushioned athletic socks with lyric detail.", stock: 45, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   327→      { slug: "al-vinyl", name: "After Lyric Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Colored vinyl with gatefold sleeve.", stock: 5, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   328→      { slug: "al-mug", name: "After Lyric Mug", price: 18, category: "Mugs", sizes: [], colors: [WHITE, CREAM], image: "", description: "Stoneware mug with debossed logo.", stock: 28, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   329→      { slug: "al-cup", name: "After Lyric Tumbler", price: 15, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Insulated travel tumbler, 16oz.", stock: 32, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   330→      { slug: "al-hat", name: "After Lyric Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [BLACK, CREAM], image: "", description: "Washed cotton dad hat.", stock: 20, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   331→      { slug: "al-poster", name: "After Lyric Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Art print on archival paper.", stock: 0, albumSlug: "after-lyric", albumTitle: "After Lyric" },
+   332→    ],
+   333→  },
+   334→  {
+   335→    slug: "man-in-my-life",
+   336→    title: "Man in My Life",
+   337→    releaseDate: "July 2023",
+   338→    duration: "45:52",
+   339→    description:
+   340→      "An exploration of relationships, loyalty, and the men who shaped the narrative. Honest and unapologetic.",
+   341→    quote: "You do not choose who changes you — they just do.",
+   342→    singleTitle: "Side N****a",
+   343→    cover: philly3,
+   344→    merch: [
+   345→      { slug: "ml-hoodie", name: "Man in My Life Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WINE, BLACK, GRAY], image: "", description: "Faded wash hoodie with oversized back print.", stock: 22, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   346→      { slug: "ml-tee", name: "Man in My Life Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL"], colors: [WHITE, CREAM, SLATE], image: "", description: "Vintage-wash tee with front graphic.", stock: 0, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   347→      { slug: "ml-sweater", name: "Man in My Life Cardigan", price: 95, category: "Sweaters", sizes: ["S", "M", "L", "XL"], colors: [CREAM, CHARCOAL], image: "", description: "Open-front knit cardigan with button closure.", stock: 7, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   348→      { slug: "ml-sweatpant", name: "Man in My Life Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, GRAY, WINE], image: "", description: "Matching set sweatpant with tonal drawstring.", stock: 15, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   349→      { slug: "ml-pants", name: "Man in My Life Pant", price: 82, category: "Pants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, NAVY], image: "", description: "Wide-leg trouser in premium twill.", stock: 9, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   350→      { slug: "ml-socks", name: "Man in My Life Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [WINE, BLACK, CREAM], image: "", description: "Cotton-blend dress socks.", stock: 38, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   351→      { slug: "ml-vinyl", name: "Man in My Life Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Standard weight vinyl in printed sleeve.", stock: 12, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   352→      { slug: "ml-mug", name: "Man in My Life Mug", price: 18, category: "Mugs", sizes: [], colors: [BLACK, CREAM], image: "", description: "Matte black ceramic mug.", stock: 22, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   353→      { slug: "ml-cup", name: "Man in My Life Cup", price: 12, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Ceramic cup with hand-drawn lettering.", stock: 0, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   354→      { slug: "ml-hat", name: "Man in My Life Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [WINE, BLACK, SAND], image: "", description: "Distressed cotton twill hat.", stock: 17, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   355→      { slug: "ml-poster", name: "Man in My Life Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: '24x36 lithograph poster.', stock: 20, albumSlug: "man-in-my-life", albumTitle: "Man in My Life" },
+   356→    ],
+   357→  },
+   358→  {
+   359→    slug: "story-of-my-journey",
+   360→    title: "Story of My Journey",
+   361→    releaseDate: "November 2023",
+   362→    duration: "51:07",
+   363→    description:
+   364→      "A sonic autobiography. From the corners of West Philly to stages worldwide — every chapter told in verse.",
+   365→    quote: "The journey does not end — it just finds new streets.",
+   366→    singleTitle: "Drink on the Beach",
+   367→    cover: philly1,
+   368→    merch: [
+   369→      { slug: "sj-hoodie", name: "Story of My Journey Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [FOREST, BLACK, SAND], image: "", description: "Earth-toned hoodie with journey-inspired back art.", stock: 19, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   370→      { slug: "sj-tee", name: "Story of My Journey Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WHITE, OLIVE, NAVY], image: "", description: "Oversized tee with map-print graphic.", stock: 40, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   371→      { slug: "sj-sweater", name: "Story of My Journey Pullover", price: 78, category: "Sweaters", sizes: ["S", "M", "L", "XL"], colors: [FOREST, CREAM], image: "", description: "Half-zip fleece pullover with embroidered patch.", stock: 13, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   372→      { slug: "sj-sweatpant", name: "Story of My Journey Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [OLIVE, CHARCOAL, BLACK], image: "", description: "Relaxed-fit sweatpant with embroidered knee.", stock: 16, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   373→      { slug: "sj-jogger", name: "Story of My Journey Jogger", price: 72, category: "Joggers", sizes: ["S", "M", "L", "XL"], colors: [FOREST, BLACK], image: "", description: "Lightweight jogger with map lining.", stock: 10, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   374→      { slug: "sj-socks", name: "Story of My Journey Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [FOREST, CREAM, BLACK], image: "", description: "Merino wool blend socks.", stock: 50, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   375→      { slug: "sj-vinyl", name: "Story of My Journey Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BLACK], image: "", description: "Double LP with booklet.", stock: 6, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   376→      { slug: "sj-mug", name: "Story of My Journey Mug", price: 18, category: "Mugs", sizes: [], colors: [CREAM, FOREST], image: "", description: "Speckled stoneware mug.", stock: 25, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   377→      { slug: "sj-cup", name: "Story of My Journey Cup", price: 15, category: "Cups", sizes: [], colors: [BLACK, WHITE], image: "", description: "Stainless steel camp cup.", stock: 0, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   378→      { slug: "sj-hat", name: "Story of My Journey Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [OLIVE, SAND, BLACK], image: "", description: "Washed canvas bucket hat.", stock: 15, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   379→      { slug: "sj-poster", name: "Story of My Journey Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Illustrated journey map poster.", stock: 18, albumSlug: "story-of-my-journey", albumTitle: "Story of My Journey" },
+   380→    ],
+   381→  },
+   382→  {
+   383→    slug: "tainted-love",
+   384→    title: "Tainted Love",
+   385→    releaseDate: "May 2024",
+   386→    duration: "39:44",
+   387→    description:
+   388→      "The aftermath of devotion. A darker, more vulnerable record that strips away the armor.",
+   389→    quote: "Love is the wound that keeps teaching you how to heal.",
+   390→    cover: fkboiAsset,
+   391→    merch: [
+   392→      { slug: "tl-hoodie", name: "Tainted Love Hoodie", price: 88, category: "Hoodies", sizes: ["S", "M", "L", "XL", "XXL"], colors: [BURGUNDY, BLACK, CHARCOAL], image: "", description: "Distressed hoodie with cracked-print heart graphic.", stock: 21, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   393→      { slug: "tl-tee", name: "Tainted Love Tee", price: 42, category: "T-Shirts", sizes: ["S", "M", "L", "XL", "XXL"], colors: [WHITE, BURGUNDY, SLATE], image: "", description: "Bleach-wash tee with heart-break graphic.", stock: 37, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   394→      { slug: "tl-sweater", name: "Tainted Love Sweater", price: 78, category: "Sweaters", sizes: ["S", "M", "L", "XL"], colors: [BURGUNDY, BLACK], image: "", description: "Turtleneck sweater in dark rose.", stock: 9, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   395→      { slug: "tl-sweatpant", name: "Tainted Love Sweatpant", price: 68, category: "Sweatpants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, CHARCOAL, BURGUNDY], image: "", description: "Matching set sweatpant with tonal details.", stock: 18, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   396→      { slug: "tl-pants", name: "Tainted Love Pant", price: 82, category: "Pants", sizes: ["S", "M", "L", "XL"], colors: [BLACK, CHARCOAL], image: "", description: "Straight-leg pant with hidden pocket.", stock: 7, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   397→      { slug: "tl-socks", name: "Tainted Love Socks", price: 16, category: "Socks", sizes: ["One Size"], colors: [BURGUNDY, BLACK], image: "", description: "Ribbed ankle socks with heart detail.", stock: 42, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   398→      { slug: "tl-vinyl", name: "Tainted Love Vinyl", price: 34, category: "Vinyl", sizes: [], colors: [BURGUNDY], image: "", description: "Colored vinyl in red/burgundy.", stock: 4, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   399→      { slug: "tl-mug", name: "Tainted Love Mug", price: 18, category: "Mugs", sizes: [], colors: [BLACK, WHITE], image: "", description: "Matte black mug with red accent.", stock: 20, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   400→      { slug: "tl-cup", name: "Tainted Love Cup", price: 15, category: "Cups", sizes: [], colors: [BURGUNDY, BLACK], image: "", description: "Ceramic cup with gold foil detail.", stock: 30, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   401→      { slug: "tl-hat", name: "Tainted Love Dad Hat", price: 38, category: "Hats", sizes: ["One Size"], colors: [BLACK, BURGUNDY], image: "", description: "Washed twill hat with embroidered rose.", stock: 0, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   402→      { slug: "tl-poster", name: "Tainted Love Poster", price: 25, category: "Posters", sizes: [], colors: [], image: "", description: "Dark art print on heavyweight stock.", stock: 15, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   403→      { slug: "tl-bottle-opener", name: "Tainted Love Keychain", price: 12, category: "Accessories", sizes: [], colors: [BLACK, BURGUNDY], image: "", description: "Bottle opener keychain with laser-cut heart.", stock: 0, albumSlug: "tainted-love", albumTitle: "Tainted Love" },
+   404→    ],
+   405→  },
+   406→];
+   407→
+   408→/* Flat list of all products for filtering */
+   409→export const ALL_PRODUCTS: ShopProduct[] = SHOP_ALBUMS.flatMap((a) => a.merch);
+   410→
+   411→/* All unique categories */
+   412→export const ALL_CATEGORIES: ShopCategory[] = [
+   413→  "T-Shirts",
+   414→  "Hoodies",
+   415→  "Sweaters",
+   416→  "Sweatpants",
+   417→  "Joggers",
+   418→  "Pants",
+   419→  "Socks",
+   420→  "Hats",
+   421→  "Cups",
+   422→  "Mugs",
+   423→  "Vinyl",
+   424→  "Posters",
+   425→  "Accessories",
+   426→];
+   427→
+   428→/* Tab labels for the shop navigation */
+   429→export const SHOP_TABS = ["Shop All", "Collections"];
+   430→
+   431→/* Product group filters for Shop All */
+   432→export type ProductGroup = {
+   433→  label: string;
+   434→  categories: ShopCategory[] | null;
+   435→};
+   436→export const PRODUCT_GROUPS: ProductGroup[] = [
+   437→  { label: "All", categories: null },
+   438→  { label: "Clothes", categories: ["T-Shirts", "Hoodies", "Sweaters", "Sweatpants", "Joggers", "Pants", "Socks"] },
+   439→  { label: "Products", categories: ["Vinyl", "Posters", "Accessories"] },
+   440→  { label: "Cups", categories: ["Cups"] },
+   441→  { label: "Mugs", categories: ["Mugs"] },
+   442→  { label: "Hats", categories: ["Hats"] },
+   443→];
+   444→
+   445→export const TOUR = [
+   446→  { date: "OCT 12", city: "Philadelphia, PA", venue: "The Fillmore", status: "On Sale" },
+   447→  { date: "OCT 19", city: "New York, NY", venue: "Bowery Ballroom", status: "On Sale" },
+   448→  { date: "OCT 26", city: "Washington, DC", venue: "9:30 Club", status: "Low" },
+   449→  { date: "NOV 02", city: "Boston, MA", venue: "Royale", status: "On Sale" },
+   450→  { date: "NOV 09", city: "Atlanta, GA", venue: "Terminal West", status: "On Sale" },
+   451→  { date: "NOV 16", city: "Chicago, IL", venue: "Thalia Hall", status: "Sold Out" },
+   452→  { date: "NOV 23", city: "Los Angeles, CA", venue: "The Novo", status: "On Sale" },
+   453→];
+   454→
+   455→/* Backward compat aliases */
+   456→export type AlbumMerchProduct = ShopProduct;
+   457→export const ALBUMS = SHOP_ALBUMS;
+   458→
