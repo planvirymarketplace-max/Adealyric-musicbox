@@ -283,7 +283,7 @@ const letterStyles = `
     letter-spacing: -0.045em;
     line-height: 0.85;
     color: #000;
-    font-size: clamp(4rem, 10vw, 9rem);
+    font-size: clamp(5rem, 13vw, 16rem);
   }
 
   .letter-fade-top {

@@ -39,8 +39,8 @@ export function SiteHeader() {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
-          scrolled
-            ? "border-b border-border bg-ink/80 backdrop-blur-xl"
+          isLightPage || scrolled
+            ? "border-b border-border bg-ink backdrop-blur-xl"
             : "bg-transparent"
         }`}
       >

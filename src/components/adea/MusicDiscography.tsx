@@ -53,10 +53,10 @@ export function DiscographyPage() {
         <img
           src={DISCO_HERO}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-40 grayscale"
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
         <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-16 pt-40 md:px-12 md:pb-24 md:pt-56">
           <div className="text-eyebrow text-ash">Volume — Discography</div>
           <h1 className="mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] leading-none text-bone">
