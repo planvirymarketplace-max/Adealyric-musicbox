@@ -6,7 +6,7 @@ import { useAppStore } from "@/lib/store";
 import { RELEASES, TOUR, type ReleaseType } from "@/lib/catalog";
 
 const TYPES: ("All" | ReleaseType)[] = ["All", "Album", "EP", "Single", "Mixtape"];
-const DISCO_HERO = "/discography-hero.jpg";
+const DISCO_HERO = "/lyric23.jpg";
 
 function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -49,7 +49,7 @@ export function DiscographyPage() {
   return (
     <>
       {/* ===== SECTION 1 — Hero with background image ===== */}
-      <section className="relative flex min-h-[60svh] items-end overflow-hidden md:min-h-[70svh]">
+      <section className="relative flex min-h-[60svh] items-end overflow-hidden bg-ink md:min-h-[70svh]">
         <img
           src={DISCO_HERO}
           alt=""

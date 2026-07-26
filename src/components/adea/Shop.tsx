@@ -419,7 +419,7 @@ export function AlbumDetailPage() {
     <>
       <section className="min-h-screen bg-white px-4 pt-32 pb-20 md:px-8 md:pt-44 md:pb-28">
         <div className="mx-auto max-w-[1400px]">
-          {/* Top nav links */
+          {/* Top nav links */}
           <div className="mb-8 flex items-center gap-6">
             <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath(null); }} className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
               <ArrowLeft className="h-4 w-4" />
