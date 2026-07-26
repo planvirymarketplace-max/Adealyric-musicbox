@@ -5,7 +5,6 @@ import { useAppStore } from "@/lib/store";
 import { LetterToMyFans } from "./LetterToMyFans";
 import { HomeBanner } from "./HomeBanner";
 
-const fkboiAsset = "/fkboi.jpg";
 const heroBg = "/hero-muted.png";
 
 const timelineVideos = [
@@ -289,52 +288,13 @@ function DiscographyPath() {
   );
 }
 
-/* ---- Video ---- */
-function Video() {
-  return (
-    <section className="relative bg-ink px-6 py-32 md:px-12 md:py-48">
-      <div className="mx-auto max-w-[1600px]">
-        <div className="text-eyebrow text-ash">04 — Visual</div>
-        <h2 className="mt-6 text-display text-[clamp(3rem,7vw,7rem)] text-bone">In motion.</h2>
-        <div className="mt-16 grid grid-cols-1 gap-10 md:grid-cols-5">
-          <div className="relative aspect-video overflow-hidden border border-border md:col-span-3">
-            <video autoPlay muted loop playsInline poster={fkboiAsset} className="h-full w-full object-cover grayscale">
-              <source src="https://cdn.coverr.co/videos/coverr-a-woman-singing-in-a-recording-studio-4949/1080p.mp4" type="video/mp4" />
-            </video>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
-            <div className="absolute bottom-6 left-6 text-eyebrow text-bone">Live Session — West Philly, 2024</div>
-          </div>
-          <div className="flex flex-col justify-between md:col-span-2">
-            <p className="text-2xl leading-tight text-bone md:text-3xl">A recording booth, a heavy chain, and a voice that refuses to fold.</p>
-            <div className="mt-8 grid grid-cols-2 gap-6 text-bone">
-              <Stat k="Since" v="2017" />
-              <Stat k="Home" v="West Philly" />
-              <Stat k="Genre" v="Neo-Soul" />
-              <Stat k="Label" v="Independent" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Stat({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="border-t border-border pt-4">
-      <div className="text-eyebrow text-ash">{k}</div>
-      <div className="mt-2 text-display text-2xl text-bone md:text-3xl">{v}</div>
-    </div>
-  );
-}
-
 /* ---- Newsletter ---- */
 function Newsletter() {
   return (
     <section id="tour" className="relative overflow-hidden bg-bone px-6 py-32 text-ink md:px-12 md:py-48">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 md:grid-cols-12">
         <div className="md:col-span-7">
-          <div className="text-eyebrow text-ink/60">05 — Direct Line</div>
+          <div className="text-eyebrow text-ink/60">04 — Direct Line</div>
           <h2 className="mt-6 text-display text-[clamp(3rem,9vw,10rem)] text-ink">
             First tickets.
             <br />
@@ -363,7 +323,6 @@ export function Landing() {
       <BioSection />
       <LetterToMyFans />
       <DiscographyPath />
-      <Video />
       <Newsletter />
     </>
   );

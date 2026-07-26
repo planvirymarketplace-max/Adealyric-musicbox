@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useAppStore, type TabId } from "@/lib/store";
 import { EntryGate } from "@/components/adea/EntryGate";
@@ -47,14 +47,14 @@ function TabContent({ tab }: { tab: TabId }) {
 }
 
 export default function Home() {
-  const { entered, setEntered, activeTab, detailSlug, detailType } = useAppStore();
+  const { entered, setEntered, setActiveTab, activeTab, detailSlug, detailType } = useAppStore();
   const isLight = LIGHT_TABS.has(activeTab) || !!detailSlug;
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeTab, detailSlug]);
 
-  // Detail pages have their own full shell (white background)
+  // Detail pages have their own full shell
   if (detailSlug && detailType === "release") return <ReleaseDetailPage />;
   if (detailSlug && detailType === "product") return <ProductDetailPage />;
   if (detailSlug && detailType === "album") return <AlbumDetailPage />;
@@ -74,7 +74,7 @@ export default function Home() {
       {/* After entering: show nav + content + footer */}
       {entered && (
         <>
-          <SiteHeader light={!isHome} />
+          <SiteHeader />
           {isHome ? (
             <main><TabContent tab={activeTab} /></main>
           ) : (

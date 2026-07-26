@@ -13,6 +13,7 @@ export interface AppState {
   cartCount: number;
   detailSlug: string | null;
   detailType: "release" | "product" | "album" | null;
+  shopSubPath: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   authUser: string | null;
@@ -21,6 +22,7 @@ export interface AppState {
   setActiveTab: (tab: TabId) => void;
   setEntered: (v: boolean) => void;
   setDetailSlug: (slug: string | null, type: "release" | "product" | "album" | null) => void;
+  setShopSubPath: (path: string | null) => void;
   addToCart: () => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
@@ -34,6 +36,7 @@ export const useAppStore = create<AppState>((set) => ({
   cartCount: 0,
   detailSlug: null,
   detailType: null,
+  shopSubPath: null,
   isAuthenticated: false,
   isAdmin: false,
   authUser: null,
@@ -42,6 +45,7 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveTab: (tab) => set({ activeTab: tab, detailSlug: null, detailType: null }),
   setEntered: (v) => set({ entered: v }),
   setDetailSlug: (slug, type) => set({ detailSlug: slug, detailType: type }),
+  setShopSubPath: (path) => set({ shopSubPath: path }),
   addToCart: () => set((s) => ({ cartCount: s.cartCount + 1 })),
   login: (username, password) => {
     if (username === "admin" && password === "adminphilly") {

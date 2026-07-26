@@ -24,7 +24,7 @@ export function DiscographyPage() {
   const [filter, setFilter] = useState<"All" | ReleaseType>("All");
   const [view, setView] = useState<"path" | "grid">("path");
   const [hover, setHover] = useState<string | null>(null);
-  const { setDetailSlug } = useAppStore();
+  const { setDetailSlug, setActiveTab } = useAppStore();
 
   const filtered = useMemo(() => {
     const list = filter === "All" ? RELEASES : RELEASES.filter((r) => r.type === filter);
@@ -108,6 +108,10 @@ export function DiscographyPage() {
                       <div className="flex items-center gap-4 md:gap-8">
                         <span className="text-eyebrow text-black/30">{r.year}</span>
                         <span className="hidden text-eyebrow text-black/30 md:inline">{r.runtime}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setActiveTab("shop"); }}
+                          className="hidden md:inline-flex items-center gap-2 text-eyebrow text-black/30 hover:text-black transition-colors cursor-pointer"
+                        >Buy ↗</button>
                         <span className={`grid h-12 w-12 place-items-center border border-black/10 transition-all duration-500 ${isActive ? "rotate-45 border-black bg-black text-white" : "text-black/40"}`}>
                           <ArrowIcon />
                         </span>
@@ -247,7 +251,7 @@ export function ReleaseDetailPage() {
 
   return (
     <>
-      <SiteHeader light={false} />
+      <SiteHeader />
       {/* DARK HERO */}
       <section className="relative min-h-[80svh] overflow-hidden bg-ink text-bone">
         <img src={r.bgImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40 grayscale" />
@@ -336,7 +340,7 @@ export function ReleaseDetailPage() {
 
 /* =====================================================================
    TOUR PAGE
-   ===================================================================== */
+   =====================================================================*/
 
 export function TourPage() {
   const { setActiveTab } = useAppStore();
@@ -345,10 +349,7 @@ export function TourPage() {
       <PageIntro eyebrow="On the road" title="Tour," italic="live." sub="Direct ticket purchase. Calendar links. Automated map at every stop." dark />
       <section className="bg-white px-6 pb-12 md:px-12">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between">
-          <p className="text-[11px] text-black/30">{TOUR.length} dates</p>
-          <button onClick={() => setActiveTab("booking")} className="inline-flex items-center gap-3 border border-black bg-black px-6 py-3 text-[12px] uppercase tracking-[0.15em] text-white transition-all hover:bg-black/80 cursor-pointer">
-            Book Adea →
-          </button>
+          <p className="text-[11px] text-black">{TOUR.length} dates</p>
         </div>
       </section>
       <section className="bg-white px-6 pb-24 md:px-12">
@@ -375,6 +376,42 @@ export function TourPage() {
               );
             })}
           </ul>
+        </div>
+      </section>
+
+      {/* Recently Played */}
+      <section className="border-t border-black/10 bg-white px-6 py-20 md:px-12 md:py-32">
+        <div className="mx-auto max-w-[1600px]">
+          <div className="text-eyebrow mb-4 text-black/30">Recently Played</div>
+          <h2 className="text-display text-4xl text-black md:text-6xl">
+            What you&apos;ve been <span className="italic text-black/40">listening to.</span>
+          </h2>
+          <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+            {RELEASES.slice(0, 4).map((r) => (
+              <div key={r.slug} className="group cursor-pointer">
+                <div className="relative aspect-square overflow-hidden border border-black/10">
+                  <img src={r.cover} alt={r.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                </div>
+                <div className="mt-3">
+                  <h3 className="text-sm font-semibold text-black">{r.title}</h3>
+                  <p className="text-[11px] text-black/30 uppercase tracking-wider">{r.year} · {r.type}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Book Adea Banner — above footer */}
+      <section className="relative bg-ink px-6 py-16 md:px-12 md:py-20">
+        <div className="mx-auto flex max-w-[1600px] flex-col items-center justify-between gap-6 md:flex-row">
+          <div>
+            <h3 className="text-display text-3xl text-bone md:text-5xl">Book Adea</h3>
+            <p className="mt-2 text-ash">Vocal coaching, live sessions, and private events.</p>
+          </div>
+          <button onClick={() => setActiveTab("booking")} className="inline-flex items-center gap-3 border border-bone px-8 py-4 text-eyebrow text-bone transition-all hover:bg-bone hover:text-ink cursor-pointer">
+            Book Now →
+          </button>
         </div>
       </section>
     </>

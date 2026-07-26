@@ -129,57 +129,58 @@ export function LetterToMyFans() {
   return (
     <div
       ref={wrapperRef}
-      className="relative"
-      style={{ minHeight: "60vh" }}
+      className="relative bg-white"
     >
-      {/* Full-bleed brown parchment */}
       <style>{letterStyles}</style>
-      <div className="letter-bleed">
-        {/* Top fade: white (bio section) → brown */}
+      <div className="letter-container">
+        {/* Top fade: white (bio section) → white */}
         <div className="letter-fade-top" />
 
-        <article className="letter-sheet-bleed">
-          <header className="mb-14 text-center">
-            <p className="text-[10px] uppercase tracking-[0.5em] opacity-50">
-              Philadelphia · PA
-            </p>
-            <h3 className="letter-title mt-5 text-4xl sm:text-5xl">
-              A Letter to My Fans
-            </h3>
-            <div className="mt-6 flex items-center justify-center gap-3 text-xs opacity-50">
-              <span className="h-px w-10 bg-current" />
-              <span className="tracking-[0.3em] uppercase">
-                from Adea Lyric
-              </span>
-              <span className="h-px w-10 bg-current" />
+        <div className="letter-grid">
+          {/* LEFT COLUMN — Block letter title */}
+          <div className="letter-left">
+            <div className="letter-sticky">
+              <p className="text-[10px] uppercase tracking-[0.5em] text-black/30">
+                Philadelphia · PA
+              </p>
+              <h2 className="letter-title-block mt-5">
+                A Letter<br />to My<br />Fans
+              </h2>
+              <div className="mt-6 flex items-center gap-3 text-xs text-black/30">
+                <span className="h-px w-10 bg-black/20" />
+                <span className="tracking-[0.3em] uppercase">
+                  from Adea Lyric
+                </span>
+                <span className="h-px w-10 bg-black/20" />
+              </div>
+              <p className="scroll-hint mt-10 text-[10px] uppercase tracking-[0.4em] text-black/25">
+                scroll ↓ to read
+              </p>
             </div>
-            <p className="scroll-hint mt-10 text-[10px] uppercase tracking-[0.4em] opacity-40">
-              scroll ↓ to read
-            </p>
-          </header>
-
-          <div className="letter-body-bleed">
-            {BLOCKS.map((block, i) => (
-              <BlockView
-                key={i}
-                block={block}
-                range={RANGES.ranges[i]}
-                revealed={revealed}
-              />
-            ))}
           </div>
 
-          <footer className="mt-16 border-t border-current/15 pt-6 text-center text-[10px] uppercase tracking-[0.45em] opacity-40">
-            Made in Philly · With love
-          </footer>
-        </article>
+          {/* RIGHT COLUMN — Letter body */}
+          <div className="letter-right">
+            <div className="letter-body">
+              {BLOCKS.map((block, i) => (
+                <BlockView
+                  key={i}
+                  block={block}
+                  range={RANGES.ranges[i]}
+                  revealed={revealed}
+                />
+              ))}
+            </div>
 
-        {/* Bottom fade: brown → dark (discography section) */}
+            <footer className="mt-16 border-t border-black/10 pt-6 text-center text-[10px] uppercase tracking-[0.45em] text-black/25">
+              Made in Philly · With love
+            </footer>
+          </div>
+        </div>
+
+        {/* Bottom fade: white → dark (discography section) */}
         <div className="letter-fade-bottom" />
       </div>
-
-      {/* Extra scroll space so user can reveal the full letter */}
-      <div aria-hidden className="h-[50vh]" />
     </div>
   );
 }
@@ -199,12 +200,12 @@ function BlockView({
   if (block.kind === "break") {
     return (
       <div
-        className="my-8 flex items-center justify-center gap-3 text-xs opacity-40"
-        style={{ opacity: revealed >= range.end ? 0.4 : isActive ? 0.25 : 0.1 }}
+        className="my-8 flex items-center justify-center gap-3 text-xs text-black/25"
+        style={{ opacity: revealed >= range.end ? 1 : isActive ? 0.5 : 0.15 }}
       >
-        <span className="h-px w-8 bg-current" />
+        <span className="h-px w-8 bg-black/20" />
         <span>❦</span>
-        <span className="h-px w-8 bg-current" />
+        <span className="h-px w-8 bg-black/20" />
       </div>
     );
   }
@@ -234,93 +235,98 @@ function BlockView({
 }
 
 const letterStyles = `
-  /* ─── Full-bleed parchment wrapper ─── */
-  .letter-bleed {
+  .letter-container {
     position: relative;
-    background-color: #f5f0e6;
-    background-image:
-      radial-gradient(circle at 8% 12%, rgba(139,119,80,0.06), transparent 42%),
-      radial-gradient(circle at 92% 82%, rgba(139,119,80,0.08), transparent 46%),
-      radial-gradient(circle at 50% 55%, rgba(255,255,255,0.1), transparent 70%),
-      repeating-linear-gradient(38deg, rgba(139,119,80,0.025) 0 2px, transparent 2px 7px),
-      repeating-linear-gradient(-52deg, rgba(139,119,80,0.02) 0 1px, transparent 1px 9px);
-    color: #2a2118;
+    background-color: #ffffff;
     padding: 80px 24px 100px;
   }
   @media (min-width: 640px) {
-    .letter-bleed {
+    .letter-container {
       padding: 100px 48px 120px;
     }
   }
   @media (min-width: 768px) {
-    .letter-bleed {
+    .letter-container {
       padding: 120px 80px 140px;
     }
   }
 
-  /* ─── Top fade: white → brown ─── */
+  .letter-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .letter-grid {
+      grid-template-columns: 320px 1fr;
+      gap: 0 64px;
+    }
+  }
+
+  .letter-left {
+    position: relative;
+  }
+  .letter-sticky {
+    position: sticky;
+    top: 120px;
+  }
+
+  .letter-right {
+    min-width: 0;
+  }
+
+  .letter-title-block {
+    font-family: var(--font-display, 'Fraunces', serif);
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    line-height: 0.85;
+    color: #000;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+  }
+
   .letter-fade-top {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 80px;
+    height: 40px;
     background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
     pointer-events: none;
     z-index: 2;
   }
 
-  /* ─── Bottom fade: brown → dark ─── */
   .letter-fade-bottom {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 120px;
-    background: linear-gradient(to bottom, rgba(245,240,230,0) 0%, rgba(18,18,18,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(18,18,18,1) 100%);
     pointer-events: none;
     z-index: 2;
   }
 
-  /* ─── Bleed sheet (wider than before) ─── */
-  .letter-sheet-bleed {
-    max-width: 800px;
-    margin: 0 auto;
-    position: relative;
-  }
-  @media (min-width: 768px) {
-    .letter-sheet-bleed {
-      max-width: 900px;
-    }
-  }
-
-  /* ─── Typography ─── */
-  .letter-title {
-    font-family: var(--font-display, 'Fraunces', serif);
-    font-weight: 500;
-    letter-spacing: -0.045em;
-    color: #2a2118;
-    line-height: 0.85;
-  }
   .signature {
     font-family: 'IM Fell English', serif;
     font-style: italic;
+    color: #000;
   }
 
-  /* ─── Body text ─── */
-  .letter-body-bleed .letter-p {
+  .letter-body .letter-p {
     font-family: 'Special Elite', 'Courier New', ui-monospace, monospace;
     line-height: 1.95;
     letter-spacing: 0.005em;
     margin: 0 0 1.6rem 0;
-    text-shadow: 0 0 1px rgba(42,33,24,0.12);
+    color: #000;
+    text-shadow: none;
   }
-  .letter-body-bleed .letter-p .ghost,
-  .letter-body-bleed .signature .ghost {
+  .letter-body .letter-p .ghost,
+  .letter-body .signature .ghost {
     opacity: 0;
   }
 
-  /* ─── Typewriter caret ─── */
   .typewriter-caret {
     display: inline-block;
     margin: 0 1px;
-    color: #2a2118;
+    color: #000;
     animation: caret-blink 0.85s steps(1) infinite;
   }
   @keyframes caret-blink {
@@ -328,10 +334,9 @@ const letterStyles = `
     50%, 100% { opacity: 0; }
   }
 
-  /* ─── Scroll hint bounce ─── */
   .scroll-hint { animation: hint-bounce 2.2s ease-in-out infinite; }
   @keyframes hint-bounce {
-    0%, 100% { transform: translateY(0); opacity: 0.4; }
-    50%      { transform: translateY(6px); opacity: 0.7; }
+    0%, 100% { transform: translateY(0); opacity: 0.25; }
+    50%      { transform: translateY(6px); opacity: 0.5; }
   }
 `;

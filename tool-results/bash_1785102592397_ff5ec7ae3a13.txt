@@ -339,8 +339,8 @@ function ShopAllView({ onSelectProduct, onQuickAdd }: { onSelectProduct: (p: Sho
    ═══════════════════════════════════════════════════ */
 
 export function ShopPage() {
-  const { setDetailSlug, addToCart, cartCount, shopSubPath, setShopSubPath } = useAppStore();
-  const [shopPath, setShopPath] = useState<ShopPath>(shopSubPath as ShopPath || "albums");
+  const { setDetailSlug, addToCart, cartCount } = useAppStore();
+  const [shopPath, setShopPath] = useState<ShopPath>("albums");
 
   const openAlbum = useCallback((album: ShopAlbum) => { setDetailSlug(album.slug, "album"); }, [setDetailSlug]);
   const openProduct = useCallback((p: ShopProduct) => { setDetailSlug(p.slug, "product"); }, [setDetailSlug]);
@@ -400,7 +400,7 @@ function AlbumActionList({ album, onStream, onAddToCart }: { album: ShopAlbum; o
 }
 
 export function AlbumDetailPage() {
-  const { detailSlug, setDetailSlug, addToCart, setActiveTab, setShopSubPath } = useAppStore();
+  const { detailSlug, setDetailSlug, addToCart, setActiveTab } = useAppStore();
   const [streamOpen, setStreamOpen] = useState(false);
   const [streamTitle, setStreamTitle] = useState("");
   const [sidebarCats, setSidebarCats] = useState<ShopCategory[] | null>(null);
@@ -419,16 +419,16 @@ export function AlbumDetailPage() {
     <>
       <section className="min-h-screen bg-white px-4 pt-32 pb-20 md:px-8 md:pt-44 md:pb-28">
         <div className="mx-auto max-w-[1400px]">
-          {/* Top nav links */
+          {/* Top nav links */}
           <div className="mb-8 flex items-center gap-6">
-            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath(null); }} className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
+            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }} className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer">
               <ArrowLeft className="h-4 w-4" />
               Shop
             </button>
-            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("shop-all"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
+            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer">
               Shop All
             </button>
-            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("collections"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
+            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer">
               Collections
             </button>
           </div>
@@ -526,7 +526,7 @@ export function AlbumDetailPage() {
    ═══════════════════════════════════════════════════ */
 
 export function ProductDetailPage() {
-  const { detailSlug, setDetailSlug, addToCart, setActiveTab, setShopSubPath } = useAppStore();
+  const { detailSlug, setDetailSlug, addToCart, setActiveTab } = useAppStore();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [notifyEmail, setNotifyEmail] = useState("");
   const [notifySent, setNotifySent] = useState(false);
@@ -563,15 +563,15 @@ export function ProductDetailPage() {
             onClick={() => {
               const parentAlbum = SHOP_ALBUMS.find((a) => a.slug === product.albumSlug);
               if (parentAlbum) { setDetailSlug(parentAlbum.slug, "album"); }
-              else { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath(null); }
+              else { setDetailSlug(null, null); setActiveTab("shop"); }
             }}
-            className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer"
+            className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
           </button>
-          <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("shop-all"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">Shop All</button>
-          <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("collections"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">Collections</button>
+          <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer">Shop All</button>
+          <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors cursor-pointer">Collections</button>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[180px_1fr_1fr] md:gap-0">

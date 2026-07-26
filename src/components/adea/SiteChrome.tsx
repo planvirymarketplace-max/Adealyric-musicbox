@@ -11,7 +11,7 @@ const NAV: { label: string; id: TabId }[] = [
   { label: "Bio", id: "bio" },
 ];
 
-export function SiteHeader({ light = false }: { light?: boolean }) {
+export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const { activeTab, setActiveTab, cartCount } = useAppStore();
@@ -35,57 +35,53 @@ export function SiteHeader({ light = false }: { light?: boolean }) {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
-          scrolled || activeTab !== "home"
-            ? light
-              ? "border-b border-black/10 bg-white/80 backdrop-blur-xl"
-              : "border-b border-border bg-ink/80 backdrop-blur-xl"
-            : light
-              ? "bg-white/60 backdrop-blur-sm"
-              : "bg-transparent"
+          scrolled
+            ? "border-b border-border bg-ink/80 backdrop-blur-xl"
+            : "bg-transparent"
         }`}
       >
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-5 md:px-12">
-          <button onClick={() => setActiveTab("home")} className={`text-eyebrow cursor-pointer ${light ? "text-black" : "text-bone"}`}>
-            Adea<span className={"mx-2 " + (light ? "text-black/40" : "text-ash")}>/</span>Lyric
+          <button onClick={() => setActiveTab("home")} className="text-eyebrow text-bone cursor-pointer">
+            Adea<span className="mx-2 text-ash">/</span>Lyric
           </button>
           <nav className="hidden items-center gap-10 md:flex">
             {NAV.map((n) => {
               const active = activeTab === n.id;
               return (
-                <button key={n.id} onClick={() => setActiveTab(n.id)} className={`group relative text-eyebrow transition-colors cursor-pointer ${light ? (active ? "text-black" : "text-black/50 hover:text-black") : (active ? "text-bone" : "text-bone/70 hover:text-bone")}`}>
+                <button key={n.id} onClick={() => setActiveTab(n.id)} className={`group relative text-eyebrow transition-colors cursor-pointer ${active ? "text-bone" : "text-bone/70 hover:text-bone"}`}>
                   {n.label}
-                  <span className={`absolute -bottom-1 left-0 h-px transition-all duration-500 ${light ? (active ? "w-full bg-black" : "w-0 group-hover:w-full bg-black/30") : (active ? "w-full bg-bone" : "w-0 group-hover:w-full bg-bone")}`} />
+                  <span className={`absolute -bottom-1 left-0 h-px transition-all duration-500 ${active ? "w-full bg-bone" : "w-0 group-hover:w-full bg-bone"}`} />
                 </button>
               );
             })}
           </nav>
           <div className="flex items-center gap-6">
-            <button onClick={() => setActiveTab("login")} className={`hidden text-eyebrow md:inline-flex cursor-pointer ${light ? "text-black/50 hover:text-black" : "text-bone/70 hover:text-bone"}`}>
+            <button onClick={() => setActiveTab("login")} className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
               Log In
             </button>
-            <button onClick={() => setActiveTab("off")} className={`hidden text-eyebrow md:inline-flex cursor-pointer ${light ? "text-black/50 hover:text-black" : "text-bone/70 hover:text-bone"}`}>
+            <button onClick={() => setActiveTab("off")} className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
               Sign Up
             </button>
-            <button onClick={() => setActiveTab("shop")} className={`hidden text-eyebrow md:inline-flex cursor-pointer ${light ? "text-black/50 hover:text-black" : "text-bone/70 hover:text-bone"}`}>
+            <button onClick={() => setActiveTab("shop")} className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
               Cart / {cartCount}
             </button>
-            <button className={`grid h-10 w-10 place-items-center border md:hidden cursor-pointer ${light ? "border-black/15" : "border-border"}`} onClick={() => setMenu((v) => !v)} aria-label="Menu">
+            <button className="grid h-10 w-10 place-items-center border border-border md:hidden cursor-pointer" onClick={() => setMenu((v) => !v)} aria-label="Menu">
               <div className="flex flex-col gap-1.5">
-                <span className={`block h-px w-5 transition-transform ${light ? "bg-black" : "bg-bone"} ${menu ? "translate-y-1 rotate-45" : ""}`} />
-                <span className={`block h-px w-5 transition-transform ${light ? "bg-black" : "bg-bone"} ${menu ? "-translate-y-1 -rotate-45" : ""}`} />
+                <span className={`block h-px w-5 transition-transform bg-bone ${menu ? "translate-y-1 rotate-45" : ""}`} />
+                <span className={`block h-px w-5 transition-transform bg-bone ${menu ? "-translate-y-1 -rotate-45" : ""}`} />
               </div>
             </button>
           </div>
         </div>
       </header>
 
-      <div className={`fixed inset-0 z-30 transition-all duration-500 md:hidden ${menu ? (light ? "bg-white opacity-100 pointer-events-auto" : "bg-ink opacity-100 pointer-events-auto") : (light ? "bg-white opacity-0 pointer-events-none" : "bg-ink opacity-0 pointer-events-none")}`}>
+      <div className={`fixed inset-0 z-30 transition-all duration-500 md:hidden ${menu ? "bg-ink opacity-100 pointer-events-auto" : "bg-ink opacity-0 pointer-events-none"}`}>
         <nav className="flex h-full flex-col justify-center gap-8 px-8">
           {NAV.map((n, i) => (
-            <button key={n.id} onClick={() => { setActiveTab(n.id); setMenu(false); }} className={`text-display text-6xl cursor-pointer text-left ${light ? "text-black" : "text-bone"}`} style={{ transitionDelay: `${i * 50}ms` }}>{n.label}</button>
+            <button key={n.id} onClick={() => { setActiveTab(n.id); setMenu(false); }} className="text-display text-6xl cursor-pointer text-left text-bone" style={{ transitionDelay: `${i * 50}ms` }}>{n.label}</button>
           ))}
-          <button onClick={() => { setActiveTab("booking"); setMenu(false); }} className={`text-display text-6xl cursor-pointer text-left ${light ? "text-black/50" : "text-bone/50"}`}>Booking</button>
-          <button onClick={() => { setActiveTab("login"); setMenu(false); }} className={`text-display text-6xl cursor-pointer text-left ${light ? "text-black/50" : "text-bone/50"}`}>Log In</button>
+          <button onClick={() => { setActiveTab("booking"); setMenu(false); }} className="text-display text-6xl cursor-pointer text-left text-bone/50">Booking</button>
+          <button onClick={() => { setActiveTab("login"); setMenu(false); }} className="text-display text-6xl cursor-pointer text-left text-bone/50">Log In</button>
         </nav>
       </div>
     </>
@@ -109,8 +105,8 @@ export function PlatformIcon({ name, className = "h-5 w-5" }: { name: string; cl
 
 const FOOTER_LINKS = [
   { heading: "Music", links: [{ label: "Discography", action: "discography" as TabId }, { label: "Latest Release", action: "discography" as TabId }, { label: "Streaming", external: true }] },
-  { heading: "Shop", links: [{ label: "Merchandise", action: "shop" as TabId }, { label: "Vinyl & CDs", action: "shop" as TabId }] },
-  { heading: "Connect", links: [{ label: "Tour Dates", action: "tour" as TabId }, { label: "Booking", action: "booking" as TabId }, { label: "Newsletter", action: "home" as TabId }] },
+  { heading: "Shop", links: [{ label: "Merchandise", action: "shop" as TabId }, { label: "Vinyl & CDs", action: "shop" as TabId }, { label: "USB Drives", action: "shop" as TabId }] },
+  { heading: "Connect", links: [{ label: "Tour Dates", action: "tour" as TabId }, { label: "Vocal Coaching Booking", action: "booking" as TabId }, { label: "Newsletter", action: "home" as TabId }] },
   { heading: "Account", links: [{ label: "Log In", action: "login" as TabId }, { label: "Sign Up", action: "off" as TabId }] },
   { heading: "Industry", links: [{ label: "Sync Agents", external: true }, { label: "Writers Room", external: true }] },
 ];
@@ -136,7 +132,7 @@ export function SiteFooter() {
     <footer className="relative bg-ink px-6 pt-20 pb-10 md:px-12 md:pt-28 md:pb-12">
       <div className="mx-auto max-w-[1600px]">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
-          <div className="md:col-span-5">
+          <div className="md:col-span-4">
             <button onClick={() => go("home")} className="relative block cursor-pointer group" aria-label="Adea Lyric Home">
               <img
                 src="/logo-footer.png"
@@ -147,7 +143,7 @@ export function SiteFooter() {
             </button>
             <p className="mt-6 max-w-md text-base leading-relaxed text-ash">The sound of West Philly. Singer, songwriter, and producer creating every record from the soul.</p>
           </div>
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-4 md:col-span-7">
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-5 md:col-span-8">
             {FOOTER_LINKS.map((col) => (
               <div key={col.heading}>
                 <div className="text-eyebrow mb-5 text-bone/50">{col.heading}</div>
@@ -184,10 +180,10 @@ export function SiteFooter() {
   );
 }
 
-export function PageShell({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
+export function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`relative min-h-screen w-full text-bone ${light ? "bg-white text-black" : "bg-ink text-bone"}`}>
-      <SiteHeader light={light} />
+    <div className="relative min-h-screen w-full text-bone bg-ink">
+      <SiteHeader />
       <main>{children}</main>
       <SiteFooter />
     </div>
