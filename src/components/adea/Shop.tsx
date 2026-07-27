@@ -291,12 +291,35 @@ function AlbumsView({ onAlbumClick }: { onAlbumClick: (a: ShopAlbum) => void }) 
   );
 }
 
-/* ─── Collections View (placeholder) ─── */
-function CollectionsView({ selectedCats, onCategoryChange }: { selectedCats: ShopCategory[] | null; onCategoryChange: (c: ShopCategory[] | null) => void }) {
+
+/* --- Collections View --- */
+function CollectionsView(_props: { selectedCats: ShopCategory[] | null; onCategoryChange: (c: ShopCategory[] | null) => void }) {
   return (
-    <div className="mt-20 flex flex-col items-center justify-center py-20">
-      <p className="text-display text-3xl text-black/15">Collections</p>
-      <p className="mt-4 text-sm text-black">Special runs and collaborations coming soon.</p>
+    <div className="mt-10">
+      <div className="mb-16">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-black/40 mb-2">Collection</p>
+        <h2 className="text-display text-[clamp(2rem,5vw,4.5rem)] leading-[0.9] text-black">Get the Look.</h2>
+        <p className="mt-4 max-w-lg text-sm text-black">
+          Adea&apos;s style, curated. Every piece worn on stage, in press, and on the streets of West Philly.
+        </p>
+        <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="group cursor-pointer">
+              <div className="relative aspect-[3/4] overflow-hidden border border-black/10 bg-[#f0f0f0]">
+                <div className="flex h-full w-full items-center justify-center text-[11px] uppercase tracking-widest text-black/15">
+                  Look {i}
+                </div>
+              </div>
+              <p className="mt-3 text-[12px] font-medium uppercase tracking-wide text-black/80 line-clamp-1">Look {i}</p>
+              <p className="mt-1 text-[11px] text-black/50">Coming soon</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="border-t border-black/10 pt-16">
+        <p className="text-display text-3xl text-black/15">More collections coming soon.</p>
+        <p className="mt-4 text-sm text-black">Special runs and collaborations.</p>
+      </div>
     </div>
   );
 }

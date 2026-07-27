@@ -60,8 +60,8 @@ export function DiscographyPage() {
         <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-16 pt-40 md:px-12 md:pb-24 md:pt-56">
           <div className="text-eyebrow text-ash">Volume — Discography</div>
           <h1 className="mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] leading-none text-bone">
-            The Ledger,
-            <span className="block italic text-ash">year by year.</span>
+            The Sound of
+            <span className="block italic text-ash">West Philly.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg text-bone/70">
             Every release, in the order the world got to hear it.

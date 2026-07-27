@@ -8,7 +8,6 @@ const NAV: { label: string; id: TabId }[] = [
   { label: "Discography", id: "discography" },
   { label: "Tour", id: "tour" },
   { label: "Shop", id: "shop" },
-  { label: "Get the Look", id: "getthelook" },
   { label: "Bio", id: "bio" },
 ];
 

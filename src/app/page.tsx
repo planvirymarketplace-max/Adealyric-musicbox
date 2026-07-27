@@ -9,7 +9,7 @@ import { DiscographyPage, ReleaseDetailPage, TourPage } from "@/components/adea/
 import { ShopPage, ProductDetailPage, AlbumDetailPage } from "@/components/adea/Shop";
 import { BookingPage } from "@/components/adea/Booking";
 import { BioPage } from "@/components/adea/BioAccount";
-import { GetTheLookPage } from "@/components/adea/GetTheLook";
+
 import { SiteHeader, SiteFooter } from "@/components/adea/SiteChrome";
 import { OffPage, LoginPage } from "@/components/adea/OffLogin";
 
@@ -18,7 +18,7 @@ const AdminPortal = dynamic(() => import("@/components/dashboard/AdminPortal").t
 const UserPortal = dynamic(() => import("@/components/portal/UserPortal").then(m => ({ default: m.UserPortal })), { ssr: false });
 
 // Interior pages that should have white/off-white backgrounds
-const LIGHT_TABS = new Set<TabId>(["discography", "shop", "tour", "bio", "booking", "getthelook"]);
+const LIGHT_TABS = new Set<TabId>(["discography", "shop", "tour", "bio", "booking"]);
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -34,8 +34,7 @@ function TabContent({ tab }: { tab: TabId }) {
       return <BookingPage />;
     case "bio":
       return <BioPage />;
-    case "getthelook":
-      return <GetTheLookPage />;
+
     case "off":
       return <OffPage />;
     case "login":
