@@ -61,7 +61,7 @@ export function DiscographyPage() {
           <div className="text-eyebrow text-ash">Volume — Discography</div>
           <h1 className="mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] leading-none text-bone">
             The Sound of
-            <span className="block italic text-ash">West Philly.</span>
+            <span className="block italic text-ash">West Philly</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg text-bone/70">
             Every release, in the order the world got to hear it.

@@ -9,10 +9,10 @@ const philly3 = "/philly-3.jpg";
 export function BioPage() {
   return (
     <>
-      {/* DARK HERO — headline pushed to bottom */}
-      <section className="relative flex min-h-[50svh] items-end overflow-hidden bg-ink md:min-h-[60svh]">
+      {/* DARK HERO — headline at bottom */}
+      <section className="relative flex min-h-[60svh] items-end overflow-hidden bg-ink md:min-h-[70svh]">
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" />
-        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-16 pt-40 md:px-12 md:pb-24 md:pt-56">
+        <div className="relative z-10 w-full px-6 pb-16 md:px-12 md:pb-24">
           <div className="text-eyebrow text-ash">The Artist</div>
           <h1 className="mt-6 text-display text-[clamp(3.5rem,11vw,12rem)] leading-none text-bone">
             Adea Lyric,
