@@ -5,14 +5,15 @@ import { useAppStore } from "@/lib/store";
 import { LetterToMyFans } from "./LetterToMyFans";
 import { HomeBanner } from "./HomeBanner";
 
-const heroBg = "/hero-muted.png";
+const heroBg = "/Home Page/Hero Section/home page hero.jpg";
 
 const timelineVideos = [
-  "/Screen Recording 2026-07-24 034249.mp4",
-  "/Screen Recording 2026-07-24 034528.mp4",
-  "/Screen Recording 2026-07-24 035242.mp4",
-  "/Screen Recording 2026-07-24 035616.mp4",
-  "/Screen Recording 2026-07-24 035951.mp4",
+  "/Home Page/Stepped Path to Progress/Timeline2017.mp4",
+  "/Home Page/Stepped Path to Progress/Timeline2019.mp4",
+  "/Home Page/Stepped Path to Progress/Timeline2021.mp4",
+  "/Home Page/Stepped Path to Progress/Timeline2023.mp4",
+  "/Home Page/Stepped Path to Progress/Timeline2025.mp4",
+  "/Home Page/Stepped Path to Progress/Timeline2026.mp4",
 ];
 
 /* ---- Icons ---- */

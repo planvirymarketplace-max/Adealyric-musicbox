@@ -2,9 +2,9 @@
 
 import { PageIntro } from "./SiteChrome";
 
-const philly1 = "/philly-1.jpg";
-const philly2 = "/philly-2.jpg";
-const philly3 = "/philly-3.jpg";
+const philly1 = "/Discography/Album Covers/philly-1.jpg";
+const philly2 = "/Discography/Album Covers/philly-2.jpg";
+const philly3 = "/Discography/Album Covers/philly-3.jpg";
 
 export function BioPage() {
   return (

@@ -6,7 +6,7 @@ import { useAppStore } from "@/lib/store";
 import { RELEASES, TOUR, type ReleaseType } from "@/lib/catalog";
 
 const TYPES: ("All" | ReleaseType)[] = ["All", "Album", "EP", "Single", "Mixtape"];
-const DISCO_HERO = "/lyric23.jpg";
+const DISCO_HERO = "/Discography/Hero/lyric23.jpg";
 
 function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (

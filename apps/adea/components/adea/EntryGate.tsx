@@ -63,7 +63,7 @@ export function EntryGate({ onEnter, onLogin }: Props) {
     <div className="fixed inset-0 z-[100] overflow-hidden bg-ink text-bone">
       {/* Background image */}
       <img
-        src="/splash-bg.jpg"
+        src="/Splash Gate Page Background/splash-bg.jpg"
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden="true"

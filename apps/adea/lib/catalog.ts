@@ -1,8 +1,8 @@
-const fkboiAsset = "/fkboi.jpg";
-const cantnobodyAsset = "/cantnobody.webp";
-const philly1 = "/philly-1.jpg";
-const philly2 = "/philly-2.jpg";
-const philly3 = "/philly-3.jpg";
+const fkboiAsset = "/Discography/Album Covers/fkboi.jpg";
+const cantnobodyAsset = "/Discography/Album Covers/cantnobody.webp";
+const philly1 = "/Discography/Album Covers/philly-1.jpg";
+const philly2 = "/Discography/Album Covers/philly-2.jpg";
+const philly3 = "/Discography/Album Covers/philly-3.jpg";
 
 export type ReleaseType = "Album" | "EP" | "Single" | "Mixtape";
 

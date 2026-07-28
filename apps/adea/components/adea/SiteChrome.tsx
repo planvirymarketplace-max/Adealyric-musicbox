@@ -128,7 +128,7 @@ export function SiteFooter() {
           <div className="md:col-span-4">
             <Link href="/" className="relative block cursor-pointer group" aria-label="Adea Lyric Home">
               <img
-                src="/logo-footer.png"
+                src="/Footer/Footer Logo/logo-footer.png"
                 alt="Adea Lyric"
                 className="h-auto w-28 sm:w-32 md:w-36 opacity-20 hover:opacity-30 transition-opacity duration-300"
                 style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
