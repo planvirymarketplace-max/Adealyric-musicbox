@@ -104,7 +104,7 @@ const FOOTER_LINKS = [
   { heading: "Shop", links: [{ label: "Merchandise", href: "/shop" }, { label: "Vinyl & CDs", href: "/shop" }, { label: "USB Drives", href: "/shop" }] },
   { heading: "Connect", links: [{ label: "Tour Dates", href: "/events" }, { label: "Vocal Coaching Booking", href: "/booking" }, { label: "Newsletter", href: "/" }] },
   { heading: "Account", links: [{ label: "Log In", href: "/login" }, { label: "Sign Up", href: "/signup" }] },
-  { heading: "Industry", links: [{ label: "Sync Agents", external: true }, { label: "Writers Room", external: true }] },
+  { heading: "MusicBox", links: [{ label: "For Labels", href: "https://musicbox.com/labels" }, { label: "For Artists", href: "https://musicbox.com/artists" }, { label: "For Sync Agents", href: "https://musicbox.com/sync" }] },
 ];
 
 const PLATFORMS = [
@@ -150,6 +150,19 @@ export function SiteFooter() {
                       )}
                     </li>
                   ))}
+                  {col.heading === "MusicBox" && (
+                    <>
+                      <li>
+                        <a href="https://musicbox.com/labels" className="text-sm text-bone/70 transition-colors hover:text-bone cursor-pointer text-left" target="_blank" rel="noopener noreferrer">For Labels</a>
+                      </li>
+                      <li>
+                        <a href="https://musicbox.com/artists" className="text-sm text-bone/70 transition-colors hover:text-bone cursor-pointer text-left" target="_blank" rel="noopener noreferrer">For Artists</a>
+                      </li>
+                      <li>
+                        <a href="https://musicbox.com/sync" className="text-sm text-bone/70 transition-colors hover:text-bone cursor-pointer text-left" target="_blank" rel="noopener noreferrer">For Sync Agents</a>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
             ))}
