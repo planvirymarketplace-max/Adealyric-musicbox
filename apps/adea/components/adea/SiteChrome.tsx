@@ -1,23 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useAppStore, type TabId } from "@/lib/store";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
-const NAV: { label: string; id: TabId }[] = [
-  { label: "Home", id: "home" },
-  { label: "Discography", id: "discography" },
-  { label: "Tour", id: "tour" },
-  { label: "Shop", id: "shop" },
-  { label: "Bio", id: "bio" },
+const NAV: { label: string; href: string }[] = [
+  { label: "Home", href: "/" },
+  { label: "Discography", href: "/music" },
+  { label: "Tour", href: "/events" },
+  { label: "Shop", href: "/shop" },
+  { label: "Bio", href: "/bio" },
 ];
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
-  const { activeTab, setActiveTab, cartCount } = useAppStore();
+  const pathname = usePathname();
 
   // Interior pages have white bg — header needs solid dark bg
-  const isLightPage = activeTab !== "home";
+  const isLightPage = pathname !== "/";
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20);
@@ -25,14 +26,6 @@ export function SiteHeader() {
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
-
-  const prevTab = useRef(activeTab);
-  useEffect(() => {
-    if (prevTab.current !== activeTab) {
-      setMenu(false);
-      prevTab.current = activeTab;
-    }
-  }, [activeTab]);
 
   return (
     <>
@@ -44,30 +37,30 @@ export function SiteHeader() {
         }`}
       >
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-5 md:px-12">
-          <button onClick={() => setActiveTab("home")} className="text-eyebrow text-bone cursor-pointer">
+          <Link href="/" className="text-eyebrow text-bone cursor-pointer">
             Adea<span className="mx-2 text-ash">/</span>Lyric
-          </button>
+          </Link>
           <nav className="hidden items-center gap-10 md:flex">
             {NAV.map((n) => {
-              const active = activeTab === n.id;
+              const active = pathname === n.href;
               return (
-                <button key={n.id} onClick={() => setActiveTab(n.id)} className={`group relative text-eyebrow transition-colors cursor-pointer ${active ? "text-bone" : "text-bone/70 hover:text-bone"}`}>
+                <Link key={n.href} href={n.href} className={`group relative text-eyebrow transition-colors cursor-pointer ${active ? "text-bone" : "text-bone/70 hover:text-bone"}`}>
                   {n.label}
                   <span className={`absolute -bottom-1 left-0 h-px transition-all duration-500 ${active ? "w-full bg-bone" : "w-0 group-hover:w-full bg-bone"}`} />
-                </button>
+                </Link>
               );
             })}
           </nav>
           <div className="flex items-center gap-6">
-            <button onClick={() => setActiveTab("login")} className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
+            <Link href="/login" className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
               Log In
-            </button>
-            <button onClick={() => setActiveTab("off")} className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
+            </Link>
+            <Link href="/signup" className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
               Sign Up
-            </button>
-            <button onClick={() => setActiveTab("shop")} className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
-              Cart / {cartCount}
-            </button>
+            </Link>
+            <Link href="/shop" className="hidden text-eyebrow text-bone/70 hover:text-bone md:inline-flex cursor-pointer">
+              Cart
+            </Link>
             <button className="grid h-10 w-10 place-items-center border border-border md:hidden cursor-pointer" onClick={() => setMenu((v) => !v)} aria-label="Menu">
               <div className="flex flex-col gap-1.5">
                 <span className={`block h-px w-5 transition-transform bg-bone ${menu ? "translate-y-1 rotate-45" : ""}`} />
@@ -81,10 +74,10 @@ export function SiteHeader() {
       <div className={`fixed inset-0 z-30 transition-all duration-500 md:hidden ${menu ? "bg-ink opacity-100 pointer-events-auto" : "bg-ink opacity-0 pointer-events-none"}`}>
         <nav className="flex h-full flex-col justify-center gap-8 px-8">
           {NAV.map((n, i) => (
-            <button key={n.id} onClick={() => { setActiveTab(n.id); setMenu(false); }} className="text-display text-6xl cursor-pointer text-left text-bone" style={{ transitionDelay: `${i * 50}ms` }}>{n.label}</button>
+            <Link key={n.href} href={n.href} onClick={() => setMenu(false)} className="text-display text-6xl cursor-pointer text-left text-bone" style={{ transitionDelay: `${i * 50}ms` }}>{n.label}</Link>
           ))}
-          <button onClick={() => { setActiveTab("booking"); setMenu(false); }} className="text-display text-6xl cursor-pointer text-left text-bone/50">Booking</button>
-          <button onClick={() => { setActiveTab("login"); setMenu(false); }} className="text-display text-6xl cursor-pointer text-left text-bone/50">Log In</button>
+          <Link href="/booking" onClick={() => setMenu(false)} className="text-display text-6xl cursor-pointer text-left text-bone/50">Booking</Link>
+          <Link href="/login" onClick={() => setMenu(false)} className="text-display text-6xl cursor-pointer text-left text-bone/50">Log In</Link>
         </nav>
       </div>
     </>
@@ -107,10 +100,10 @@ export function PlatformIcon({ name, className = "h-5 w-5" }: { name: string; cl
 }
 
 const FOOTER_LINKS = [
-  { heading: "Music", links: [{ label: "Discography", action: "discography" as TabId }, { label: "Latest Release", action: "discography" as TabId }, { label: "Streaming", external: true }] },
-  { heading: "Shop", links: [{ label: "Merchandise", action: "shop" as TabId }, { label: "Vinyl & CDs", action: "shop" as TabId }, { label: "USB Drives", action: "shop" as TabId }] },
-  { heading: "Connect", links: [{ label: "Tour Dates", action: "tour" as TabId }, { label: "Vocal Coaching Booking", action: "booking" as TabId }, { label: "Newsletter", action: "home" as TabId }] },
-  { heading: "Account", links: [{ label: "Log In", action: "login" as TabId }, { label: "Sign Up", action: "off" as TabId }] },
+  { heading: "Music", links: [{ label: "Discography", href: "/music" }, { label: "Latest Release", href: "/music" }, { label: "Streaming", external: true }] },
+  { heading: "Shop", links: [{ label: "Merchandise", href: "/shop" }, { label: "Vinyl & CDs", href: "/shop" }, { label: "USB Drives", href: "/shop" }] },
+  { heading: "Connect", links: [{ label: "Tour Dates", href: "/events" }, { label: "Vocal Coaching Booking", href: "/booking" }, { label: "Newsletter", href: "/" }] },
+  { heading: "Account", links: [{ label: "Log In", href: "/login" }, { label: "Sign Up", href: "/signup" }] },
   { heading: "Industry", links: [{ label: "Sync Agents", external: true }, { label: "Writers Room", external: true }] },
 ];
 
@@ -128,22 +121,19 @@ const PLATFORMS = [
 const ALL_PLATFORMS = [...PLATFORMS, ...PLATFORMS, ...PLATFORMS, ...PLATFORMS];
 
 export function SiteFooter() {
-  const { setActiveTab } = useAppStore();
-  const go = (action?: TabId) => { if (action) setActiveTab(action); };
-
   return (
     <footer className="relative bg-ink px-6 pt-20 pb-10 md:px-12 md:pt-28 md:pb-12">
       <div className="mx-auto max-w-[1600px]">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-4">
-            <button onClick={() => go("home")} className="relative block cursor-pointer group" aria-label="Adea Lyric Home">
+            <Link href="/" className="relative block cursor-pointer group" aria-label="Adea Lyric Home">
               <img
                 src="/logo-footer.png"
                 alt="Adea Lyric"
                 className="h-auto w-28 sm:w-32 md:w-36 opacity-20 hover:opacity-30 transition-opacity duration-300"
                 style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
               />
-            </button>
+            </Link>
             <p className="mt-6 max-w-md text-base leading-relaxed text-ash">The sound of West Philly. Singer, songwriter, and producer creating every record from the soul.</p>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-5 md:col-span-8">
@@ -153,7 +143,11 @@ export function SiteFooter() {
                 <ul className="flex flex-col gap-3">
                   {col.links.map((link) => (
                     <li key={link.label}>
-                      <button onClick={() => go(link.action)} className="text-sm text-bone/70 transition-colors hover:text-bone cursor-pointer text-left">{link.label}</button>
+                      {link.external ? (
+                        <span className="text-sm text-bone/70">{link.label}</span>
+                      ) : (
+                        <Link href={link.href} className="text-sm text-bone/70 transition-colors hover:text-bone cursor-pointer text-left">{link.label}</Link>
+                      )}
                     </li>
                   ))}
                 </ul>

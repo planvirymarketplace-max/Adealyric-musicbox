@@ -1,0 +1,33 @@
+{
+  "name": "@musicbox/label-portal",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@musicbox/auth": "workspace:*",
+    "@musicbox/database": "workspace:*",
+    "@musicbox/hooks": "workspace:*",
+    "@musicbox/ui": "workspace:*",
+    "@musicbox/permissions": "workspace:*",
+    "next": "^16.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@tanstack/react-query": "^5.82.0",
+    "zustand": "^5.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5",
+    "eslint": "^9",
+    "eslint-config-next": "^16.1.1",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4"
+  }
+}

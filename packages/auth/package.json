@@ -1,0 +1,22 @@
+{
+  "name": "@musicbox/auth",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@musicbox/database": "workspace:*",
+    "jose": "^5.9.6",
+    "zod": "^4.0.2",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "typescript": "^5"
+  }
+}

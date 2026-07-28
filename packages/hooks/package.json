@@ -9,6 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@musicbox/auth": "workspace:*",
     "@musicbox/database": "workspace:*",
     "@tanstack/react-query": "^5.82.0",
     "react": "^19.0.0"

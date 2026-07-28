@@ -1,6 +1,8 @@
 "use client";
 
 import { type ReactNode, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import {
   LayoutDashboard,
   Disc3,
@@ -26,7 +28,6 @@ import {
   Heart,
   ExternalLink,
 } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
 
 interface NavItem {
   to: string;
@@ -38,72 +39,72 @@ interface NavItem {
 const navSections: { title: string; items: NavItem[] }[] = [
   {
     title: 'Overview',
-    items: [{ to: '/', label: 'Dashboard', icon: <LayoutDashboard size={18} /> }],
+    items: [{ to: '/admin', label: 'Dashboard', icon: <LayoutDashboard size={18} /> }],
   },
   {
     title: 'Catalog',
     items: [
-      { to: '/catalog/releases', label: 'Releases', icon: <Disc3 size={18} /> },
-      { to: '/catalog/tracks', label: 'Tracks', icon: <Music size={18} /> },
+      { to: '/admin/catalog/releases', label: 'Releases', icon: <Disc3 size={18} /> },
+      { to: '/admin/catalog/tracks', label: 'Tracks', icon: <Music size={18} /> },
     ],
   },
   {
     title: 'Commerce',
-    items: [{ to: '/commerce/orders', label: 'Orders', icon: <ShoppingBag size={18} /> }],
+    items: [{ to: '/admin/commerce/orders', label: 'Orders', icon: <ShoppingBag size={18} /> }],
   },
   {
     title: 'CMS',
     items: [
-      { to: '/cms/galleries', label: 'Image Galleries', icon: <Image size={18} /> },
-      { to: '/cms/videos', label: 'Video Galleries', icon: <Video size={18} /> },
-      { to: '/cms/banners', label: 'Banners', icon: <LayoutTemplate size={18} /> },
+      { to: '/admin/cms/galleries', label: 'Image Galleries', icon: <Image size={18} /> },
+      { to: '/admin/cms/videos', label: 'Video Galleries', icon: <Video size={18} /> },
+      { to: '/admin/cms/banners', label: 'Banners', icon: <LayoutTemplate size={18} /> },
     ],
   },
   {
     title: 'Tickets',
     items: [
-      { to: '/tickets/events', label: 'Events', icon: <Ticket size={18} /> },
-      { to: '/tickets/sales', label: 'Sales', icon: <ShoppingBag size={18} /> },
+      { to: '/admin/tickets/events', label: 'Events', icon: <Ticket size={18} /> },
+      { to: '/admin/tickets/sales', label: 'Sales', icon: <ShoppingBag size={18} /> },
     ],
   },
   {
     title: 'Bookings',
     items: [
-      { to: '/bookings/pipeline', label: 'Pipeline', icon: <Calendar size={18} /> },
-      { to: '/bookings/calendar', label: 'Calendar', icon: <Calendar size={18} /> },
-      { to: '/bookings/inquiries', label: 'Inquiries', icon: <Inbox size={18} /> },
+      { to: '/admin/bookings/pipeline', label: 'Pipeline', icon: <Calendar size={18} /> },
+      { to: '/admin/bookings/calendar', label: 'Calendar', icon: <Calendar size={18} /> },
+      { to: '/admin/bookings/inquiries', label: 'Inquiries', icon: <Inbox size={18} /> },
     ],
   },
   {
     title: 'CRM',
     items: [
-      { to: '/crm/contacts', label: 'Contacts', icon: <Users size={18} /> },
-      { to: '/crm/import', label: 'CSV Import', icon: <Download size={18} /> },
+      { to: '/admin/crm/contacts', label: 'Contacts', icon: <Users size={18} /> },
+      { to: '/admin/crm/csv-import', label: 'CSV Import', icon: <Download size={18} /> },
     ],
   },
   {
     title: 'Fans',
     items: [
-      { to: '/fans', label: 'Fan Management', icon: <Heart size={18} /> },
+      { to: '/admin/fans', label: 'Fan Management', icon: <Heart size={18} /> },
     ],
   },
   {
     title: 'Comms',
-    items: [{ to: '/comms/campaigns', label: 'Campaigns', icon: <Mail size={18} /> }],
+    items: [{ to: '/admin/comms/campaigns', label: 'Campaigns', icon: <Mail size={18} /> }],
   },
   {
     title: 'System',
     items: [
-      { to: '/integrations', label: 'Integrations', icon: <Plug size={18} /> },
-      { to: '/automation', label: 'Automation (MCP)', icon: <Bot size={18} /> },
-      { to: '/exports', label: 'Exports', icon: <Download size={18} /> },
-      { to: '/settings', label: 'Settings', icon: <Settings size={18} /> },
+      { to: '/admin/integrations', label: 'Integrations', icon: <Plug size={18} /> },
+      { to: '/admin/automation', label: 'Automation (MCP)', icon: <Bot size={18} /> },
+      { to: '/admin/exports', label: 'Exports', icon: <Download size={18} /> },
+      { to: '/admin/settings', label: 'Settings', icon: <Settings size={18} /> },
     ],
   },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { adminRoute, setAdminRoute } = useAppStore();
+  const pathname = usePathname();
   return (
     <nav className="flex-1 overflow-y-auto px-3 py-4">
       {navSections.map((section) => (
@@ -111,11 +112,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">{section.title}</p>
           <div className="space-y-0.5">
             {section.items.map((item) => {
-              const isActive = adminRoute === item.to;
+              const isActive = pathname === item.to;
               return (
-                <button
+                <Link
                   key={item.to}
-                  onClick={() => { setAdminRoute(item.to); onNavigate?.(); }}
+                  href={item.to}
+                  onClick={() => onNavigate?.()}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left cursor-pointer ${
                     isActive
                       ? 'bg-neutral-900 text-white'
@@ -129,7 +131,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                       {item.badge}
                     </span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -142,7 +144,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 export function AdminLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [artistMenuOpen, setArtistMenuOpen] = useState(false);
-  const { setAdminRoute, setActiveTab, logout } = useAppStore();
 
   return (
     <div className="min-h-screen bg-neutral-50 flex">
@@ -156,12 +157,12 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </div>
         <SidebarContent />
         <div className="px-6 py-4 border-t border-neutral-200">
-          <button onClick={() => { setActiveTab('portal'); }} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer">
+          <Link href="/portal" className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer">
             <ExternalLink size={12} /> View User Portal
-          </button>
-          <button onClick={logout} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer mt-2">
+          </Link>
+          <Link href="/login" className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer mt-2">
             Sign Out
-          </button>
+          </Link>
           <p className="text-xs text-neutral-400 mt-2">Admin Portal v3.0</p>
         </div>
       </aside>
@@ -183,6 +184,14 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               </button>
             </div>
             <SidebarContent onNavigate={() => setMobileOpen(false)} />
+            <div className="px-6 py-4 border-t border-neutral-200">
+              <Link href="/portal" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer">
+                <ExternalLink size={12} /> View User Portal
+              </Link>
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer mt-2">
+                Sign Out
+              </Link>
+            </div>
           </aside>
         </div>
       )}

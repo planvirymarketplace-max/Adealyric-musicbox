@@ -1,2 +1,5 @@
-// Prisma client will be generated and exported here
-// export * from '@prisma/client';
+export * from '@prisma/client';
+export { prisma } from './src/client';
+export { createTenantMiddleware, createTenantPrismaClient } from './src/middleware';
+
+

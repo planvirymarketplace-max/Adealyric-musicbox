@@ -9,6 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@musicbox/auth": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -43,6 +44,7 @@
     "framer-motion": "^12.23.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.525.0",
+    "next": "^16.1.1",
     "react": "^19.0.0",
     "react-day-picker": "^9.8.0",
     "react-resizable-panels": "^3.0.3",

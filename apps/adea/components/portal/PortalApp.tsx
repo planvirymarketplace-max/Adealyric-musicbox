@@ -1,54 +1,18 @@
 "use client";
 
-import { Link, useLocation, useNavigate } from '@/lib/react-router-stub';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Music, Calendar, Image as ImageIcon, Video, User, Home, LogOut, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useAppStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase-stub';
 import { toast } from '@/components/dashboard/ui/Toast';
-import PortalHomePage from '@/components/portal/pages/PortalHomePage';
-import PortalEventsPage from '@/components/portal/pages/PortalEventsPage';
-import PortalEventDetailPage from '@/components/portal/pages/PortalEventDetailPage';
-import PortalGalleryPage from '@/components/portal/pages/PortalGalleryPage';
-import PortalVideosPage from '@/components/portal/pages/PortalVideosPage';
-import PortalLoginPage from '@/components/portal/pages/PortalLoginPage';
-import PortalSignupPage from '@/components/portal/pages/PortalSignupPage';
-import PortalDashboardPage from '@/components/portal/pages/PortalDashboardPage';
-import PortalMusicPage from '@/components/portal/pages/PortalMusicPage';
-import PortalReleaseDetailPage from '@/components/portal/pages/PortalReleaseDetailPage';
+import { type ReactNode } from 'react';
 
-function PortalRouteContent({ route }: { route: string }) {
-  switch (route) {
-    case '/portal':
-    case '/':
-      return <PortalHomePage />;
-    case '/portal/music':
-      return <PortalMusicPage />;
-    case '/portal/events':
-      return <PortalEventsPage />;
-    case '/portal/gallery':
-      return <PortalGalleryPage />;
-    case '/portal/videos':
-      return <PortalVideosPage />;
-    case '/portal/login':
-      return <PortalLoginPage />;
-    case '/portal/signup':
-      return <PortalSignupPage />;
-    case '/portal/dashboard':
-      return <PortalDashboardPage />;
-    default:
-      if (route.startsWith('/portal/music/')) return <PortalReleaseDetailPage />;
-      if (route.startsWith('/portal/events/')) return <PortalEventDetailPage />;
-      return <PortalHomePage />;
-  }
-}
-
-export default function PortalApp() {
+export default function PortalApp({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<unknown>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { portalRoute } = useAppStore();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -61,7 +25,7 @@ export default function PortalApp() {
     await supabase.auth.signOut();
     setUser(null);
     toast('success', 'Signed out');
-    navigate('/portal');
+    router.push('/portal');
   };
 
   const navItems = [
@@ -77,7 +41,7 @@ export default function PortalApp() {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-neutral-950/80 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <Link to="/portal" className="flex items-center gap-2">
+          <Link href="/portal" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
               <Music size={18} className="text-white" />
             </div>
@@ -89,9 +53,9 @@ export default function PortalApp() {
             {navItems.map((item) => (
               <Link
                 key={item.to}
-                to={item.to}
+                href={item.to}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location.pathname === item.to ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'
+                  pathname === item.to ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {item.label}
@@ -103,7 +67,7 @@ export default function PortalApp() {
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
-                <Link to="/portal/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors">
+                <Link href="/portal/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors">
                   <User size={16} /> Dashboard
                 </Link>
                 <button onClick={signOut} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
@@ -112,8 +76,8 @@ export default function PortalApp() {
               </>
             ) : (
               <>
-                <Link to="/portal/login" className="px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white transition-colors">Sign In</Link>
-                <Link to="/portal/signup" className="px-4 py-2 rounded-lg text-sm font-medium bg-white text-neutral-900 hover:bg-white/90 transition-colors">Sign Up</Link>
+                <Link href="/portal/login" className="px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white transition-colors">Sign In</Link>
+                <Link href="/portal/signup" className="px-4 py-2 rounded-lg text-sm font-medium bg-white text-neutral-900 hover:bg-white/90 transition-colors">Sign Up</Link>
               </>
             )}
           </div>
@@ -128,19 +92,19 @@ export default function PortalApp() {
         {mobileOpen && (
           <nav className="md:hidden border-t border-white/5 px-4 py-3 space-y-1">
             {navItems.map((item) => (
-              <Link key={item.to} to={item.to} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5">
+              <Link key={item.to} href={item.to} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5">
                 {item.icon}{item.label}
               </Link>
             ))}
             {user ? (
               <>
-                <Link to="/portal/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5"><User size={16} /> Dashboard</Link>
+                <Link href="/portal/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5"><User size={16} /> Dashboard</Link>
                 <button onClick={() => { signOut(); setMobileOpen(false); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 cursor-pointer"><LogOut size={16} /> Sign Out</button>
               </>
             ) : (
               <div className="flex gap-2 pt-2">
-                <Link to="/portal/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center px-3 py-2 rounded-lg text-sm text-white/60 border border-white/10">Sign In</Link>
-                <Link to="/portal/signup" onClick={() => setMobileOpen(false)} className="flex-1 text-center px-3 py-2 rounded-lg text-sm font-medium bg-white text-neutral-900">Sign Up</Link>
+                <Link href="/portal/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center px-3 py-2 rounded-lg text-sm text-white/60 border border-white/10">Sign In</Link>
+                <Link href="/portal/signup" onClick={() => setMobileOpen(false)} className="flex-1 text-center px-3 py-2 rounded-lg text-sm font-medium bg-white text-neutral-900">Sign Up</Link>
               </div>
             )}
           </nav>
@@ -149,13 +113,13 @@ export default function PortalApp() {
 
       {/* Content */}
       <main className="flex-1">
-        <PortalRouteContent route={portalRoute} />
+        {children}
       </main>
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-8 px-4 text-center">
         <p className="text-sm text-white/30">© 2026 My Artist. All rights reserved.</p>
-        <a href="/" className="text-xs text-white/20 hover:text-white/40 mt-1 inline-block">Admin Portal</a>
+        <Link href="/admin" className="text-xs text-white/20 hover:text-white/40 mt-1 inline-block">Admin Portal</Link>
       </footer>
     </div>
   );
