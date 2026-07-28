@@ -10,6 +10,8 @@ const NAV: { label: string; href: string }[] = [
   { label: "Tour", href: "/events" },
   { label: "Shop", href: "/shop" },
   { label: "Bio", href: "/bio" },
+  { label: "News", href: "/news" },
+  { label: "Services", href: "/services" },
 ];
 
 export function SiteHeader() {
