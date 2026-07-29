@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import FansPage from '@/components/dashboard/pages/fans/FansPage';
 
-export default function AdminFansPage() {
-  return <AdminPortal />;
+export default function Page() {
+  return (
+    <AdminLayout>
+      <FansPage />
+    </AdminLayout>
+  );
 }

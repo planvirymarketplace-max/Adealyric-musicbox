@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import OrdersPage from '@/components/dashboard/pages/commerce/OrdersPage';
 
-export default function AdminOrdersPage() {
-  return <AdminPortal />;
+export default function Page() {
+  return (
+    <AdminLayout>
+      <OrdersPage />
+    </AdminLayout>
+  );
 }

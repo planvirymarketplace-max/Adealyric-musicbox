@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import CsvImportPage from '@/components/dashboard/pages/crm/CsvImportPage';
 
-export default function AdminCsvImportPage() {
-  return <AdminPortal />;
+export default function Page() {
+  return (
+    <AdminLayout>
+      <CsvImportPage />
+    </AdminLayout>
+  );
 }

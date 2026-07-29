@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import BookingsCalendarPage from '@/components/dashboard/pages/bookings/BookingsCalendarPage';
 
-export default function AdminBookingsCalendarPage() {
-  return <AdminPortal />;
+export default function Page() {
+  return (
+    <AdminLayout>
+      <BookingsCalendarPage />
+    </AdminLayout>
+  );
 }

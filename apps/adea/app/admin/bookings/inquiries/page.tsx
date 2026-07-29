@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import InquiriesPage from '@/components/dashboard/pages/bookings/InquiriesPage';
 
-export default function AdminInquiriesPage() {
-  return <AdminPortal />;
+export default function Page() {
+  return (
+    <AdminLayout>
+      <InquiriesPage />
+    </AdminLayout>
+  );
 }
