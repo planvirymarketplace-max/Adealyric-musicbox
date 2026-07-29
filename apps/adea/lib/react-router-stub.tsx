@@ -1,76 +1,49 @@
 "use client";
 
-import { type ReactNode, useCallback } from 'react';
-import { useAppStore } from '@/lib/store';
+import { type ReactNode } from 'react';
+import NextLink from 'next/link';
+import { useRouter as useNextRouter, useParams as useNextParams, usePathname } from 'next/navigation';
 
 export function Link({ to, children, className, onClick, ...props }: { to: string; children: ReactNode; className?: string; onClick?: () => void; [key: string]: unknown }) {
-  const { setAdminRoute, setPortalRoute, activeTab } = useAppStore();
-  const isPortal = activeTab === 'portal';
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isPortal) {
-      setPortalRoute(to);
-    } else {
-      setAdminRoute(to);
-    }
-    onClick?.();
-  }, [to, isPortal, setAdminRoute, setPortalRoute, onClick]);
   return (
-    <a href={to} className={className} onClick={handleClick} {...props}>
+    <NextLink href={to} className={className} onClick={onClick} {...props}>
       {children}
-    </a>
+    </NextLink>
   );
 }
 
 export function NavLink({ to, children, className, onClick, ...props }: { to: string; children: ReactNode; className?: string | ((args: { isActive: boolean }) => string); onClick?: () => void; [key: string]: unknown }) {
-  const { setAdminRoute, setPortalRoute, activeTab, adminRoute, portalRoute } = useAppStore();
-  const isPortal = activeTab === 'portal';
-  const currentRoute = isPortal ? portalRoute : adminRoute;
-  const isActive = currentRoute === to;
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isPortal) {
-      setPortalRoute(to);
-    } else {
-      setAdminRoute(to);
-    }
-    onClick?.();
-  }, [to, isPortal, setAdminRoute, setPortalRoute, onClick]);
+  const pathname = usePathname();
+  const isActive = pathname === to;
   return (
-    <a href={to} className={typeof className === 'function' ? className({ isActive }) : className} onClick={handleClick} {...props}>
+    <NextLink href={to} className={typeof className === 'function' ? className({ isActive }) : className} onClick={onClick} {...props}>
       {children}
-    </a>
+    </NextLink>
   );
 }
 
 export function Navigate({ to }: { to: string }) {
-  const { setAdminRoute, setPortalRoute, activeTab } = useAppStore();
-  if (activeTab === 'portal') {
-    setPortalRoute(to);
-  } else {
-    setAdminRoute(to);
+  const router = useNextRouter();
+  if (typeof window !== 'undefined') {
+    router.push(to);
   }
   return null;
 }
 
 export function useNavigate() {
-  const { setAdminRoute, setPortalRoute, activeTab } = useAppStore();
+  const router = useNextRouter();
   return (path: string) => {
-    if (activeTab === 'portal') {
-      setPortalRoute(path);
-    } else {
-      setAdminRoute(path);
-    }
+    router.push(path);
   };
 }
 
 export function useLocation() {
-  const { adminRoute, portalRoute, activeTab } = useAppStore();
-  return { pathname: activeTab === 'portal' ? portalRoute : adminRoute };
+  const pathname = usePathname();
+  return { pathname };
 }
 
 export function useParams() {
-  return {};
+  return useNextParams() || {};
 }
 
 export function Routes({ children }: { children: ReactNode }) { return <>{children}</>; }
