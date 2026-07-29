@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { useRouter } from '@/lib/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { useProAuth } from '@/lib/auth';
 import {
   Music, LayoutDashboard, Disc3, FileAudio, Send, PlusCircle, RefreshCw,
@@ -42,7 +42,8 @@ const INDUSTRY_NAV: NavSection[] = [
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { path, navigate } = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -51,11 +52,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">{section.title}</p>
           <div className="space-y-0.5">
             {section.items.map((item) => {
-              const active = path === item.to || path.startsWith(item.to + '/');
+              const active = pathname === item.to || pathname.startsWith(item.to + '/');
               return (
                 <button
                   key={item.to}
-                  onClick={() => { navigate(item.to); onNavigate?.(); }}
+                  onClick={() => { router.push(item.to); onNavigate?.(); }}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left ${
                     active
                       ? 'bg-neutral-900 text-white'
@@ -75,20 +76,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function ProPortalShell({ children }: { children: ReactNode; role?: string }) {
+  const router = useRouter();
   const { portalUser, signOut, loading } = useProAuth();
-  const { path, navigate } = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
   if (loading) return <div className="min-h-screen bg-neutral-50 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-200 border-t-neutral-400 rounded-full animate-spin" /></div>;
-  if (!portalUser) { navigate('/'); return <div className="min-h-screen bg-neutral-50 flex items-center justify-center"><p className="text-neutral-500">Redirecting…</p></div>; }
-  if (portalUser.status === 'pending') { navigate('/pro/pending'); return null; }
-  if (portalUser.status === 'suspended') { navigate('/pro/suspended'); return null; }
+  if (!portalUser) { router.push('/'); return <div className="min-h-screen bg-neutral-50 flex items-center justify-center"><p className="text-neutral-500">Redirecting…</p></div>; }
+  if (portalUser.status === 'pending') { router.push('/pro/pending'); return null; }
+  if (portalUser.status === 'suspended') { router.push('/pro/suspended'); return null; }
 
   const handleSignOut = () => {
     signOut();
     toast('success', 'Signed out');
-    navigate('/');
+    router.push('/');
   };
 
   return (
@@ -107,7 +108,7 @@ export function ProPortalShell({ children }: { children: ReactNode; role?: strin
             <span className="px-2 py-1 rounded-full bg-neutral-100 text-neutral-600 font-medium">Industry & Sync</span>
             {portalUser.org_name && <span className="text-neutral-400 truncate">{portalUser.org_name}</span>}
           </div>
-          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors mt-2 w-full">
+          <button onClick={() => router.push('/')} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors mt-2 w-full">
             <ExternalLink size={12} /> Back to Home
           </button>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { useRouter } from '@/lib/router';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Search, FileText, ScrollText, MessageSquare,
   Bell, Menu, X, ChevronDown, ExternalLink, Music, Shield,
@@ -36,7 +36,8 @@ const navSections: NavSection[] = [
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { path, navigate } = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -45,11 +46,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">{section.title}</p>
           <div className="space-y-0.5">
             {section.items.map((item) => {
-              const active = path === item.to || (item.to !== '/sync' && path.startsWith(item.to));
+              const active = pathname === item.to || (item.to !== '/sync' && pathname.startsWith(item.to));
               return (
                 <button
                   key={item.to}
-                  onClick={() => { navigate(item.to); onNavigate?.(); }}
+                  onClick={() => { router.push(item.to); onNavigate?.(); }}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left ${
                     active
                       ? 'bg-neutral-900 text-white'
@@ -69,7 +70,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function SyncPortalShell({ children, role }: { children: ReactNode; role?: SyncRole }) {
-  const { navigate } = useRouter();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const currentRole: SyncRole = role ?? 'Sync Agent';
@@ -96,7 +97,7 @@ export function SyncPortalShell({ children, role }: { children: ReactNode; role?
             <Shield size={14} className="text-neutral-400" />
             <span className={`px-2 py-1 rounded-full font-medium ${roleBadgeColors[currentRole]}`}>{currentRole}</span>
           </div>
-          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors w-full">
+          <button onClick={() => router.push('/')} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors w-full">
             <ExternalLink size={12} /> Back to Gate
           </button>
         </div>
@@ -164,7 +165,7 @@ export function SyncPortalShell({ children, role }: { children: ReactNode; role?
                       <p className="text-sm font-medium truncate text-neutral-900">Sync Agent</p>
                       <p className="text-xs text-neutral-400 truncate">sync@label.com</p>
                     </div>
-                    <button onClick={() => { navigate('/'); setShowProfile(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-50">
+                    <button onClick={() => { router.push('/'); setShowProfile(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-50">
                       <ExternalLink size={14} /> Back to Gate
                     </button>
                   </div>
