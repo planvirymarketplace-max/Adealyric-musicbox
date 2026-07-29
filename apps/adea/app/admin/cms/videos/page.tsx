@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import VideosPage from '@/components/dashboard/pages/cms/VideosPage';
 
 export default function AdminVideosPage() {
-  return <AdminPortal />;
+  return (
+    <AdminLayout>
+      <VideosPage />
+    </AdminLayout>
+  );
 }

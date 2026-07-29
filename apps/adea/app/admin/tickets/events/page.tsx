@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import TicketEventsPage from '@/components/dashboard/pages/tickets/TicketEventsPage';
 
 export default function AdminTicketEventsPage() {
-  return <AdminPortal />;
+  return (
+    <AdminLayout>
+      <TicketEventsPage />
+    </AdminLayout>
+  );
 }

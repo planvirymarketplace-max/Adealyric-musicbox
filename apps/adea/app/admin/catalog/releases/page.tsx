@@ -1,5 +1,10 @@
-import { AdminPortal } from '@/components/dashboard/AdminPortal';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import ReleasesPage from '@/components/dashboard/pages/catalog/ReleasesPage';
 
 export default function AdminReleasesPage() {
-  return <AdminPortal />;
+  return (
+    <AdminLayout>
+      <ReleasesPage />
+    </AdminLayout>
+  );
 }

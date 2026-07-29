@@ -1,9 +1,7 @@
 'use client';
 
 import { type ReactNode, useState } from 'react';
-import { useRouter } from '@/lib/router';
-import { useProAuth } from '@/lib/auth';
-import { toast } from '@/components/ui/Toast';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Disc3,
@@ -195,7 +193,8 @@ const navSections: { title: string; collapsible: boolean; items: NavItem[] }[] =
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { path, navigate } = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
   // Track which sections are expanded
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ Overview: true, Create: true, Website: true, CMS: true, Shop: true, Discography: true });
 
@@ -233,11 +232,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           {(!section.collapsible || expanded[section.title]) && (
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const isActive = path === item.to || (item.to !== '/admin' && path.startsWith(item.to));
+                const isActive = pathname === item.to || (item.to !== '/admin' && pathname.startsWith(item.to));
                 return (
                   <button
                     key={item.to}
-                    onClick={() => { navigate(item.to); onNavigate?.(); }}
+                    onClick={() => { router.push(item.to); onNavigate?.(); }}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left ${
                       isActive
                         ? 'bg-neutral-900 text-white'
@@ -257,11 +256,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             <div className="mt-2 px-3 space-y-1">
               <p className="text-xs font-semibold text-neutral-500 mb-2">Action Cards</p>
               {actionCards.map(card => {
-                const isCardActive = path === card.route;
+                const isCardActive = pathname === card.route;
                 return (
                   <button
                     key={card.label}
-                    onClick={() => { navigate(card.route); onNavigate?.(); }}
+                    onClick={() => { router.push(card.route); onNavigate?.(); }}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors w-full text-left ${
                       isCardActive ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
                     }`}
@@ -277,7 +276,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       ))}
       {/* Settings */}
       <div className="mb-2">
-        <button onClick={() => { navigate('/admin/settings'); onNavigate?.(); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left ${path === '/admin/settings' ? 'bg-neutral-900 text-white' : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'}`}>
+        <button onClick={() => { router.push('/admin/settings'); onNavigate?.(); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left ${pathname === '/admin/settings' ? 'bg-neutral-900 text-white' : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'}`}>
           <Settings size={18} /><span>Settings</span>
         </button>
       </div>
@@ -286,8 +285,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function AdminLayout({ children }: { children: ReactNode }) {
-  const { signOut } = useProAuth();
-  const { navigate } = useRouter();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -302,23 +300,23 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </div>
         <SidebarContent />
         <div className="px-6 py-4 border-t border-neutral-200 space-y-2">
-          <button onClick={async () => { await signOut(); toast('success', 'Signed out'); navigate('/pro/login'); }} className="flex items-center gap-2 text-xs text-red-500 hover:text-red-700 transition-colors w-full">
+          <button onClick={() => router.push('/')} className="flex items-center gap-2 text-xs text-red-500 hover:text-red-700 transition-colors w-full">
             <LogOut size={12} /> Sign Out
           </button>
           <p className="text-xs font-semibold text-neutral-500 mt-3">Switch Portal</p>
-          <button onClick={() => navigate('/portal')} className="flex items-center gap-2 text-xs text-emerald-600 hover:text-emerald-800 transition-colors">
+          <button onClick={() => router.push('/portal')} className="flex items-center gap-2 text-xs text-emerald-600 hover:text-emerald-800 transition-colors">
             <ExternalLink size={12} /> Fan Portal
           </button>
-          <button onClick={() => navigate('/pro')} className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 transition-colors">
+          <button onClick={() => router.push('/pro')} className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 transition-colors">
             <ExternalLink size={12} /> Industry Portal
           </button>
-          <button onClick={() => navigate('/sync')} className="flex items-center gap-2 text-xs text-violet-600 hover:text-violet-800 transition-colors">
+          <button onClick={() => router.push('/sync')} className="flex items-center gap-2 text-xs text-violet-600 hover:text-violet-800 transition-colors">
             <ExternalLink size={12} /> Sync Portal
           </button>
-          <button onClick={() => navigate('/writer')} className="flex items-center gap-2 text-xs text-amber-600 hover:text-amber-800 transition-colors">
+          <button onClick={() => router.push('/writer')} className="flex items-center gap-2 text-xs text-amber-600 hover:text-amber-800 transition-colors">
             <ExternalLink size={12} /> Writer Portal
           </button>
-          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors">
+          <button onClick={() => router.push('/')} className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900 transition-colors">
             <ExternalLink size={12} /> Back to Gate
           </button>
           <p className="text-xs text-neutral-400 mt-1">Admin Portal v3.0</p>
