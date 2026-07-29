@@ -7,7 +7,7 @@ import { Card } from '@/components/dashboard/ui/Card';
 import { StatusBadge } from '@/components/dashboard/ui/Badge';
 import { LoadingState, EmptyState } from '@/components/dashboard/ui/States';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDateTime } from '@/lib/dashboard/format';
 import { toast } from '@/components/dashboard/ui/Toast';
 import type { TicketOrder, TicketEvent, TicketTier } from '@/lib/dashboard/database';

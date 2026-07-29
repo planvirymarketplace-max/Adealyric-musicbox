@@ -10,7 +10,7 @@ import { LoadingState, ErrorState, EmptyState } from '@/components/dashboard/ui/
 import { Field, Input, Select, Textarea } from '@/components/dashboard/ui/Form';
 import { Modal } from '@/components/dashboard/ui/Modal';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate, formatDateTime, timeAgo, centsToInput, inputToCents } from '@/lib/dashboard/format';
 import type { CrmContact, CrmActivity } from '@/lib/dashboard/database';
 

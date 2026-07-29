@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Video as VideoIcon, X, Play } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import type { CmsGallery, CmsVideo } from '@/lib/dashboard/database';
 
 export default function PortalVideosPage() {

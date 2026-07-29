@@ -7,7 +7,7 @@ import { Badge } from '@/components/dashboard/ui/Badge';
 import { LoadingState, EmptyState } from '@/components/dashboard/ui/States';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { Input } from '@/components/dashboard/ui/Form';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/dashboard/format';
 import type { FanProfile } from '@/lib/dashboard/database';
 

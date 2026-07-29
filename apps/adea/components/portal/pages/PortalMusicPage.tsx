@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@/lib/react-router-stub';
 import { Disc3, Music, Search } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatDate, formatCents } from '@/lib/dashboard/format';
 import { Badge } from '@/components/dashboard/ui/Badge';
 import { Input } from '@/components/dashboard/ui/Form';

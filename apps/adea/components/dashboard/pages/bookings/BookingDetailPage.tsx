@@ -10,7 +10,7 @@ import { LoadingState, ErrorState } from '@/components/dashboard/ui/States';
 import { Field, Input, Select, Textarea } from '@/components/dashboard/ui/Form';
 import { Modal } from '@/components/dashboard/ui/Modal';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate, formatDateTime, centsToInput, inputToCents } from '@/lib/dashboard/format';
 import type { Booking, BookingPayment } from '@/lib/dashboard/database';
 

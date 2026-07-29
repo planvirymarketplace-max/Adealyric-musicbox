@@ -8,7 +8,7 @@ import { Badge } from '@/components/dashboard/ui/Badge';
 import { Select } from '@/components/dashboard/ui/Form';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import type { CrmContact } from '@/lib/dashboard/database';
 
 // CSV parser — handles quoted fields, commas inside quotes, newlines inside quotes

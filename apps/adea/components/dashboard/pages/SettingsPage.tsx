@@ -7,7 +7,7 @@ import { Card } from '@/components/dashboard/ui/Card';
 import { Field, Input, Textarea, Select } from '@/components/dashboard/ui/Form';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: <User size={16} /> },

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Image as ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import type { CmsGallery, CmsImage } from '@/lib/dashboard/database';
 
 export default function PortalGalleryPage() {

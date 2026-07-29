@@ -7,7 +7,7 @@ import { Card, StatCard } from '@/components/dashboard/ui/Card';
 import { StatusBadge } from '@/components/dashboard/ui/Badge';
 import { LoadingState } from '@/components/dashboard/ui/States';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate } from '@/lib/dashboard/format';
 import type { Booking, BookingInquiry, CrmContact, Order } from '@/lib/dashboard/database';
 

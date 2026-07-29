@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { Modal } from '@/components/dashboard/ui/Modal';
 import { Field, Select } from '@/components/dashboard/ui/Form';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatDateTime } from '@/lib/dashboard/format';
 import type { PlatformConnection, PlatformProvider, Artist } from '@/lib/dashboard/database';
 

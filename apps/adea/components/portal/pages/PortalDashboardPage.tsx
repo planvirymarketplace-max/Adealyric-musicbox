@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, Navigate } from '@/lib/react-router-stub';
 import { Ticket, Heart, User, Mail, MapPin } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate } from '@/lib/dashboard/format';
 import { StatusBadge } from '@/components/dashboard/ui/Badge';
 import { Card } from '@/components/dashboard/ui/Card';

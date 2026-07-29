@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from '@/lib/react-router-stub';
 import { ArrowLeft, Disc3, Download, DollarSign, Gift, Lock, ShoppingBag } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate } from '@/lib/dashboard/format';
 import { AudioPlayer } from '@/components/dashboard/ui/AudioPlayer';
 import { Badge } from '@/components/dashboard/ui/Badge';

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from '@/lib/react-router-stub';
 import { Calendar, MapPin, Clock, ArrowLeft, Ticket as TicketIcon, AlertCircle } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate, inputToCents } from '@/lib/dashboard/format';
 import { toast } from '@/components/dashboard/ui/Toast';
 import { Button } from '@/components/dashboard/ui/Button';

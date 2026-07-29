@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { Modal } from '@/components/dashboard/ui/Modal';
 import { Field, Input, Select, Textarea } from '@/components/dashboard/ui/Form';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatCents, formatDate, centsToInput, inputToCents } from '@/lib/dashboard/format';
 import type { Booking } from '@/lib/dashboard/database';
 

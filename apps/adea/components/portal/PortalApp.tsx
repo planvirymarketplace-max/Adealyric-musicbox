@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Music, Calendar, Image as ImageIcon, Video, User, Home, LogOut, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/dashboard/ui/Toast';
 import { type ReactNode } from 'react';
 

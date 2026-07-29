@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@/lib/react-router-stub';
 import { Calendar, MapPin } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/dashboard/format';
 import type { TicketEvent } from '@/lib/dashboard/database';
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from '@/lib/react-router-stub';
 import { Mail, Lock, Music } from 'lucide-react';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/dashboard/ui/Toast';
 import { Button } from '@/components/dashboard/ui/Button';
 import { Field, Input } from '@/components/dashboard/ui/Form';

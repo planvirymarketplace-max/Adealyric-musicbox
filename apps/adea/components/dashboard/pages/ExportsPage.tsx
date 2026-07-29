@@ -6,7 +6,7 @@ import { Button } from '@/components/dashboard/ui/Button';
 import { Card } from '@/components/dashboard/ui/Card';
 import { PageHeader } from '@/components/dashboard/layout/PageHeader';
 import { toast } from '@/components/dashboard/ui/Toast';
-import { supabase } from '@/lib/supabase-stub';
+import { supabase } from '@/lib/supabase';
 
 const EXPORTS = [
   { table: 'bookings', label: 'Bookings', desc: 'All booking records with status, fees, and dates' },
