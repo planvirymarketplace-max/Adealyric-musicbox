@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { SiteHeader, SiteFooter, PageIntro } from "./SiteChrome";
 import { useAppStore } from "@/lib/store";
 import { RELEASES, TOUR, type ReleaseType } from "@/lib/catalog";
@@ -21,10 +22,11 @@ function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
    ===================================================================== */
 
 export function DiscographyPage() {
+  const router = useRouter();
   const [filter, setFilter] = useState<"All" | ReleaseType>("All");
   const [view, setView] = useState<"path" | "grid">("path");
   const [hover, setHover] = useState<string | null>(null);
-  const { setDetailSlug, setActiveTab } = useAppStore();
+  const { setActiveTab } = useAppStore();
 
   const filtered = useMemo(() => {
     const list = filter === "All" ? RELEASES : RELEASES.filter((r) => r.type === filter);
@@ -97,7 +99,7 @@ export function DiscographyPage() {
                 return (
                   <li key={r.slug} onMouseEnter={() => setHover(r.slug)} className="group relative">
                     <button
-                      onClick={() => setDetailSlug(r.slug, "release")}
+                      onClick={() => router.push(`/music/${r.slug}`)}
                       className="relative flex w-full items-center justify-between gap-8 py-6 md:py-10 text-left cursor-pointer"
                     >
                       <div className="flex items-baseline gap-6 md:gap-12">
@@ -109,7 +111,7 @@ export function DiscographyPage() {
                         <span className="text-eyebrow text-black">{r.year}</span>
                         <span className="hidden text-eyebrow text-black md:inline">{r.runtime}</span>
                         <button
-                          onClick={(e) => { e.stopPropagation(); setActiveTab("shop"); }}
+                          onClick={(e) => { e.stopPropagation(); router.push("/shop"); }}
                           className="hidden md:inline-flex items-center gap-2 text-eyebrow text-black hover:text-black transition-colors cursor-pointer"
                         >Buy ↗</button>
                         <span className={`grid h-12 w-12 place-items-center border border-black/10 transition-all duration-500 ${isActive ? "rotate-45 border-black bg-black text-white" : "text-black"}`}>
@@ -131,7 +133,7 @@ export function DiscographyPage() {
         <section className="relative z-10 bg-white px-6 py-20 md:px-12 md:py-32">
           <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-4 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
             {filtered.map((r) => (
-              <button key={r.slug} onClick={() => setDetailSlug(r.slug, "release")} className="group relative block aspect-square overflow-hidden border border-black/10 cursor-pointer">
+              <button key={r.slug} onClick={() => router.push(`/music/${r.slug}`)} className="group relative block aspect-square overflow-hidden border border-black/10 cursor-pointer">
                 <img src={r.cover} alt={r.title} className="absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-between p-5">
@@ -185,7 +187,7 @@ export function DiscographyPage() {
               <div className="mt-6 text-eyebrow text-black">{track.release.type} · {track.release.year}</div>
               <h3 className="mt-2 text-display text-4xl text-black md:text-5xl">{track.title}</h3>
               <button
-                onClick={() => { setDetailSlug(track.release.slug, "release"); }}
+                onClick={() => { router.push(`/music/${track.release.slug}`); }}
                 className="mt-2 inline-block text-black hover:text-black cursor-pointer"
               >
                 from <span className="italic">{track.release.title}</span>
@@ -239,15 +241,17 @@ export function DiscographyPage() {
    RELEASE DETAIL PAGE  (keeps its own PageShell)
    ===================================================================== */
 
-export function ReleaseDetailPage() {
+export function ReleaseDetailPage({ slug }: { slug?: string }) {
+  const router = useRouter();
   const { detailSlug, setDetailSlug, setActiveTab } = useAppStore();
-  const r = RELEASES.find((x) => x.slug === detailSlug);
+  const activeSlug = slug || detailSlug;
+  const r = RELEASES.find((x) => x.slug === activeSlug);
   if (!r) return null;
   const idx = RELEASES.findIndex((x) => x.slug === r.slug);
   const prev = RELEASES[idx - 1];
   const next = RELEASES[idx + 1];
 
-  const goToShop = () => { setDetailSlug(null, null); setActiveTab("shop"); };
+  const goToShop = () => { router.push("/shop"); };
 
   return (
     <>
@@ -263,7 +267,7 @@ export function ReleaseDetailPage() {
             </div>
           </div>
           <div className="md:col-span-7">
-            <button onClick={() => setDetailSlug(null, null)} className="text-eyebrow text-ash hover:text-bone cursor-pointer">
+            <button onClick={() => router.push("/music")} className="text-eyebrow text-ash hover:text-bone cursor-pointer">
               ← Discography
             </button>
             <div className="mt-6 flex items-center gap-6 text-eyebrow text-ash">
@@ -315,7 +319,7 @@ export function ReleaseDetailPage() {
       {/* WHITE CONTENT — Prev/Next */}
       <section className="grid grid-cols-1 border-t border-black/10 bg-white md:grid-cols-2">
         {prev ? (
-          <button onClick={() => setDetailSlug(prev.slug, "release")} className="group relative flex flex-col justify-between gap-6 border-b border-black/10 p-8 transition-colors hover:bg-black/[0.02] md:border-b-0 md:border-r md:p-12 cursor-pointer text-left">
+          <button onClick={() => router.push(`/music/${prev.slug}`)} className="group relative flex flex-col justify-between gap-6 border-b border-black/10 p-8 transition-colors hover:bg-black/[0.02] md:border-b-0 md:border-r md:p-12 cursor-pointer text-left">
             <div className="text-eyebrow text-black">← Previous</div>
             <div>
               <div className="text-eyebrow text-black">{prev.year} · {prev.type}</div>
@@ -324,7 +328,7 @@ export function ReleaseDetailPage() {
           </button>
         ) : <div className="hidden md:block" />}
         {next ? (
-          <button onClick={() => setDetailSlug(next.slug, "release")} className="group relative flex flex-col items-end justify-between gap-6 p-8 transition-colors hover:bg-black/[0.02] md:p-12 cursor-pointer text-right">
+          <button onClick={() => router.push(`/music/${next.slug}`)} className="group relative flex flex-col items-end justify-between gap-6 p-8 transition-colors hover:bg-black/[0.02] md:p-12 cursor-pointer text-right">
             <div className="text-eyebrow text-black">Next →</div>
             <div className="text-right">
               <div className="text-eyebrow text-black">{next.year} · {next.type}</div>

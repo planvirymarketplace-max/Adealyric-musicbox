@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 import { PlatformIcon } from "./SiteChrome";
 import {
@@ -362,7 +363,8 @@ function ShopAllView({ onSelectProduct, onQuickAdd }: { onSelectProduct: (p: Sho
    ═══════════════════════════════════════════════════ */
 
 export function ShopPage() {
-  const { setDetailSlug, addToCart, cartCount, shopSubPath, setShopSubPath } = useAppStore();
+  const router = useRouter();
+  const { addToCart, cartCount, shopSubPath } = useAppStore();
   const [shopPath, setShopPath] = useState<ShopPath>((shopSubPath as ShopPath) || "albums");
 
   // Sync local state with store when shopSubPath changes (e.g. from breadcrumb)
@@ -372,8 +374,8 @@ export function ShopPage() {
     }
   }, [shopSubPath]);
 
-  const openAlbum = useCallback((album: ShopAlbum) => { setDetailSlug(album.slug, "album"); }, [setDetailSlug]);
-  const openProduct = useCallback((p: ShopProduct) => { setDetailSlug(p.slug, "product"); }, [setDetailSlug]);
+  const openAlbum = useCallback((album: ShopAlbum) => { router.push(`/shop/${album.slug}`); }, [router]);
+  const openProduct = useCallback((p: ShopProduct) => { router.push(`/shop/${p.slug}`); }, [router]);
   const handleQuickAdd = useCallback(() => { addToCart(); }, [addToCart]);
 
   return (
@@ -429,15 +431,17 @@ function AlbumActionList({ album, onStream, onAddToCart }: { album: ShopAlbum; o
   );
 }
 
-export function AlbumDetailPage() {
+export function AlbumDetailPage({ slug }: { slug?: string }) {
+  const router = useRouter();
   const { detailSlug, setDetailSlug, addToCart, setActiveTab, setShopSubPath } = useAppStore();
   const [streamOpen, setStreamOpen] = useState(false);
   const [streamTitle, setStreamTitle] = useState("");
   const [sidebarCats, setSidebarCats] = useState<ShopCategory[] | null>(null);
 
-  const album = useMemo(() => SHOP_ALBUMS.find((a) => a.slug === detailSlug), [detailSlug]);
+  const activeSlug = slug || detailSlug;
+  const album = useMemo(() => SHOP_ALBUMS.find((a) => a.slug === activeSlug), [activeSlug]);
 
-  const openProduct = useCallback((p: ShopProduct) => { setDetailSlug(p.slug, "product"); }, [setDetailSlug]);
+  const openProduct = useCallback((p: ShopProduct) => { router.push(`/shop/${p.slug}`); }, [router]);
   const handleQuickAdd = useCallback(() => { addToCart(); }, [addToCart]);
   const openStream = useCallback((title: string) => { setStreamTitle(title); setStreamOpen(true); }, []);
 
@@ -451,14 +455,14 @@ export function AlbumDetailPage() {
         <div className="mx-auto max-w-[1400px]">
           {/* Top nav links */}
           <div className="mb-8 flex items-center gap-6">
-            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath(null); }} className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
+            <button onClick={() => { router.push("/shop"); }} className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
               <ArrowLeft className="h-4 w-4" />
               Shop
             </button>
-            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("shop-all"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
+            <button onClick={() => { router.push("/shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
               Shop All
             </button>
-            <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("collections"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
+            <button onClick={() => { router.push("/shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">
               Collections
             </button>
           </div>
@@ -555,14 +559,16 @@ export function AlbumDetailPage() {
    PRODUCT DETAIL PAGE
    ═══════════════════════════════════════════════════ */
 
-export function ProductDetailPage() {
+export function ProductDetailPage({ slug }: { slug?: string }) {
+  const router = useRouter();
   const { detailSlug, setDetailSlug, addToCart, setActiveTab, setShopSubPath } = useAppStore();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [notifyEmail, setNotifyEmail] = useState("");
   const [notifySent, setNotifySent] = useState(false);
   const [sidebarCats, setSidebarCats] = useState<ShopCategory[] | null>(null);
 
-  const product = useMemo(() => ALL_PRODUCTS.find((p) => p.slug === detailSlug), [detailSlug]);
+  const activeSlug = slug || detailSlug;
+  const product = useMemo(() => ALL_PRODUCTS.find((p) => p.slug === activeSlug), [activeSlug]);
   const available = product ? product.stock > 0 : false;
   const enriched = product ? enrichProduct(product as ShopProduct) : null;
 
@@ -572,10 +578,10 @@ export function ProductDetailPage() {
   }, [product]);
 
   const openRelated = useCallback((p: EnrichedProduct) => {
-    setDetailSlug(p.slug, "product");
+    router.push(`/shop/${p.slug}`);
     setSelectedSize(null);
     setNotifySent(false);
-  }, [setDetailSlug]);
+  }, [router]);
 
   const handleAddToCart = useCallback(() => { if (available) addToCart(); }, [available, addToCart]);
   const handleNotify = useCallback(() => { if (notifyEmail) setNotifySent(true); }, [notifyEmail]);
@@ -592,16 +598,16 @@ export function ProductDetailPage() {
           <button
             onClick={() => {
               const parentAlbum = SHOP_ALBUMS.find((a) => a.slug === product.albumSlug);
-              if (parentAlbum) { setDetailSlug(parentAlbum.slug, "album"); }
-              else { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath(null); }
+              if (parentAlbum) { router.push(`/shop/${parentAlbum.slug}`); }
+              else { router.push("/shop"); }
             }}
             className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
           </button>
-          <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("shop-all"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">Shop All</button>
-          <button onClick={() => { setDetailSlug(null, null); setActiveTab("shop"); setShopSubPath("collections"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">Collections</button>
+          <button onClick={() => { router.push("/shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">Shop All</button>
+          <button onClick={() => { router.push("/shop"); }} className="text-[11px] uppercase tracking-[0.2em] text-black hover:text-black transition-colors cursor-pointer">Collections</button>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[180px_1fr_1fr] md:gap-0">

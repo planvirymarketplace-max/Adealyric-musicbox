@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 import { LetterToMyFans } from "./LetterToMyFans";
 import { HomeBanner } from "./HomeBanner";
@@ -43,7 +44,7 @@ function useReveal<T extends HTMLElement>() {
 /* ---- Hero ---- */
 function Hero() {
   const [t, setT] = useState(0);
-  const { setActiveTab } = useAppStore();
+  const router = useRouter();
   useEffect(() => {
     const on = () => setT(window.scrollY);
     window.addEventListener("scroll", on, { passive: true });
@@ -86,7 +87,7 @@ function Hero() {
             style={{ animationDelay: "0.7s" }}
           >
             <button
-              onClick={() => setActiveTab("discography")}
+              onClick={() => router.push("/music")}
               className="group inline-flex items-center gap-4 border border-bone px-8 py-4 text-eyebrow text-bone transition-all hover:bg-bone hover:text-ink cursor-pointer"
             >
               <PlayIcon />
@@ -172,7 +173,7 @@ function FlipCard({ card, layout, index }: { card: (typeof NAME_CARDS)[0]; layou
 /* ---- Bio Section ---- */
 function BioSection() {
   const { ref, shown } = useReveal<HTMLDivElement>();
-  const { setActiveTab } = useAppStore();
+  const router = useRouter();
   return (
     <section id="bio" ref={ref} className="relative bg-white px-6 py-32 md:px-12 md:py-48">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
@@ -193,7 +194,7 @@ function BioSection() {
             ))}
           </div>
           <div className="mt-10">
-            <button onClick={() => setActiveTab("bio")} className="inline-flex items-center gap-4 text-eyebrow text-ink cursor-pointer">
+            <button onClick={() => router.push("/bio")} className="inline-flex items-center gap-4 text-eyebrow text-ink cursor-pointer">
               <span className="block h-px w-16 bg-ink" />
               Read the full story
             </button>
@@ -213,7 +214,7 @@ function StepRow({ step, left, index, total }: {
 }) {
   const { ref, shown } = useReveal<HTMLDivElement>();
   const vidRef = useRef<HTMLVideoElement>(null);
-  const { setActiveTab, setDetailSlug } = useAppStore();
+  const router = useRouter();
   const gradeOpacity = 0.35 + (index / (total - 1)) * 0.65;
   return (
     <div ref={ref} className="relative grid grid-cols-1 gap-8 py-16 md:grid-cols-2 md:py-24">
@@ -250,7 +251,7 @@ function StepRow({ step, left, index, total }: {
           <div className="mt-8 flex items-center gap-4">
             <span className="block h-px w-16 bg-bone" />
             <button
-              onClick={() => { setActiveTab("discography"); setDetailSlug(step.slug, "release"); }}
+              onClick={() => router.push(`/music/${step.slug}`)}
               className="text-eyebrow text-bone transition-opacity hover:opacity-70 cursor-pointer"
             >
               Detail
